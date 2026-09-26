@@ -22,9 +22,11 @@ Test an upgrade with existing settings, a saved credential, history, and diction
 
 The repository was renamed to `azhurb/pipeup` on 2026-09-26. Origin, package metadata, app source links, templates, active documentation, and stacked PR links use the new name. The fork relationship and upstream attribution are preserved.
 
-A maintainer must separately authorize outward changes:
+The repository description is "Voice input for desktop with your own speech and AI providers." Topics are `voice-input`, `speech-to-text`, `tauri`, `macos`, `windows`, `linux`, and `byok`, applied and verified on 2026-09-26.
 
-- Update the repository description and topics, and decide whether to enable Issues. Suggested description: "Voice input for desktop with your own speech and AI providers." Suggested topics: `voice-input`, `speech-to-text`, `tauri`, `macos`, `windows`, `linux`, `byok`.
+A maintainer must separately authorize remaining outward changes:
+
+- Decide whether to enable Issues.
 - Decide independently whether to detach the fork. Detachment is permanent and can remove repository metadata. Review the actual repository history and GitHub's current [detachment guidance](https://docs.github.com/en/pull-requests/how-tos/work-with-forks/detaching-a-fork) before authorizing it. A product rebrand does not require detachment.
 
 See GitHub's [rename guidance](https://docs.github.com/en/repositories/creating-and-managing-repositories/renaming-a-repository) for redirect behavior and exceptions. Name and trademark clearance still needs maintainer judgment.
