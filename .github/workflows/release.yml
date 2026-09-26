@@ -139,6 +139,8 @@ jobs:
 
             Disable Launch at Startup in the old app, quit it, and remove the old app copy after installing Pipeup. Keep the existing application data. Settings, credentials, history, and dictionary retain their existing storage identities. Re-enable Launch at Startup in Pipeup if needed.
 
+            macOS Accessibility may still list Pipeup as OpenTypeless after upgrading. If Pipeup is absent, enable the old-name entry. If paste still fails, follow the [permission recovery steps](https://github.com/${{ github.repository }}/blob/${{ github.event.inputs.tag || github.ref_name }}/docs/references/troubleshooting.md#macos-accessibility-lists-opentypeless-instead-of-pipeup).
+
             ## Before publishing this draft
 
             The maintainer must add the release highlights, verified platforms, and known issues after completing the [release checks](https://github.com/${{ github.repository }}/blob/${{ github.event.inputs.tag || github.ref_name }}/docs/references/release-preparation.md). Remove this draft-only section before publication.

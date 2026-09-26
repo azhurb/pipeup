@@ -68,6 +68,7 @@ describe('PermissionsStep (macOS)', () => {
     render(<PermissionsStep />)
     expect(screen.getByText('permissions.microphone.title')).toBeInTheDocument()
     expect(screen.getByText('permissions.accessibility.title')).toBeInTheDocument()
+    expect(screen.getByText('permissions.accessibility.settingsHint')).toBeInTheDocument()
   })
 
   it('mic Grant button triggers requestMicrophonePermission when not_determined', async () => {
@@ -103,6 +104,7 @@ describe('PermissionsStep (macOS)', () => {
     // Both cards are in granted state — no Grant button anywhere.
     expect(screen.queryAllByText('permissions.grant').length).toBe(0)
     expect(screen.getByText('permissions.microphone.grantedHint')).toBeInTheDocument()
+    expect(screen.queryByText('permissions.accessibility.settingsHint')).not.toBeInTheDocument()
   })
 
   it('AX Grant button calls requestAccessibilityPermission and re-checks', async () => {

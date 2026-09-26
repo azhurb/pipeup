@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect } from 'react'
 import { Mic, ShieldCheck, ShieldAlert } from 'lucide-react'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { useTranslation } from 'react-i18next'
@@ -21,7 +21,6 @@ export function PermissionsStep() {
   const setMicAuthStatus = useAppStore((s) => s.setMicAuthStatus)
   const accessibilityTrusted = useAppStore((s) => s.accessibilityTrusted)
   const setAccessibilityTrusted = useAppStore((s) => s.setAccessibilityTrusted)
-  const [axClicked, setAxClicked] = useState(false)
 
   // Sync from native state on mount so any grants done while the app was
   // backgrounded between steps are picked up.
@@ -43,7 +42,6 @@ export function PermissionsStep() {
   }, [micAuthStatus, setMicAuthStatus])
 
   const handleGrantAx = useCallback(async () => {
-    setAxClicked(true)
     await requestAccessibilityPermission()
     const trusted = await checkAccessibilityPermission()
     setAccessibilityTrusted(trusted)
@@ -143,11 +141,9 @@ export function PermissionsStep() {
                 {t('permissions.openSettings')}
               </button>
             </div>
-            {axClicked && (
-              <p className="text-[10px] text-text-tertiary mt-1.5 text-center">
-                {t('permissions.accessibility.afterClickHint')}
-              </p>
-            )}
+            <p className="text-[12px] text-text-secondary mt-2">
+              {t('permissions.accessibility.settingsHint')}
+            </p>
           </>
         )}
       </div>

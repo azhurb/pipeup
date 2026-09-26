@@ -37,9 +37,14 @@ export function AccessibilityBanner() {
         >
           <div className="flex items-center gap-2 px-4 py-2 bg-amber-500/10 border-b border-amber-500/20">
             <ShieldAlert size={14} className="text-amber-500 shrink-0" />
-            <span className="text-[12px] text-text-primary flex-1">
-              {t('settings.accessibilityRequired')} — {t('settings.accessibilityPermission')}
-            </span>
+            <div className="text-[12px] flex-1 min-w-0">
+              <p className="text-text-primary">
+                {t('settings.accessibilityPermission')}: {t('settings.accessibilityRequired')}
+              </p>
+              <p className="text-text-secondary mt-1">
+                {t('permissions.accessibility.settingsHint')}
+              </p>
+            </div>
             <button
               onClick={handleGrant}
               className="px-3 py-1 text-[11px] font-medium text-white bg-accent rounded-full border-none cursor-pointer hover:bg-accent-hover transition-colors shrink-0"

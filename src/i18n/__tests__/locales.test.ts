@@ -50,7 +50,7 @@ describe('i18n locale parity', () => {
     'permissions.accessibility.title',
     'permissions.accessibility.required',
     'permissions.accessibility.grantedHint',
-    'permissions.accessibility.afterClickHint',
+    'permissions.accessibility.settingsHint',
     'permissions.openSettings',
     'permissions.grant',
     'permissions.skip',

@@ -140,7 +140,7 @@
       "title": "Accessibility",
       "required": "Required to paste dictated text",
       "grantedHint": "Granted",
-      "afterClickHint": "Toggle Pipeup on in System Settings → Accessibility, then come back."
+      "settingsHint": "In System Settings > Privacy & Security > Accessibility, enable Pipeup. After an upgrade, macOS may list it as OpenTypeless, its previous name."
     },
     "openSettings": "Open System Settings",
     "grant": "Grant",

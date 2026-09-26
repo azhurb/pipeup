@@ -86,6 +86,7 @@ describe('AccessibilityBanner', () => {
     useAppStore.getState().setAccessibilityTrusted(false)
     render(<AccessibilityBanner />)
     expect(screen.getByText(/settings.accessibilityRequired/)).toBeInTheDocument()
+    expect(screen.getByText('permissions.accessibility.settingsHint')).toBeInTheDocument()
     expect(screen.getByText('settings.grantPermission')).toBeInTheDocument()
   })
 
