@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { Settings, History, LogOut, AppWindow } from 'lucide-react'
 
 interface Props {
@@ -5,6 +6,7 @@ interface Props {
 }
 
 export function CapsuleContextMenu({ onClose }: Props) {
+  const { t } = useTranslation()
   const openMainWindow = async (hash: string) => {
     try {
       const { WebviewWindow } = await import('@tauri-apps/api/webviewWindow')
@@ -23,7 +25,7 @@ export function CapsuleContextMenu({ onClose }: Props) {
   const items = [
     {
       icon: AppWindow,
-      label: 'Open Main Window',
+      label: t('capsule.openMainWindow'),
       onClick: () => {
         openMainWindow('#/')
         onClose()
@@ -32,7 +34,7 @@ export function CapsuleContextMenu({ onClose }: Props) {
     { type: 'separator' as const },
     {
       icon: Settings,
-      label: 'Settings',
+      label: t('capsule.settings'),
       onClick: () => {
         openMainWindow('#/settings')
         onClose()
@@ -40,7 +42,7 @@ export function CapsuleContextMenu({ onClose }: Props) {
     },
     {
       icon: History,
-      label: 'History',
+      label: t('capsule.history'),
       onClick: () => {
         openMainWindow('#/history')
         onClose()
@@ -49,7 +51,7 @@ export function CapsuleContextMenu({ onClose }: Props) {
     { type: 'separator' as const },
     {
       icon: LogOut,
-      label: 'Exit',
+      label: t('capsule.exit'),
       onClick: () => {
         import('@tauri-apps/api/core')
           .then(({ invoke }) => invoke('plugin:process|exit', { code: 0 }))

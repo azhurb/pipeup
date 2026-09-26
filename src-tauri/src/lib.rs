@@ -32,6 +32,8 @@ struct HotkeyModeCache(Arc<Mutex<String>>);
 /// Cached close_to_tray setting to avoid blocking I/O in the window close handler.
 struct CloseToTrayCache(Arc<Mutex<bool>>);
 
+struct UiLanguageCache(Mutex<String>);
+
 /// The app-wide pooled HTTP client. `reqwest::Client` is `Arc`-backed, so
 /// clones share one connection pool and its warm TLS sessions; building a fresh
 /// client per call (as every provider and command used to) throws that away and
@@ -59,13 +61,24 @@ fn build_tray_menu(
     is_recording: bool,
     window_visible: bool,
 ) -> Result<Menu<tauri::Wry>, Box<dyn std::error::Error>> {
+    let chinese = app
+        .try_state::<UiLanguageCache>()
+        .map(|state| {
+            state
+                .0
+                .lock()
+                .unwrap_or_else(|e| e.into_inner())
+                .starts_with("zh")
+        })
+        .unwrap_or(false);
+    let label = |en: &'static str, zh: &'static str| if chinese { zh } else { en };
     let show_hide = MenuItem::with_id(
         app,
         "show_hide",
         if window_visible {
-            "Hide Window"
+            label("Hide Window", "隐藏窗口")
         } else {
-            "Show Window"
+            label("Show Window", "打开 Pipeup")
         },
         true,
         None::<&str>,
@@ -75,19 +88,37 @@ fn build_tray_menu(
         app,
         "record",
         if is_recording {
-            "Stop Recording"
+            label("Stop Recording", "停止听写")
         } else {
-            "Start Recording"
+            label("Start Recording", "开始听写")
         },
         true,
         None::<&str>,
     )?;
     let sep2 = PredefinedMenuItem::separator(app)?;
-    let settings = MenuItem::with_id(app, "settings", "Settings", true, None::<&str>)?;
-    let history = MenuItem::with_id(app, "history", "History", true, None::<&str>)?;
+    let settings = MenuItem::with_id(
+        app,
+        "settings",
+        label("Settings", "设置"),
+        true,
+        None::<&str>,
+    )?;
+    let history = MenuItem::with_id(
+        app,
+        "history",
+        label("History", "历史记录"),
+        true,
+        None::<&str>,
+    )?;
     let sep3 = PredefinedMenuItem::separator(app)?;
-    let about = MenuItem::with_id(app, "about", "About Pipeup", true, None::<&str>)?;
-    let quit = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
+    let about = MenuItem::with_id(
+        app,
+        "about",
+        label("About Pipeup", "关于 Pipeup"),
+        true,
+        None::<&str>,
+    )?;
+    let quit = MenuItem::with_id(app, "quit", label("Quit", "退出"), true, None::<&str>)?;
 
     let menu = Menu::with_items(
         app,
@@ -218,6 +249,10 @@ async fn update_config(
     }
     *cache.0.lock().unwrap_or_else(|e| e.into_inner()) = config.hotkey_mode.clone();
     *close_tray_cache.0.lock().unwrap_or_else(|e| e.into_inner()) = config.close_to_tray;
+    if let Some(language) = app.try_state::<UiLanguageCache>() {
+        *language.0.lock().unwrap_or_else(|e| e.into_inner()) = config.ui_language.clone();
+    }
+    refresh_tray(&app);
     // Apply the (possibly lowered) history retention immediately, so the user
     // sees the setting take effect on Save instead of at next launch. A failed
     // DELETE must not fail the save — the config itself is already persisted.
@@ -1424,6 +1459,9 @@ pub fn run() {
             app.manage(history_store);
             app.manage(dictionary_store);
             app.manage(pipeline_handle);
+            app.manage(UiLanguageCache(Mutex::new(
+                initial_config.ui_language.clone(),
+            )));
             app.manage(HotkeyModeCache(Arc::new(Mutex::new(
                 initial_config.hotkey_mode.clone(),
             ))));

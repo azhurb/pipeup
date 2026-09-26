@@ -68,12 +68,14 @@ export function DictionaryPane() {
           value={word}
           onChange={(e) => setWord(e.target.value)}
           placeholder={t('dictionary.word')}
+          aria-label={t('dictionary.word')}
           className="flex-1 px-3 py-2.5 bg-bg-secondary border border-border rounded-[10px] text-[13px] text-text-primary outline-none focus:border-border-focus transition-colors"
         />
         <input
           value={pronunciation}
           onChange={(e) => setPronunciation(e.target.value)}
           placeholder={t('dictionary.pronunciationOptional')}
+          aria-label={t('dictionary.pronunciationOptional')}
           className="flex-1 px-3 py-2.5 bg-bg-secondary border border-border rounded-[10px] text-[13px] text-text-primary outline-none focus:border-border-focus transition-colors"
         />
         <button
@@ -136,6 +138,10 @@ export function DictionaryPane() {
                   <td className="px-3 py-2.5">
                     <button
                       onClick={() => handleRemove(entry.id)}
+                      aria-label={t('dictionary.removeWord', {
+                        word: entry.word,
+                        defaultValue: 'Remove {{word}}',
+                      })}
                       className="p-1 rounded-[6px] hover:bg-bg-tertiary transition-colors bg-transparent border-none cursor-pointer text-text-tertiary hover:text-error"
                     >
                       <Trash2 size={14} />

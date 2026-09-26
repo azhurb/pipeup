@@ -14,6 +14,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, waitFor, act, cleanup } from '@testing-library/react'
 import React from 'react'
+import { beginHotkeyCapture } from '../../../lib/hotkeyCapture'
 import { useAppStore } from '../../../stores/appStore'
 
 // Clean up the DOM after each test so repeated render() calls don't leave
@@ -44,6 +45,7 @@ const MOTION_PROPS = new Set([
 ])
 
 vi.mock('framer-motion', () => ({
+  useReducedMotion: () => false,
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   motion: new Proxy(
     {},
@@ -104,15 +106,14 @@ vi.mock('@tauri-apps/plugin-opener', () => ({ openUrl: vi.fn() }))
 
 // ─── Mock @tauri-apps/api/app ───────────────────────────────────────────────
 // AboutPane reads the version from the bundle; there is no IPC under vitest.
-vi.mock('@tauri-apps/api/app', () => ({
-  getVersion: vi.fn().mockResolvedValue('9.9.9'),
-}))
+vi.mock('@tauri-apps/api/app', () => ({ getVersion: vi.fn().mockResolvedValue('9.9.9') }))
 
 // ─── Import components AFTER mocks ───────────────────────────────────────────
 import { Settings } from '../index'
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 function resetStore() {
+  window.history.replaceState(null, '', '#/settings')
   useAppStore.setState(useAppStore.getInitialState())
 }
 
@@ -136,6 +137,7 @@ function clickSidebarItem(label: string) {
   const btn = (sidebarSpan ?? spans[0]).closest('[data-motion="button"], button')
   if (btn) fireEvent.click(btn)
   else fireEvent.click(spans[0])
+  act(() => window.dispatchEvent(new HashChangeEvent('hashchange')))
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -147,14 +149,14 @@ describe('Settings tab switching', () => {
     seedSavedConfig()
   })
 
-  it('initial render shows the General pane (with hotkey section)', () => {
+  it('initial render shows appearance in General', () => {
     renderSettings()
-    expect(screen.getByText('settings.hotkey')).toBeDefined()
+    expect(screen.getByText('settings.appearance')).toBeDefined()
   })
 
   it('shows STT provider fields after clicking Speech Recognition', () => {
     renderSettings()
-    clickSidebarItem('settings.speechRecognition')
+    clickSidebarItem('settings.dictation')
     expect(screen.getByText('settings.provider')).toBeDefined()
     expect(screen.getByText('settings.sttLanguages')).toBeDefined()
   })
@@ -165,10 +167,10 @@ describe('Settings tab switching', () => {
     expect(screen.getByText('settings.enableAiPolish')).toBeDefined()
   })
 
-  it('shows the dictionary input placeholder after clicking Dictionary', () => {
+  it('shows history retention in Privacy', () => {
     renderSettings()
-    clickSidebarItem('settings.dictionary')
-    expect(screen.getByPlaceholderText('dictionary.word')).toBeDefined()
+    clickSidebarItem('settings.privacy')
+    expect(screen.getByText('settings.keepHistoryFor')).toBeDefined()
   })
 
   it('shows the version info section after clicking About', () => {
@@ -191,13 +193,13 @@ describe('Settings tab switching', () => {
     expect(screen.getByText('settings.enableAiPolish')).toBeDefined()
 
     clickSidebarItem('settings.general')
-    expect(screen.getByText('settings.hotkey')).toBeDefined()
+    expect(screen.getByText('settings.appearance')).toBeDefined()
   })
 
   it('updates the title bar after switching tabs', () => {
     renderSettings()
-    clickSidebarItem('settings.dictionary')
-    const titles = screen.getAllByText('settings.dictionary')
+    clickSidebarItem('settings.privacy')
+    const titles = screen.getAllByText('settings.privacy')
     // At least twice: sidebar nav and title bar h2.
     expect(titles.length).toBeGreaterThanOrEqual(2)
   })
@@ -212,15 +214,15 @@ describe('Settings animation structure', () => {
     seedSavedConfig()
   })
 
-  it('motion wrapper renders pane content', () => {
-    const { container } = renderSettings()
-    // Our mock tags motion elements with a data-motion attribute.
-    expect(container.querySelector('[data-motion]')).not.toBeNull()
+  it('opens About directly from its deep link', () => {
+    window.history.replaceState(null, '', '#/settings/about')
+    renderSettings()
+    expect(screen.getByText('settings.openSource')).toBeDefined()
   })
 
   it('updates pane content after switching tabs (no freeze)', () => {
     renderSettings()
-    clickSidebarItem('settings.speechRecognition')
+    clickSidebarItem('settings.dictation')
     expect(document.body).toBeDefined()
   })
 })
@@ -395,6 +397,20 @@ describe('DirtyBar behavior', () => {
     expect(screen.queryByText('Unsaved changes')).toBeNull()
   })
 
+  it('blocks saving and discarding until shortcut restoration finishes', () => {
+    renderSettings()
+    let finish: () => void = () => {}
+    act(() => {
+      finish = beginHotkeyCapture()
+      useAppStore.getState().updateConfig({ hotkey: 'Ctrl+K' })
+    })
+    expect(screen.getByText('Save').closest('button')).toBeDisabled()
+    expect(screen.getByText('Discard changes').closest('button')).toBeDisabled()
+    act(() => finish())
+    expect(screen.getByText('Save').closest('button')).toBeEnabled()
+    expect(screen.getByText('Discard changes').closest('button')).toBeEnabled()
+  })
+
   it('appears after config is modified', async () => {
     renderSettings()
     act(() => {
@@ -492,10 +508,7 @@ describe('DirtyBar behavior', () => {
 
   it('Save sends the typed key to the vault, never to the config', async () => {
     const { setApiKey, updateConfig, getCredentialStatus } = await import('../../../lib/tauri')
-    vi.mocked(getCredentialStatus).mockResolvedValue({
-      stt: 'saved',
-      llm: 'missing',
-    })
+    vi.mocked(getCredentialStatus).mockResolvedValue({ stt: 'saved', llm: 'missing' })
 
     renderSettings()
     act(() => {
@@ -514,10 +527,7 @@ describe('DirtyBar behavior', () => {
     expect(JSON.stringify(savedConfig)).not.toContain('sk-fresh')
     // Drafts clear once the vault accepted the key.
     await waitFor(() => {
-      expect(useAppStore.getState().keyDrafts).toEqual({
-        stt: null,
-        llm: null,
-      })
+      expect(useAppStore.getState().keyDrafts).toEqual({ stt: null, llm: null })
     })
   })
 

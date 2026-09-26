@@ -1,11 +1,11 @@
-import { Settings, Mic, Sparkles, BookOpen, Info } from 'lucide-react'
+import { Settings, Mic, Sparkles, Shield, Info } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 const PANES = [
   { id: 'general', labelKey: 'settings.general', icon: Settings },
-  { id: 'stt', labelKey: 'settings.speechRecognition', icon: Mic },
-  { id: 'llm', labelKey: 'settings.aiPolish', icon: Sparkles },
-  { id: 'dictionary', labelKey: 'settings.dictionary', icon: BookOpen },
+  { id: 'dictation', labelKey: 'settings.dictation', icon: Mic },
+  { id: 'ai', labelKey: 'settings.aiPolish', icon: Sparkles },
+  { id: 'privacy', labelKey: 'settings.privacy', icon: Shield },
   { id: 'about', labelKey: 'settings.about', icon: Info },
 ] as const
 
