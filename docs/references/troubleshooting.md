@@ -64,7 +64,7 @@ If prompts genuinely repeat for a *released* build, the signing certificate has 
 Inspect what a bundle claims with:
 
 ```bash
-codesign -d -r- /Applications/OpenTypeless.app
+codesign -d -r- /Applications/Pipeup.app
 ```
 
 ## macOS: "I granted Microphone but it never appeared again"
@@ -102,7 +102,7 @@ Provider failures are reported as `<stage>: <reason>` — the stage says which s
 
 `No speech detected` means what it says: the microphone is the thing to check *only* for that message. Before 0.7.1 it was also shown when the STT provider itself failed, which sent people looking at their microphone over what was actually an exhausted quota.
 
-The capsule's error pill fits one short line and clears after 2.5 s, so it carries the reason and nothing more. The provider's full response — status, body, model — is logged at error level. `Needs confirmation:` a packaged build currently logs to stdout only, so on a Finder launch there is nothing to read afterwards; launching the binary from a terminal (`/Applications/OpenTypeless.app/Contents/MacOS/opentypeless`) is the only way to capture it today.
+The capsule's error pill fits one short line and clears after 2.5 s, so it carries the reason and nothing more. The provider's full response — status, body, model — is logged at error level. `Needs confirmation:` a packaged build currently logs to stdout only, so on a Finder launch there is nothing to read afterwards; launching the binary from a terminal (`/Applications/Pipeup.app/Contents/MacOS/opentypeless`) is the only way to capture it today.
 
 An `Edit` failure never costs you anything: the selection is left exactly as it was. A `Polish` failure still pastes the raw transcript.
 

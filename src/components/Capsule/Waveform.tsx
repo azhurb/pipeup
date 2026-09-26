@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import { useReducedMotion } from 'framer-motion'
 import { useAppStore } from '../../stores/appStore'
 
-const BAR_COUNT = 7
+const BAR_COUNT = 5
 const MIN_HEIGHT = 3
 const MAX_HEIGHT = 16
 
@@ -18,8 +18,8 @@ const ATTACK = 0.5
 const RELEASE = 0.18
 
 // Center bars react more than edge bars, giving the column a voice-shaped
-// envelope rather than seven bars moving in lockstep.
-const BAR_RESPONSIVITY = [0.55, 0.75, 0.9, 1.0, 0.9, 0.75, 0.55]
+// envelope rather than five bars moving in lockstep.
+const BAR_RESPONSIVITY = [0.55, 0.8, 1.0, 0.8, 0.55]
 
 export function Waveform() {
   const barsRef = useRef<(HTMLDivElement | null)[]>([])
@@ -67,7 +67,7 @@ export function Waveform() {
           ref={(el) => {
             barsRef.current[i] = el
           }}
-          className="w-[2px] rounded-full bg-white/80"
+          className="w-[2px] rounded-full bg-current/80"
           style={{
             height: `${MIN_HEIGHT}px`,
             opacity: 0.5,

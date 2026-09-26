@@ -1,5 +1,5 @@
 // App metadata
-export const APP_NAME = 'OpenTypeless'
+export const APP_NAME = 'Pipeup'
 // No APP_VERSION here on purpose: the release workflow rewrites the version in
 // package.json / tauri.conf.json / Cargo.toml at build time and never commits
 // it, so any constant in this file is permanently stale. AboutPane reads the

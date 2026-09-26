@@ -32,15 +32,17 @@ export function Settings() {
 
   return (
     <div className="w-full h-full bg-bg-primary text-text-primary flex flex-col">
-      <div className="flex-1 flex min-h-0">
-        {/* Sidebar */}
+      <div className="flex-1 flex flex-col min-h-0">
+        <div className="px-6 pt-6 pb-4">
+          <h1 className="text-[24px] font-semibold tracking-tight">{t('settings.title')}</h1>
+        </div>
         <SettingsSidebar activePane={activePane} onSelect={setActivePane} />
 
         {/* Content */}
-        <div className="flex-1 flex flex-col min-w-0">
+        <div className="flex-1 flex flex-col min-w-0 min-h-0">
           {/* Title bar */}
-          <div className="flex items-center justify-between px-6 pt-4 pb-3 border-b border-border bg-bg-primary/50">
-            <h2 className="text-[15px] font-medium">{t(paneTitleKeys[activePane])}</h2>
+          <div className="flex items-center justify-between px-6 pt-6 pb-1">
+            <h2 className="text-[17px] font-semibold">{t(paneTitleKeys[activePane])}</h2>
           </div>
 
           {/* Pane content */}
@@ -48,7 +50,7 @@ export function Settings() {
             <AnimatePresence mode="sync">
               <motion.div
                 key={activePane}
-                className="w-full"
+                className="w-full max-w-[720px]"
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -6 }}

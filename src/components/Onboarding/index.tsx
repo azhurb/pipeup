@@ -43,7 +43,7 @@ export function Onboarding() {
 
   const titles: Record<number, { title: string; subtitle?: string }> = {
     0: {
-      title: 'Welcome to OpenTypeless',
+      title: 'Welcome to Pipeup',
       subtitle: 'A few quick steps to get started with voice input',
     },
     1: {

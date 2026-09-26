@@ -1,4 +1,4 @@
-# OpenTypeless Documentation
+# Pipeup Documentation
 
 Repository-local system of record for architecture, domain knowledge, decisions, and workflows.
 
@@ -13,6 +13,8 @@ Repository-local system of record for architecture, domain knowledge, decisions,
 - [Storage](architecture/storage.md) — `tauri-plugin-store` config and SQLite history/dictionary.
 
 ## Domain
+
+- [Appearance](domain/appearance.md) - brand assets, visual system, capsule behavior, and identity compatibility.
 
 - [Feature map](domain/features.md) — public features reconciled with repo evidence.
 - [Voice input](domain/voice-input.md) — recording flow and prompt behavior.

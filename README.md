@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="src-tauri/icons/128x128@2x.png" width="128" height="128" alt="OpenTypeless Logo" />
+  <img src="src-tauri/icons/128x128@2x.png" width="128" height="128" alt="Pipeup Logo" />
 </p>
 
-<h1 align="center">OpenTypeless</h1>
+<h1 align="center">Pipeup</h1>
 
 <p align="center">
   Open-source AI voice input for desktop. Speak naturally, get polished text in any app.
@@ -10,7 +10,7 @@
 
 <p align="center">
   Whether you're writing emails, coding, chatting, or taking notes — just press a hotkey,<br/>
-  speak your mind, and OpenTypeless transcribes and polishes your words with AI,<br/>
+  speak your mind, and Pipeup transcribes and polishes your words with AI,<br/>
   then types them directly into whatever app you're using.
 </p>
 
@@ -22,27 +22,23 @@
 </p>
 
 <p align="center">
-  <img src="docs/images/demo.gif" width="720" alt="OpenTypeless Demo" />
+  <img src="docs/images/app-main-light.png" width="720" alt="Pipeup desktop app" />
 </p>
 
 <details>
-<summary>More screenshots</summary>
+<summary>Provider settings</summary>
 
-<p align="center">
-  <img src="docs/images/app-main-light.png" width="720" alt="OpenTypeless Main Window" />
-</p>
+<img src="docs/images/app-settings.png" width="720" alt="Pipeup AI polish settings" />
 
-| Settings | History |
-|---|---|
-| <img src="docs/images/app-settings.png" width="360" /> | <img src="docs/images/app-history.png" width="360" /> |
+Screenshots show the real interface with offline preview data.
 
 </details>
 
 ---
 
-## Why OpenTypeless?
+## Why Pipeup?
 
-| | OpenTypeless | macOS Dictation | Windows Voice Typing | Whisper Desktop |
+| | Pipeup | macOS Dictation | Windows Voice Typing | Whisper Desktop |
 |---|---|---|---|---|
 | AI text polishing | ✅ Multiple LLMs | ❌ | ❌ | ❌ |
 | STT provider choice | ✅ 7+ providers | ❌ Apple only | ❌ Microsoft only | ❌ Whisper only |
@@ -59,7 +55,7 @@
 - 💊 Floating capsule widget that stays on top
 - 🗣️ 7+ STT providers: Deepgram, AssemblyAI, Gemini 3.5 Transcribe, Whisper, Groq, GLM-ASR, SiliconFlow
 - 🤖 Text polishing via multiple LLMs: OpenAI, DeepSeek, Claude, Gemini, Ollama, and more
-- ⚡ Live progress — the capsule shows the polish forming as the LLM works, then pastes once it's done
+- A compact, text-free capsule: an audio-reactive waveform while recording, then processing dots until the result is pasted. Hover or focus to cancel.
 - ⌨️ Lands in whatever app is focused, via the clipboard plus a synthesized ⌘V / Ctrl+V — split into chunks for terminal CLIs that choke on bulk pastes
 - ✏️ Edit selected text by voice — select a paragraph, say "fix the grammar" or "make this shorter", and the selection is rewritten in place (macOS only, requires AI Polish; works in native apps and browser text fields, not in Monaco-based editors like VS Code or Cursor)
 - 🌐 Translation mode: speak in one language, output in another (20+ languages)
@@ -98,14 +94,16 @@ Download the latest version for your platform:
 
 Builds are signed with a self-signed certificate (not a paid Apple Developer ID), so macOS quarantines them on download. On first install, strip the quarantine attribute:
 
-1. Open the `.dmg` and drag **OpenTypeless** into `/Applications`.
+1. Open the `.dmg` and drag **Pipeup** into `/Applications`.
 2. In Terminal, run:
    ```bash
-   xattr -cr /Applications/OpenTypeless.app
+   xattr -cr /Applications/Pipeup.app
    ```
 3. Launch the app. Grant **Microphone** and **Accessibility** permissions when prompted.
 
-When upgrading to a new release, repeat step 2 (each download gets a fresh quarantine flag). Accessibility and Microphone grants persist across upgrades — no need to re-grant.
+When upgrading to a new release, repeat step 2 (each download gets a fresh quarantine flag).
+
+**Upgrading from OpenTypeless:** turn off Launch at Startup in the old app if enabled, then quit it. After installing Pipeup, move the old `OpenTypeless.app` to Trash so both copies cannot start. Re-enable Launch at Startup from Pipeup if you use it. Keep the application data: Pipeup retains `com.opentypeless.app`, the existing credential namespace, settings, history, and dictionary. Grant permissions if macOS requests them. The repository URL remains unchanged during this rebrand.
 
 ### Windows and Linux
 
@@ -183,7 +181,7 @@ src-tauri/src/        # Rust backend
 ## FAQ
 
 **Is my audio sent to the cloud?**
-Audio goes directly to whichever STT provider you configure (e.g., Groq, Deepgram). No data is routed through OpenTypeless servers — there is no telemetry or background reporting in this fork.
+Audio goes directly to whichever STT provider you configure (e.g., Groq, Deepgram). No data is routed through Pipeup servers — there is no telemetry or background reporting in this fork.
 
 **Can I use it offline?**
 With a local STT provider (Whisper via Ollama) and a local LLM (Ollama), the app works entirely offline. No internet connection needed.
@@ -216,10 +214,6 @@ Looking for a place to start? Check out issues labeled [`good first issue`](http
     <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=azhurb/opentypeless&type=Date" />
   </picture>
 </a>
-
-## Built with Claude Code
-
-This entire project was built in a single day using [Claude Code](https://claude.com/claude-code) — from architecture design to full implementation, including the Tauri backend, React frontend, CI/CD pipeline, and this README.
 
 ## Credits
 

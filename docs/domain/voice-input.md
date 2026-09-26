@@ -1,6 +1,6 @@
 # Voice Input Domain
 
-OpenTypeless turns speech into polished text in the foreground desktop app. Mechanism is in [Pipeline](../architecture/pipeline.md); user-facing feature inventory is in [Feature map](features.md).
+Pipeup turns speech into polished text in the foreground desktop app. Mechanism is in [Pipeline](../architecture/pipeline.md); user-facing feature inventory is in [Feature map](features.md).
 
 Evidence: `README.md`, `src-tauri/src/pipeline.rs`, `src-tauri/src/llm/prompt.rs`, `src-tauri/src/app_detector/mod.rs`, `src/stores/appStore.ts`.
 
@@ -59,3 +59,9 @@ Shared by both:
 
 - Voice commands and undo behavior are not implemented beyond the prompt rules above; the README roadmap mentions them as future work.
 - Whether dictionary `pronunciation` should feed the prompt — schema/UI capture it, but `src-tauri/src/llm/prompt.rs` currently uses only `DictionaryStore::words()`.
+
+## Recording feedback
+
+The capsule uses a waveform while recording and three processing dots while transcribing or polishing. It does not show elapsed time, shortcuts, or transcript text. Cancellation appears on hover or keyboard focus (always visible on devices without hover); it discards the current dictation. The configured recording limit still applies through `src/hooks/useRecordingLimit.ts`.
+
+Errors, clipboard recovery, selected-text confirmation, and dictionary-correction undo still show actionable text. The selected-text amber ring remains visible. See [Appearance](appearance.md) for the visual system.

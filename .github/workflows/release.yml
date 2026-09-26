@@ -121,7 +121,7 @@ jobs:
           APPLE_SIGNING_IDENTITY: ${{ env.APPLE_SIGNING_IDENTITY }}
         with:
           tagName: ${{ github.event.inputs.tag || github.ref_name }}
-          releaseName: 'OpenTypeless ${{ github.event.inputs.tag || github.ref_name }}'
+          releaseName: 'Pipeup ${{ github.event.inputs.tag || github.ref_name }}'
           releaseBody: 'See the assets below to download and install.'
           releaseDraft: true
           prerelease: false

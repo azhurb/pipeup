@@ -1,5 +1,9 @@
 # Glossary
 
+## Pipeup
+
+The product name of this OpenTypeless-derived app. The repository URL, bundle identifier, credential namespace, and internal package names remain unchanged for compatibility. See [Appearance](appearance.md).
+
 ## AppConfig
 
 Rust + TypeScript config shape for user settings (providers, API keys, hotkey, theme, translation). Defaults: [Storage → AppConfig defaults](../architecture/storage.md#appconfig-defaults).

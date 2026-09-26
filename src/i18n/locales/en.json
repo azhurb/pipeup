@@ -5,7 +5,7 @@
     "delete": "Delete"
   },
   "app": {
-    "name": "OpenTypeless",
+    "name": "Pipeup",
     "tagline": "AI Voice Input",
     "loading": "Loading...",
     "failedToLoad": "Failed to load application data.",
@@ -17,7 +17,7 @@
     "history": "History"
   },
   "home": {
-    "welcome": "Welcome to OpenTypeless",
+    "welcome": "Welcome to Pipeup",
     "description": "Hold {{hotkey}} to start voice recording. Your speech will be transcribed and optionally polished by AI.",
     "totalRecordings": "Total Recordings",
     "today": "Today",
@@ -29,7 +29,7 @@
     "disabled": "Disabled"
   },
   "onboarding": {
-    "welcomeTitle": "Welcome to OpenTypeless",
+    "welcomeTitle": "Welcome to Pipeup",
     "welcomeSubtitle": "A few quick steps to get started with voice input",
     "speechRecognition": "Speech Recognition",
     "speechRecognitionDesc": "Configure your ASR service to convert speech to text",
@@ -78,18 +78,21 @@
     "cancelProcessing": "Cancel processing",
     "cancelPolishing": "Cancel polishing",
     "errorOccurred": "An error occurred",
-    "accessibilityRequired": "Accessibility needed — tap to open Settings",
-    "microphoneDenied": "Microphone denied — tap to open Settings",
+    "accessibilityRequired": "Enable Accessibility",
+    "microphoneDenied": "Enable microphone",
     "clipboardTip": "Copied — press {{shortcut}} to paste",
     "editedTip": "Edited — press {{shortcut}} to undo",
     "openMainWindow": "Open Main Window",
     "settings": "Settings",
     "history": "History",
-    "exit": "Exit"
+    "exit": "Exit",
+    "cancel": "Cancel dictation",
+    "recording": "Recording",
+    "processing": "Processing"
   },
   "permissions": {
     "title": "Permissions",
-    "description": "OpenTypeless needs two macOS permissions to record and paste. Granting them now means dictation works on first try.",
+    "description": "Pipeup needs two macOS permissions to record and paste. Granting them now means dictation works on first try.",
     "microphone": {
       "title": "Microphone",
       "required": "Required for dictation",
@@ -100,7 +103,7 @@
       "title": "Accessibility",
       "required": "Required to paste dictated text",
       "grantedHint": "Granted",
-      "afterClickHint": "Toggle OpenTypeless on in System Settings → Accessibility, then come back."
+      "afterClickHint": "Toggle Pipeup on in System Settings → Accessibility, then come back."
     },
     "openSettings": "Open System Settings",
     "grant": "Grant",
@@ -181,7 +184,7 @@
     "noEntries": "No entries yet. Add proper nouns to improve recognition accuracy.",
     "learnFromCorrections": {
       "label": "Learn from corrections (experimental)",
-      "description": "After dictation, OpenTypeless watches your edits for ~15 s and offers to add fixed names and terms here. Reads the focused text field via macOS Accessibility — you'll be prompted to grant the permission on first use."
+      "description": "After dictation, Pipeup watches your edits for ~15 s and offers to add fixed names and terms here. Reads the focused text field via macOS Accessibility — you'll be prompted to grant the permission on first use."
     },
     "failedToAdd": "Failed to add dictionary entry",
     "failedToRemove": "Failed to remove dictionary entry",

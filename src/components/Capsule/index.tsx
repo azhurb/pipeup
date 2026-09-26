@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useAppStore } from '../../stores/appStore'
 import { useRecording } from '../../hooks/useRecording'
 import { useCapsuleResize } from '../../hooks/useCapsuleResize'
+import { useRecordingLimit } from '../../hooks/useRecordingLimit'
 import { CapsuleIdle } from './CapsuleIdle'
 import { CapsuleRecording } from './CapsuleRecording'
 import { CapsuleProcessing } from './CapsuleProcessing'
@@ -64,6 +65,7 @@ export function Capsule() {
   const isDragging = useRef(false)
 
   useCapsuleResize()
+  useRecordingLimit()
 
   const hasError = pipelineError !== null
   const capsuleState = getCapsuleState(pipelineState, pipelineError, clipboardTip, editedTip)
@@ -169,14 +171,14 @@ export function Capsule() {
       style={{ background: 'transparent' }}
       onContextMenu={handleContextMenu}
     >
-      {/* Persistent outer shell — jelly capsule. Hidden while the toast is up. */}
+      {/* Persistent capsule shell. Hidden while the toast is up. */}
       {!showToast && (
         <motion.div
           className={`absolute left-3 rounded-full pointer-events-auto shrink-0 ${
             capsuleState === 'error'
               ? 'jelly-capsule-error'
               : capsuleState === 'idle'
-                ? 'jelly-capsule text-neutral-700'
+                ? 'jelly-capsule'
                 : 'jelly-capsule-active text-white'
           }${showEditingRing ? ' jelly-capsule-editing' : ''}`}
           onPointerDown={handlePointerDown}
