@@ -2,7 +2,14 @@
   "common": {
     "cancel": "取消",
     "confirm": "确定",
-    "delete": "删除"
+    "delete": "删除",
+    "saving": "正在保存...",
+    "settingsSaved": "设置已保存",
+    "saveFailed": "无法保存设置。",
+    "unsavedChanges": "有未保存的更改",
+    "discardChanges": "放弃更改",
+    "close": "关闭",
+    "save": "保存"
   },
   "app": {
     "name": "Pipeup",
@@ -30,7 +37,7 @@
   },
   "onboarding": {
     "welcomeTitle": "欢迎使用 Pipeup",
-    "welcomeSubtitle": "几个简单步骤，即可开始语音输入",
+    "welcomeSubtitle": "使用您自己的 API 密钥设置语音输入。",
     "speechRecognition": "语音识别",
     "speechRecognitionDesc": "配置 ASR 服务，将语音转换为文字",
     "aiPolish": "AI 润色",
@@ -46,7 +53,7 @@
     "speakToWrite": "说话即写作 — 实时将语音转化为润色文本",
     "selectLanguage": "选择你的语言",
     "selectLanguageDesc": "选择应用的界面语言，之后可以在设置中更改。",
-    "allSet": "一切就绪",
+    "allSet": "可以开始听写了",
     "startUsing": "开始使用语音输入",
     "hotkey": "快捷键",
     "hold": "按住",
@@ -71,7 +78,33 @@
     "llm": "LLM",
     "output": "输出",
     "releaseToStop": "松开停止录音",
-    "holdAndSay": "按住并说点什么"
+    "holdAndSay": "按住并说点什么",
+    "speechTitle": "语音识别",
+    "speechSubtitle": "选择服务商并测试连接。",
+    "aiTitle": "AI 处理（可选）",
+    "aiSubtitle": "关闭此选项可在不配置 AI 服务商的情况下使用转录。",
+    "demoTitle": "使用方法",
+    "demoSubtitle": "预览在其他应用中的听写过程。",
+    "doneTitle": "设置完成",
+    "saveFailed": "无法保存设置，请重试。",
+    "skipSetup": "稍后设置",
+    "holdShortcut": "按住 {{shortcut}} 说话。",
+    "pressShortcut": "按 {{shortcut}} 开始或停止录音。",
+    "demoPhase0": "随时可以开始",
+    "demoPhase1": "自然地说话",
+    "demoPhase2": "正在处理文字",
+    "demoPhase3": "文字将出现在当前应用中",
+    "exampleResult": "结果示例",
+    "demoPolished": "您好，能帮我处理一下吗？",
+    "demoRaw": "你好，嗯，能帮我处理一下吗",
+    "demoNotice": "这只是演示，不会录制或发送音频。",
+    "readyHint": "在其他应用中选中一个文本框，然后使用快捷键。",
+    "clickCapsule": "点击胶囊",
+    "startRecording": "胶囊可见时即可开始录音。",
+    "dragCapsule": "拖动以调整位置",
+    "dragHint": "将胶囊放在屏幕上的任意位置。",
+    "menuCapsule": "右键点击打开菜单",
+    "menuHint": "打开设置、历史记录等。"
   },
   "capsule": {
     "cancelRecording": "取消录音",
@@ -174,7 +207,8 @@
     "retentionDays": "{{days}} 天",
     "retentionHintForever": "记录会一直保留，直到你手动删除。",
     "retentionHintDays": "超过 {{days}} 天的记录会被自动删除，已保存的记录也包括在内；即使关闭保存，该期限依然生效。",
-    "retentionConfirm": "将历史记录保留 {{days}} 天？\n\n保存后，超过该期限的记录将被删除，且无法撤销。"
+    "retentionConfirm": "将历史记录保留 {{days}} 天？\n\n保存后，超过该期限的记录将被删除，且无法撤销。",
+    "translationRequiresAi": "启用 AI 处理后才能翻译听写内容。"
   },
   "dictionary": {
     "word": "词语",

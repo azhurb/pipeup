@@ -1,43 +1,50 @@
-import { motion } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 import { Check, Keyboard, MousePointerClick, GripHorizontal, MousePointer } from 'lucide-react'
 import { useAppStore } from '../../stores/appStore'
 
 export function DoneStep() {
+  const { t } = useTranslation()
   const config = useAppStore((s) => s.config)
 
   return (
     <div className="flex flex-col items-center gap-5 py-2">
       {/* Success animation */}
-      <motion.div
-        className="w-16 h-16 rounded-full bg-success/10 flex items-center justify-center"
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ type: 'spring', stiffness: 500, damping: 20 }}
-      >
-        <motion.div
-          initial={{ opacity: 0, scale: 0 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2, type: 'spring', stiffness: 500, damping: 20 }}
-        >
+      <div className="w-16 h-16 rounded-full bg-success/10 flex items-center justify-center">
+        <div>
           <Check size={28} className="text-success" />
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
 
       <div className="text-center">
-        <h2 className="text-[17px] font-semibold text-text-primary">All Set</h2>
-        <p className="text-[13px] text-text-secondary mt-1">The capsule is now on your desktop</p>
+        <h2 className="text-[17px] font-semibold text-text-primary">{t('onboarding.allSet')}</h2>
+        <p className="text-[13px] text-text-secondary mt-1">{t('onboarding.readyHint')}</p>
       </div>
 
       {/* Usage tips */}
       <div className="w-full space-y-2">
         <Tip
           icon={Keyboard}
-          title={`${config.hotkey_mode === 'hold' ? 'Hold' : 'Press'} ${config.hotkey}`}
-          desc={config.hotkey_mode === 'hold' ? 'to talk anywhere' : 'to start/stop recording'}
+          title={config.hotkey}
+          desc={t(
+            config.hotkey_mode === 'hold' ? 'onboarding.holdShortcut' : 'onboarding.pressShortcut',
+            { shortcut: config.hotkey },
+          )}
         />
-        <Tip icon={MousePointerClick} title="Click the capsule" desc="to start recording" />
-        <Tip icon={GripHorizontal} title="Drag to reposition" desc="place it anywhere on screen" />
-        <Tip icon={MousePointer} title="Right-click for menu" desc="settings, history, and more" />
+        <Tip
+          icon={MousePointerClick}
+          title={t('onboarding.clickCapsule')}
+          desc={t('onboarding.startRecording')}
+        />
+        <Tip
+          icon={GripHorizontal}
+          title={t('onboarding.dragCapsule')}
+          desc={t('onboarding.dragHint')}
+        />
+        <Tip
+          icon={MousePointer}
+          title={t('onboarding.menuCapsule')}
+          desc={t('onboarding.menuHint')}
+        />
       </div>
     </div>
   )

@@ -384,4 +384,15 @@ describe('LlmPane', () => {
       expect(screen.queryByText('Requires AI Polish')).not.toBeInTheDocument()
     })
   })
+  it('disables translation and hides target language when AI processing is off', () => {
+    mockAppStore.config.polish_enabled = false
+    mockAppStore.config.translate_enabled = true
+    render(<LlmPane />)
+    const toggle = screen.getByRole('switch', { name: 'Translation Mode' })
+    expect(toggle).toBeDisabled()
+    expect(toggle).toHaveAttribute('aria-checked', 'false')
+    expect(screen.queryByText('Target Language')).not.toBeInTheDocument()
+    fireEvent.click(toggle)
+    expect(mockAppStore.updateConfig).not.toHaveBeenCalled()
+  })
 })

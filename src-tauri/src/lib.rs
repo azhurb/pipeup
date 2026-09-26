@@ -20,6 +20,11 @@ use tracing_subscriber::EnvFilter;
 
 use std::sync::{Arc, Mutex};
 
+// Config writes and shortcut capture commands must share one transaction boundary.
+// In particular, resume must load the saved shortcut only after an in-flight save
+// has finished, otherwise it can unregister the newly saved shortcut.
+static PREFERENCE_UPDATE_LOCK: tokio::sync::Mutex<()> = tokio::sync::Mutex::const_new(());
+
 /// Cached hotkey mode to avoid loading config from disk on every keypress.
 /// Updated whenever config is saved.
 struct HotkeyModeCache(Arc<Mutex<String>>);
@@ -165,9 +170,54 @@ async fn update_config(
     history: tauri::State<'_, storage::HistoryStore>,
     config: storage::AppConfig,
 ) -> Result<(), String> {
+    let _preference_guard = PREFERENCE_UPDATE_LOCK.lock().await;
+    use tauri_plugin_autostart::ManagerExt;
+    let previous = state.load().await.map_err(|e| e.to_string())?;
+    let new_shortcut = parse_hotkey(&config.hotkey)
+        .ok_or_else(|| format!("Invalid keyboard shortcut: {}", config.hotkey))?;
+    let old_shortcut = parse_hotkey(&previous.hotkey).unwrap_or_else(default_shortcut);
+    let shortcut_changed = old_shortcut != new_shortcut;
+    // Reserve the new shortcut before releasing the working one. A conflict
+    // must leave the saved preferences and existing shortcut intact.
+    if shortcut_changed {
+        app.global_shortcut()
+            .register(new_shortcut)
+            .map_err(|e| e.to_string())?;
+    }
+    let startup_changed = previous.auto_start != config.auto_start;
+    if startup_changed {
+        let result = if config.auto_start {
+            app.autolaunch().enable()
+        } else {
+            app.autolaunch().disable()
+        };
+        if let Err(e) = result {
+            if shortcut_changed {
+                let _ = app.global_shortcut().unregister(new_shortcut);
+            }
+            return Err(e.to_string());
+        }
+    }
+    if let Err(e) = state.save(&config).await {
+        if shortcut_changed {
+            let _ = app.global_shortcut().unregister(new_shortcut);
+        }
+        if startup_changed {
+            let _ = if previous.auto_start {
+                app.autolaunch().enable()
+            } else {
+                app.autolaunch().disable()
+            };
+        }
+        return Err(e.to_string());
+    }
+    if shortcut_changed {
+        if let Err(e) = app.global_shortcut().unregister(old_shortcut) {
+            tracing::warn!("failed to release previous keyboard shortcut: {}", e);
+        }
+    }
     *cache.0.lock().unwrap_or_else(|e| e.into_inner()) = config.hotkey_mode.clone();
     *close_tray_cache.0.lock().unwrap_or_else(|e| e.into_inner()) = config.close_to_tray;
-    state.save(&config).await.map_err(|e| e.to_string())?;
     // Apply the (possibly lowered) history retention immediately, so the user
     // sees the setting take effect on Save instead of at next launch. A failed
     // DELETE must not fail the save — the config itself is already persisted.
@@ -798,6 +848,7 @@ async fn set_auto_start(
     config_state: tauri::State<'_, storage::ConfigManager>,
     enabled: bool,
 ) -> Result<(), String> {
+    let _preference_guard = PREFERENCE_UPDATE_LOCK.lock().await;
     use tauri_plugin_autostart::ManagerExt;
     let autolaunch = app.autolaunch();
     if enabled {
@@ -820,24 +871,25 @@ async fn update_hotkey(
     config_state: tauri::State<'_, storage::ConfigManager>,
     hotkey: String,
 ) -> Result<(), String> {
+    let _preference_guard = PREFERENCE_UPDATE_LOCK.lock().await;
     let new_shortcut =
         parse_hotkey(&hotkey).ok_or_else(|| format!("Invalid hotkey: {}", hotkey))?;
 
-    // Unregister all existing shortcuts, then register the new one
-    // (the global handler from with_handler is still active)
-    app.global_shortcut()
-        .unregister_all()
-        .map_err(|e| e.to_string())?;
+    let mut config = config_state.load().await.map_err(|e| e.to_string())?;
+    let old_shortcut = parse_hotkey(&config.hotkey).unwrap_or_else(default_shortcut);
+    if new_shortcut == old_shortcut {
+        return Ok(());
+    }
     app.global_shortcut()
         .register(new_shortcut)
         .map_err(|e| e.to_string())?;
-
-    // Save updated hotkey to config
-    let mut config = config_state.load().await.map_err(|e| e.to_string())?;
     config.hotkey = hotkey;
-    config_state
-        .save(&config)
-        .await
+    if let Err(e) = config_state.save(&config).await {
+        let _ = app.global_shortcut().unregister(new_shortcut);
+        return Err(e.to_string());
+    }
+    app.global_shortcut()
+        .unregister(old_shortcut)
         .map_err(|e| e.to_string())?;
 
     Ok(())
@@ -845,7 +897,8 @@ async fn update_hotkey(
 
 /// Temporarily unregister all global shortcuts so the webview can capture key events.
 #[tauri::command]
-fn pause_hotkey(app: tauri::AppHandle) -> Result<(), String> {
+async fn pause_hotkey(app: tauri::AppHandle) -> Result<(), String> {
+    let _preference_guard = PREFERENCE_UPDATE_LOCK.lock().await;
     app.global_shortcut()
         .unregister_all()
         .map_err(|e| e.to_string())
@@ -857,6 +910,7 @@ async fn resume_hotkey(
     app: tauri::AppHandle,
     config_state: tauri::State<'_, storage::ConfigManager>,
 ) -> Result<(), String> {
+    let _preference_guard = PREFERENCE_UPDATE_LOCK.lock().await;
     let config = config_state.load().await.map_err(|e| e.to_string())?;
     let shortcut = parse_hotkey(&config.hotkey).unwrap_or_else(default_shortcut);
     // Ensure clean state, then register
