@@ -28,7 +28,7 @@ A generated command/signature reference would be a good fit for [`docs/generated
 
 ## Events
 
-Rust emits events with `app_handle.emit(...)` / `window.emit(...)`. The frontend subscribes through `useTauriEvents`. Cross-check with [Pipeline → Events](pipeline.md#events) when changing pipeline state.
+Rust broadcasts shared events with `emit(...)` and targets navigation with `emit_to("main", ...)`. Calling `window.emit(...)` also broadcasts; the window receiver does not restrict its destination. The frontend subscribes through `useTauriEvents`. Cross-check with [Pipeline → Events](pipeline.md#events) when changing pipeline state.
 
 Event names emitted by the backend:
 
@@ -40,7 +40,7 @@ Event names emitted by the backend:
 - Output: `output:no_target` (emitted to the capsule window only, no payload) — a paste did not land anywhere, so the dictation was left on the clipboard. `useTauriEvents` sets `clipboardTip` (and clears any soft pipeline error) so the capsule shows a "press ⌘V to paste" tip; it auto-dismisses and is cleared on the next `recording`. macOS only; never fired for terminals or chunked pastes. See [Pipeline → Paste-landing detection](pipeline.md#paste-landing-detection).
 - Output: `output:edited` (emitted to the capsule window only, no payload) — a paste landed and replaced a selection. `useTauriEvents` sets `editedTip`, which shows "Edited — press ⌘Z to undo" for 3 s; it auto-dismisses, is dismissed by a click, and is cleared on the next `recording`. Ranked below `clipboardTip` and errors in `getCapsuleState`: those need the user to act, this only acknowledges something that already worked.
 - Config: `config:changed` — emitted by `update_config` after persisting; payload is the full `AppConfig`. Every webview's `useTauriEvents` listens and `setConfig`s its local Zustand copy. Without this fan-out the capsule window keeps the stale config it loaded at mount, so settings like `capsule_auto_hide` would not take effect until the next launch.
-- Tray: `tray:settings`, `tray:history`, `tray:about`.
+- Tray: `tray:settings`, `tray:history`, `tray:about`, targeted to `main` only. Only the main frontend registers navigation listeners, including the capsule context menu's `navigate` event. The capsule keeps its `#capsule` hash across navigation and dev reloads while still receiving shared pipeline and config events.
 
 `pipeline:error` is also used to surface permission-gate failures as machine-readable codes the frontend matches on exactly:
 

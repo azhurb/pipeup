@@ -2,7 +2,7 @@
 
 ## Pipeup
 
-The product name of this OpenTypeless-derived app. The repository URL, bundle identifier, credential namespace, and internal package names remain unchanged for compatibility. See [Appearance](appearance.md).
+The product name of this OpenTypeless-derived app. The frontend npm package is `pipeup`. The repository URL is `azhurb/pipeup`; the native executable, bundle identifier, and credential namespace remain unchanged for compatibility. See [Appearance](appearance.md).
 
 ## AppConfig
 
@@ -10,7 +10,7 @@ Rust + TypeScript config shape for user settings (providers, API keys, hotkey, t
 
 ## BYOK
 
-Bring Your Own Key. The user configures provider API keys locally and requests go directly to the chosen provider. This fork is BYOK-only — there are no cloud or proxy modes.
+Bring Your Own Key. The user configures provider API keys locally and requests go directly to the chosen provider. This fork is BYOK-only - there are no cloud or proxy modes.
 
 ## Capsule
 
@@ -34,7 +34,7 @@ Rust orchestration flow from recording through transcription, polishing, output,
 
 ## Selected-Text Mode
 
-Mode where a dictation edits the user's selection instead of inserting text: the transcript becomes an instruction, the selection becomes the material, and the polished result replaces the selection. Captured only through macOS Accessibility (`AXSelectedText`, read at record start, off the frontmost app's own element). That reaches native apps and Chromium text inputs alike, including a browser tab. Where the app publishes no focused element — Monaco-based editors such as VS Code and Cursor — and on every non-macOS platform, the dictation is inserted as ordinary text instead; the Cmd/Ctrl+C fallback that used to cover those was removed for treating any clipboard change as a selection. Requires AI Polish, since the LLM is what applies the instruction. Detail: [Pipeline → Selected-Text Capture](../architecture/pipeline.md#selected-text-capture).
+Mode where a dictation edits the user's selection instead of inserting text: the transcript becomes an instruction, the selection becomes the material, and the polished result replaces the selection. Captured only through macOS Accessibility (`AXSelectedText`, read at record start, off the frontmost app's own element). That reaches native apps and Chromium text inputs alike, including a browser tab. Where the app publishes no focused element - Monaco-based editors such as VS Code and Cursor - and on every non-macOS platform, the dictation is inserted as ordinary text instead; the Cmd/Ctrl+C fallback that used to cover those was removed for treating any clipboard change as a selection. Requires AI processing, since the LLM is what applies the instruction. Detail: [Pipeline → Selected-Text Capture](../architecture/pipeline.md#selected-text-capture).
 
 ## STT
 

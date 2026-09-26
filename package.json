@@ -1,9 +1,9 @@
 {
-  "name": "opentypeless",
+  "name": "pipeup",
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "AI-powered speech-to-text and text polishing desktop app",
+  "description": "Voice input for desktop with your own speech and AI providers",
   "keywords": [
     "speech-to-text",
     "stt",
@@ -14,13 +14,13 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/azhurb/opentypeless"
+    "url": "https://github.com/azhurb/pipeup"
   },
-  "homepage": "https://github.com/azhurb/opentypeless",
+  "homepage": "https://github.com/azhurb/pipeup",
   "bugs": {
-    "url": "https://github.com/azhurb/opentypeless/issues"
+    "url": "https://github.com/azhurb/pipeup/issues"
   },
-  "author": "OpenTypeless Contributors",
+  "author": "Pipeup Contributors",
   "license": "MIT",
   "scripts": {
     "dev": "vite",

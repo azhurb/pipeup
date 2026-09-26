@@ -213,3 +213,49 @@ describe('useTauriEvents — selected-text editing events', () => {
     expect(useAppStore.getState().clipboardTip).toBe(false)
   })
 })
+
+describe('useTauriEvents navigation isolation', () => {
+  beforeEach(() => {
+    resetStore()
+    window.location.hash = '#/'
+  })
+
+  afterEach(() => {
+    window.location.hash = ''
+  })
+
+  const navigationEvents = [
+    ['tray:settings', undefined, '#/settings'],
+    ['tray:history', undefined, '#/history'],
+    ['tray:about', undefined, '#/settings/about'],
+    ['navigate', '#/settings/dictation', '#/settings/dictation'],
+  ] as const
+
+  it.each(navigationEvents)('routes %s in the main window', async (event, payload, hash) => {
+    renderHook(() => useTauriEvents())
+    await fire(event, payload)
+    expect(window.location.hash).toBe(hash)
+  })
+
+  it('preserves the capsule route through navigation broadcasts and remounts', async () => {
+    window.location.hash = '#capsule'
+    const first = renderHook(() => useTauriEvents('capsule'))
+    await act(async () => {
+      for (const [event, payload] of navigationEvents) {
+        handlers.get(event)?.({ event, payload, id: 0 })
+      }
+    })
+    expect(window.location.hash).toBe('#capsule')
+    first.unmount()
+
+    renderHook(() => useTauriEvents('capsule'))
+    await fire('pipeline:state', 'recording')
+    await fire('audio:volume', 0.75)
+    const config = { ...useAppStore.getState().config, capsule_auto_hide: true }
+    await fire('config:changed', config)
+    expect(window.location.hash).toBe('#capsule')
+    expect(useAppStore.getState().pipelineState).toBe('recording')
+    expect(useAppStore.getState().audioVolume).toBe(0.75)
+    expect(useAppStore.getState().config.capsule_auto_hide).toBe(true)
+  })
+})

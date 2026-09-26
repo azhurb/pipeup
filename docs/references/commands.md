@@ -24,31 +24,13 @@ npm run tauri build
 
 Output: `src-tauri/target/release/bundle/`.
 
-## CI Does Not Run Automatically On This Fork
+## CI triggers
 
-**Run the checks below locally before opening a PR. A PR with no red check has not been
-verified — it means nothing ran.**
-
-GitHub disables workflows on forks by default. The enable action exists only as a banner in
-the repository's **Actions tab** ("Workflows aren't being run on this forked repository" →
-*"I understand my workflows, go ahead and enable them"*); it is deliberately absent from
-Settings → Actions, and there is no REST API for it. Note that
-`GET /repos/{owner}/{repo}/actions/permissions` returns `"enabled": true` regardless — that
-field is the permissions *policy*, not the fork's activation state, so it is not a way to
-check this.
-
-Until that banner is accepted, `on: push` and `on: pull_request` never fire. Every run in
-this repository's history is `workflow_dispatch`, and `ci.yml` had **0 runs** up to
-2026-07-26 — which is why 14 `clippy -D warnings` errors and both formatter failures reached
-`v0.5.0` unnoticed. It is also the same root cause as the release tag-push trigger stalling
-(see [Cutting a release](#cutting-a-release), step 4).
-
-Both workflows accept a manual trigger, so CI can be run on demand either way:
+As verified on 2026-09-26, automatic CI is active on this fork. `ci.yml` runs for pushes to `main` and pull requests targeting `main`. Stacked PRs targeting another branch need a manual run. Check actual run results before merging; an absent check is not a successful check.
 
 ```bash
-gh workflow run ci.yml                      # current default branch
-gh workflow run ci.yml --ref <branch>       # a specific branch
-gh run list --workflow ci.yml --limit 5     # check results
+gh workflow run ci.yml --repo azhurb/pipeup --ref <branch>
+gh run list --repo azhurb/pipeup --workflow ci.yml --limit 5
 ```
 
 ## Frontend Checks (mirrors `check-frontend` in CI)
@@ -132,7 +114,7 @@ Releases are tag-driven. `.github/workflows/release.yml` triggers on tags matchi
 
 5. The `Release` workflow runs four parallel builds: Windows (`x86_64-pc-windows-msvc`), macOS arm64 (`aarch64-apple-darwin`), macOS x86_64 (`x86_64-apple-darwin`), Linux (`x86_64-unknown-linux-gnu`).
 6. CI strips the leading `v` and writes the version into `package.json`, `src-tauri/tauri.conf.json`, and `src-tauri/Cargo.toml` *during the build only* — these files stay at `0.1.0` in git. **Do not commit version bumps.**
-7. `tauri-apps/tauri-action@v0` uploads the artifacts to a **draft** GitHub Release with a stub body. Replace the body with proper release notes (sections from the `CHANGELOG.md` entry plus a Downloads section that includes the macOS Gatekeeper `xattr -dr com.apple.quarantine` workaround — the build is signed but not notarized, so Sequoia / Tahoe block first launch). Use a prior release as a style reference. Smoke-test the artifacts, then publish from the Releases page (default to non-prerelease for visibility).
+7. `tauri-apps/tauri-action@v0` uploads the artifacts to a **draft** GitHub Release with download and upgrade instructions plus a draft-only publishing checklist. Add the release highlights, verified platforms, and known issues using the `CHANGELOG.md` entry. Complete [release preparation](release-preparation.md), smoke-test the artifacts, and remove the draft-only section before publishing from the Releases page (default to non-prerelease for visibility).
 
 ### Re-running a build for an existing tag
 

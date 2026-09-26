@@ -5,7 +5,7 @@ import { useAppStore } from '../stores/appStore'
 import type { AppConfig, PipelineState } from '../stores/appStore'
 import { getHistory, getDictionary, type MicAuthStatus } from '../lib/tauri'
 
-export function useTauriEvents() {
+export function useTauriEvents(windowRole: 'main' | 'capsule' = 'main') {
   const {
     setAudioVolume,
     setPartialTranscript,
@@ -112,18 +112,21 @@ export function useTauriEvents() {
       setEditedTip(true)
     })
 
-    addListener<void>('tray:settings', () => {
-      window.location.hash = '#/settings'
-    })
-    addListener<void>('tray:history', () => {
-      window.location.hash = '#/history'
-    })
-    addListener<string>('navigate', (hash) => {
-      window.location.hash = hash
-    })
-    addListener<void>('tray:about', () => {
-      window.location.hash = '#/settings/about'
-    })
+    // Navigation must never replace the capsule's startup hash.
+    if (windowRole === 'main') {
+      addListener<void>('tray:settings', () => {
+        window.location.hash = '#/settings'
+      })
+      addListener<void>('tray:history', () => {
+        window.location.hash = '#/history'
+      })
+      addListener<string>('navigate', (hash) => {
+        window.location.hash = hash
+      })
+      addListener<void>('tray:about', () => {
+        window.location.hash = '#/settings/about'
+      })
+    }
 
     addListener<{ rowId: number; old: string; new: string; autoConfirmMs: number }>(
       'correction:suggest',
@@ -175,6 +178,7 @@ export function useTauriEvents() {
       unlisteners.forEach((unlisten) => unlisten())
     }
   }, [
+    windowRole,
     setAudioVolume,
     setPartialTranscript,
     setFinalTranscript,

@@ -122,7 +122,26 @@ jobs:
         with:
           tagName: ${{ github.event.inputs.tag || github.ref_name }}
           releaseName: 'Pipeup ${{ github.event.inputs.tag || github.ref_name }}'
-          releaseBody: 'See the assets below to download and install.'
+          releaseBody: |
+            ## Pipeup
+
+            Voice input for desktop with your own speech and AI providers. A speech provider API key is required; AI processing is optional.
+
+            See the [changelog](https://github.com/${{ github.repository }}/blob/${{ github.event.inputs.tag || github.ref_name }}/CHANGELOG.md) for changes in this release.
+
+            ## Downloads
+
+            Choose the macOS DMG for your processor (Apple Silicon or Intel), the Windows MSI, or the Linux AppImage/DEB below.
+
+            macOS builds are self-signed, not notarized. After installing a trusted download in Applications, run `xattr -cr /Applications/Pipeup.app` if macOS blocks opening it. Grant Microphone and Accessibility permissions when prompted.
+
+            ## Upgrading from OpenTypeless
+
+            Disable Launch at Startup in the old app, quit it, and remove the old app copy after installing Pipeup. Keep the existing application data. Settings, credentials, history, and dictionary retain their existing storage identities. Re-enable Launch at Startup in Pipeup if needed.
+
+            ## Before publishing this draft
+
+            The maintainer must add the release highlights, verified platforms, and known issues after completing the [release checks](https://github.com/${{ github.repository }}/blob/${{ github.event.inputs.tag || github.ref_name }}/docs/references/release-preparation.md). Remove this draft-only section before publication.
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}

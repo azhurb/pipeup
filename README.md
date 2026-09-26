@@ -1,224 +1,98 @@
 <p align="center">
-  <img src="src-tauri/icons/128x128@2x.png" width="128" height="128" alt="Pipeup Logo" />
+  <img src="src-tauri/icons/128x128@2x.png" width="96" height="96" alt="Pipeup icon" />
 </p>
 
 <h1 align="center">Pipeup</h1>
 
-<p align="center">
-  Open-source AI voice input for desktop. Speak naturally, get polished text in any app.
-</p>
+<p align="center">Voice input for people who want control over their tools.</p>
 
 <p align="center">
-  Whether you're writing emails, coding, chatting, or taking notes — just press a hotkey,<br/>
-  speak your mind, and Pipeup transcribes and polishes your words with AI,<br/>
-  then types them directly into whatever app you're using.
+  <a href="https://github.com/azhurb/pipeup/releases">Download</a> ·
+  <a href="docs/index.md">Documentation</a> ·
+  <a href="CONTRIBUTING.md">Contribute</a>
 </p>
 
-<p align="center">
-  <a href="https://github.com/azhurb/opentypeless/actions/workflows/ci.yml"><img src="https://github.com/azhurb/opentypeless/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
-  <a href="https://github.com/azhurb/opentypeless/releases"><img src="https://img.shields.io/github/v/release/azhurb/opentypeless?color=2ABBA7" alt="Release" /></a>
-  <a href="LICENSE"><img src="https://img.shields.io/github/license/azhurb/opentypeless" alt="License" /></a>
-  <a href="https://github.com/azhurb/opentypeless/stargazers"><img src="https://img.shields.io/github/stars/azhurb/opentypeless?style=social" alt="Stars" /></a>
-</p>
+![Pipeup desktop interface](docs/images/app-main-light.png)
 
-<p align="center">
-  <img src="docs/images/app-main-light.png" width="720" alt="Pipeup desktop app" />
-</p>
+Hold your keyboard shortcut, speak, and Pipeup transcribes into the focused app. Choose your speech provider and bring your own API key. Add optional AI processing to clean up, format, or translate the result.
+
+Built for developers and people comfortable with API keys, models, and desktop permissions. Available for macOS, Windows, and Linux.
+
+- **Your providers.** Configure speech recognition separately from AI processing. Use dictation without an LLM, or connect a supported cloud model or local Ollama model for processing.
+- **A quiet interface.** A small, text-free capsule shows recording and processing. Hover or focus to cancel. Light, dark, and system themes keep the rest of the app consistent.
+- **Useful local tools.** Keep a dictionary of specialist terms, review recent dictations, and choose whether history is saved and how long it is retained.
 
 <details>
 <summary>Provider settings</summary>
 
-<img src="docs/images/app-settings.png" width="720" alt="Pipeup AI polish settings" />
+![Pipeup provider settings](docs/images/app-settings.png)
 
-Screenshots show the real interface with offline preview data.
+Screenshots use the real interface with preview data.
 
 </details>
 
----
+## Download and setup
 
-## Why Pipeup?
+Get an installer from [Releases](https://github.com/azhurb/pipeup/releases). Check the release title: older releases are named OpenTypeless.
 
-| | Pipeup | macOS Dictation | Windows Voice Typing | Whisper Desktop |
-|---|---|---|---|---|
-| AI text polishing | ✅ Multiple LLMs | ❌ | ❌ | ❌ |
-| STT provider choice | ✅ 7+ providers | ❌ Apple only | ❌ Microsoft only | ❌ Whisper only |
-| Works in any app | ✅ | ✅ | ✅ | ❌ Copy-paste |
-| Translation mode | ✅ | ❌ | ❌ | ❌ |
-| Open source | ✅ MIT | ❌ | ❌ | ✅ |
-| Cross-platform | ✅ Win/Mac/Linux | ❌ Mac only | ❌ Windows only | ✅ |
-| Custom dictionary | ✅ | ❌ | ❌ | ❌ |
-| Self-hostable | ✅ BYOK | ❌ | ❌ | ✅ |
-
-## Features
-
-- 🎙️ Global hotkey recording — hold-to-record or toggle mode
-- 💊 Floating capsule widget that stays on top
-- 🗣️ 7+ STT providers: Deepgram, AssemblyAI, Gemini 3.5 Transcribe, Whisper, Groq, GLM-ASR, SiliconFlow
-- 🤖 Text polishing via multiple LLMs: OpenAI, DeepSeek, Claude, Gemini, Ollama, and more
-- A compact, text-free capsule: an audio-reactive waveform while recording, then processing dots until the result is pasted. Hover or focus to cancel.
-- ⌨️ Lands in whatever app is focused, via the clipboard plus a synthesized ⌘V / Ctrl+V — split into chunks for terminal CLIs that choke on bulk pastes
-- ✏️ Edit selected text by voice — select a paragraph, say "fix the grammar" or "make this shorter", and the selection is rewritten in place (macOS only, requires AI Polish; works in native apps and browser text fields, not in Monaco-based editors like VS Code or Cursor)
-- 🌐 Translation mode: speak in one language, output in another (20+ languages)
-- 📖 Custom dictionary for domain-specific terms
-- 🔍 Per-app detection to adapt formatting
-- 📜 Local history with full-text search — optional, with automatic cleanup after 7/30/90 days
-- 🌗 Dark / light / system theme
-- 🚀 Auto-start on login
-
-> [!TIP]
-> **Recommended Configuration for Best Experience**
->
-> | | Provider | Model |
-> |---|---|---|
-> | 🗣️ STT | Groq | `whisper-large-v3-turbo` |
-> | 🤖 AI Polish | Google | `gemini-2.5-flash` |
->
-> This combo delivers fast, accurate transcription with high-quality text polishing — and both offer generous free tiers.
-
-## Download
-
-Download the latest version for your platform:
-
-**[Download from Releases](https://github.com/azhurb/opentypeless/releases)**
-
-| Platform | File |
-|----------|------|
+| Platform | Download |
+| --- | --- |
+| macOS | `.dmg` matching Apple Silicon or Intel |
 | Windows | `.msi` installer |
-| macOS (Apple Silicon) | `.dmg` |
-| macOS (Intel) | `.dmg` |
-| Linux | `.AppImage` / `.deb` |
+| Linux | `.AppImage` or `.deb` |
 
-## Installation
+1. Install and grant the requested microphone and desktop permissions.
+2. Choose a speech provider and enter its API key. Provider accounts and usage charges are separate from Pipeup.
+3. Optionally configure AI processing with an LLM provider and model. You can skip this step.
+4. Use your keyboard shortcut in the app where you want to type.
+
+Speech providers include Deepgram, AssemblyAI, Gemini Transcribe, OpenAI Whisper, Groq, GLM-ASR, and SiliconFlow. Supported models and languages depend on the provider. See the [provider reference](docs/architecture/providers.md).
 
 ### macOS
 
-Builds are signed with a self-signed certificate (not a paid Apple Developer ID), so macOS quarantines them on download. On first install, strip the quarantine attribute:
-
-1. Open the `.dmg` and drag **Pipeup** into `/Applications`.
-2. In Terminal, run:
-   ```bash
-   xattr -cr /Applications/Pipeup.app
-   ```
-3. Launch the app. Grant **Microphone** and **Accessibility** permissions when prompted.
-
-When upgrading to a new release, repeat step 2 (each download gets a fresh quarantine flag).
-
-**Upgrading from OpenTypeless:** turn off Launch at Startup in the old app if enabled, then quit it. After installing Pipeup, move the old `OpenTypeless.app` to Trash so both copies cannot start. Re-enable Launch at Startup from Pipeup if you use it. Keep the application data: Pipeup retains `com.opentypeless.app`, the existing credential namespace, settings, history, and dictionary. Grant permissions if macOS requests them. The repository URL remains unchanged during this rebrand.
-
-### Windows and Linux
-
-Open the installer / AppImage / `.deb` and follow the standard install prompts.
-
-## Prerequisites
-
-- [Node.js](https://nodejs.org/) 20+
-- [Rust](https://rustup.rs/) (stable toolchain)
-- Platform-specific dependencies for Tauri: see [Tauri Prerequisites](https://v2.tauri.app/start/prerequisites/)
-
-## Getting Started
+Current release builds use a self-signed certificate rather than Apple Developer ID notarization. After downloading a release you trust, drag **Pipeup.app** into `/Applications`, then remove its quarantine attribute if macOS blocks opening it:
 
 ```bash
-# Install dependencies
-npm install
+xattr -cr /Applications/Pipeup.app
+```
 
-# Run in development mode
+Grant **Microphone** and **Accessibility** permissions when prompted. Repeat the quarantine step after an update if necessary. See [troubleshooting](docs/references/troubleshooting.md) for permission problems.
+
+### Upgrading from OpenTypeless
+
+Turn off Launch at Startup in the old app if enabled, then quit it. Install Pipeup and move the old `OpenTypeless.app` to Trash so both copies cannot start. Re-enable Launch at Startup in Pipeup if you use it.
+
+Keep the existing application data. Pipeup retains the bundle identifier, credential storage identifiers, settings, history, and dictionary. This release changes the product name without resetting your setup. The repository URL is `azhurb/pipeup`.
+
+## Data and privacy
+
+Audio goes directly to your configured speech provider. With AI processing enabled, transcript text and relevant context go directly to your configured LLM provider. Provider privacy and retention policies apply. Pipeup has no account service, subscription, telemetry, or automatic updater.
+
+Settings, dictionary, and optional history are stored locally. History searches the most recent 200 entries; clearing history deletes all stored entries. Retention can automatically remove older entries.
+
+API keys are stored separately from settings. On macOS, they use an unencrypted, owner-only file with `0600` permissions. On Windows and Linux, Pipeup uses the OS credential store with a local file fallback when it is unavailable. Existing plaintext settings keys migrate into credential storage. See the [storage reference](docs/architecture/storage.md) for details.
+
+Local Ollama support applies to AI processing. Pipeup does not bundle a speech model or promise offline dictation.
+
+## Known limits
+
+- Output uses clipboard paste into the focused app. Some applications or permission settings can prevent insertion.
+- Voice editing of selected text is macOS-only and requires AI processing. It depends on Accessibility support in the target app; Monaco editors such as VS Code and Cursor do not expose the needed selection.
+- Release downloads and platform support are described in each release's notes. A local macOS build does not verify Windows or Linux packaging.
+
+## Development
+
+Install Node.js 20.19+ or 22.12+, Rust stable, and the [Tauri platform prerequisites](https://v2.tauri.app/start/prerequisites/).
+
+```bash
+npm ci
 npm run tauri dev
-
-# Build for production
-npm run tauri build
 ```
 
-The built application will be in `src-tauri/target/release/bundle/`.
-
-## Configuration
-
-All settings are accessible from the in-app Settings panel:
-
-- **Speech Recognition** — choose STT provider and enter your API key
-- **AI Polish** — choose LLM provider, model, and API key
-- **General** — hotkey, theme, auto-start
-- **Dictionary** — add custom terms for better transcription accuracy
-
-API keys are never kept in a plaintext settings file. On Windows they go to Credential Manager and on Linux to the Secret Service; on macOS they go to a file only your account can read, because the Keychain would ask for your password after every app update unless the project pays for an Apple Developer ID. If you are upgrading from a version that kept them in `settings.json`, they move across on first launch. All STT/LLM requests go directly from your machine to the provider you configure. There is no cloud account, subscription, telemetry, or auto-update — this fork is BYOK-only.
-
-## Architecture
-
-For deeper repository-local architecture docs, start at [docs/index.md](docs/index.md).
-
-**Data Flow Pipeline:**
-
-```
-Microphone → Audio Capture → STT Provider → Raw Transcript → LLM Polish → Clipboard Paste
-```
-
-```
-src/                  # React frontend (TypeScript)
-├── components/       # UI components (Settings, History, Capsule, etc.)
-├── hooks/            # React hooks (recording, theme, Tauri events)
-├── lib/              # Utilities (API client, router, constants)
-└── stores/           # Zustand state management
-
-src-tauri/src/        # Rust backend
-├── audio/            # Audio capture via cpal
-├── stt/              # STT providers (Deepgram, AssemblyAI, Gemini, Whisper-compat)
-├── llm/              # LLM providers (OpenAI-compatible)
-├── output/           # Clipboard-paste output with per-target chunking
-├── storage/          # Config (tauri-plugin-store) + history/dictionary (SQLite)
-├── app_detector/     # Detect active application for context
-├── pipeline.rs       # Recording → STT → LLM → Output orchestration
-└── lib.rs            # Tauri app setup, commands, hotkey handling
-```
-
-## Roadmap
-
-- [ ] Plugin system for custom STT/LLM integrations
-- [ ] Improved multi-language STT accuracy and dialect support
-- [ ] Voice commands (e.g. "delete last sentence")
-- [ ] Customizable hotkey combinations
-- [ ] Improved onboarding experience
-- [ ] Mobile companion app
-
-## FAQ
-
-**Is my audio sent to the cloud?**
-Audio goes directly to whichever STT provider you configure (e.g., Groq, Deepgram). No data is routed through Pipeup servers — there is no telemetry or background reporting in this fork.
-
-**Can I use it offline?**
-With a local STT provider (Whisper via Ollama) and a local LLM (Ollama), the app works entirely offline. No internet connection needed.
-
-**Which languages are supported?**
-STT supports 99+ languages depending on the provider. AI polish and translation support 20+ target languages.
-
-**Is the app free?**
-Yes. Bring your own provider API keys.
-
-## Community
-
-- 🐛 [Issue Tracker](https://github.com/azhurb/opentypeless/issues) — Bug reports and feature requests
-- 📖 [Contributing Guide](CONTRIBUTING.md) — Development setup and guidelines
-- 🔒 [Security Policy](SECURITY.md) — Report vulnerabilities responsibly
-- 🧭 [Vision](VISION.md) — Project principles and roadmap direction
-
-## Contributing
-
-Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
-
-Looking for a place to start? Check out issues labeled [`good first issue`](https://github.com/azhurb/opentypeless/labels/good%20first%20issue).
-
-## Star History
-
-<a href="https://star-history.com/#azhurb/opentypeless&Date">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=azhurb/opentypeless&type=Date&theme=dark" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=azhurb/opentypeless&type=Date" />
-    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=azhurb/opentypeless&type=Date" />
-  </picture>
-</a>
+Use the [command reference](docs/references/commands.md) for production builds and checks, and [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidance. Architecture and behavior documentation starts at [docs/index.md](docs/index.md).
 
 ## Credits
 
-This is a personal fork of the original [OpenTypeless](https://github.com/tover0314-w/opentypeless) by [Tover0314](https://github.com/tover0314-w), who built the initial app. This fork strips the cloud / subscription / account features and keeps only the local BYOK pipeline. All credit for the original architecture and implementation goes to the upstream author; subsequent changes here are mine.
+Pipeup builds on [OpenTypeless](https://github.com/tover0314-w/opentypeless) by [Tover0314](https://github.com/tover0314-w). This fork retains the local bring-your-own-key pipeline and develops its own interface and product identity. The original author's copyright and MIT license are preserved.
 
-## License
-
-[MIT](LICENSE) — see the upstream copyright notice in [LICENSE](LICENSE).
+[MIT license](LICENSE) · [Security policy](SECURITY.md) · [Product direction](VISION.md)

@@ -27,7 +27,7 @@ import { HomePage } from './components/HomePage'
 import { ToastContainer } from './components/Toast'
 
 function CapsuleApp() {
-  useTauriEvents()
+  useTauriEvents('capsule')
   useTheme()
 
   const setConfig = useAppStore((s) => s.setConfig)

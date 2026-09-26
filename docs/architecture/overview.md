@@ -1,6 +1,6 @@
 # Architecture Overview
 
-OpenTypeless is a Tauri 2 desktop app. The user starts recording with a global hotkey or tray action, speaks, and the app transcribes, optionally polishes or translates, then outputs text into the foreground app.
+Pipeup is a Tauri 2 desktop app. The user starts recording with a global hotkey or tray action, speaks, and the app transcribes, optionally polishes or translates, then outputs text into the foreground app.
 
 Stack summary lives in [`CLAUDE.md`](../../CLAUDE.md). This page covers boundaries and runtime shape.
 
@@ -40,7 +40,7 @@ Detail: [Pipeline](pipeline.md). Provider abstractions: [Providers](providers.md
 
 `src/App.tsx` switches synchronously on `window.location.hash`, so the same JS bundle renders either app without a race during startup.
 
-On macOS the app runs as a status-bar utility: `lib.rs` sets the activation policy to `Accessory` at startup, so OpenTypeless has no Dock icon and is reached through the menu-bar tray. This is required so the capsule can overlay other apps' fullscreen Spaces — see [Frontend ↔ Backend → macOS capsule overlay](frontend-backend.md#macos-capsule-overlay-mechanics) for the full set of macOS-specific window mechanics.
+On macOS the app runs as a status-bar utility: `lib.rs` sets the activation policy to `Accessory` at startup, so Pipeup has no Dock icon and is reached through the menu-bar tray. This is required so the capsule can overlay other apps' fullscreen Spaces — see [Frontend ↔ Backend → macOS capsule overlay](frontend-backend.md#macos-capsule-overlay-mechanics) for the full set of macOS-specific window mechanics.
 
 ## Inferences
 
