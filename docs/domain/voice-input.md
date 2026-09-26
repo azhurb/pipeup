@@ -65,3 +65,9 @@ Shared by both:
 The capsule uses a waveform while recording and three processing dots while transcribing or polishing. It does not show elapsed time, shortcuts, or transcript text. Cancellation appears on hover or keyboard focus (always visible on devices without hover); it discards the current dictation. The configured recording limit still applies through `src/hooks/useRecordingLimit.ts`.
 
 Errors, clipboard recovery, selected-text confirmation, and dictionary-correction undo still show actionable text. The selected-text amber ring remains visible. See [Appearance](appearance.md) for the visual system.
+
+## Preferences and first run
+
+Keyboard shortcut capture edits a draft. The saved shortcut is restored when capture ends or the settings view closes, including when the pause request is still in flight. Save registers the new shortcut before releasing the previous one; conflicts leave the saved shortcut in place. Discard changes never changes the registered shortcut. Startup changes are applied by the same configuration command before it broadcasts success. Configuration writes and shortcut pause/resume operations share a backend transaction lock, preventing a delayed resume from restoring an outdated shortcut. Failed disk writes restore the plugin store value and leave the saved configuration cache unchanged.
+
+Onboarding requires a tested speech connection. AI processing is optional: turn it off to continue without an AI provider. When AI processing is enabled, its connection must pass before continuing. Translation is unavailable while AI processing is off. Saving failures keep setup open and display a retryable error, including failure to persist the completion marker. The demonstration is visual only and never records audio or calls a provider.

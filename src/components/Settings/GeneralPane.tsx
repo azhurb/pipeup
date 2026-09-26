@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAppStore } from '../../stores/appStore'
 import type { HotkeyMode } from '../../stores/appStore'
-import { updateHotkey, pauseHotkey, resumeHotkey } from '../../lib/tauri'
+import { pauseHotkey, resumeHotkey } from '../../lib/tauri'
 import { SegmentedControl } from './shared/SegmentedControl'
 import { Toggle } from './shared/Toggle'
 import { ConfirmDialog } from '../ConfirmDialog'
@@ -57,16 +57,8 @@ function HotkeyRecorder() {
       setRecording(false)
       setError(null)
       setModifierHint(null)
-      updateHotkey(hotkey)
-        .then(() => {
-          updateConfig({ hotkey })
-          setPending(null)
-        })
-        .catch((e) => {
-          setError(String(e))
-          setPending(null)
-          resumeHotkey().catch(() => {})
-        })
+      updateConfig({ hotkey })
+      setPending(null)
     },
     [updateConfig],
   )
@@ -134,9 +126,24 @@ function HotkeyRecorder() {
 
   useEffect(() => {
     if (!recording) return
+    let active = true
+    const paused = pauseHotkey()
+    paused.catch((e) => {
+      if (active) {
+        setError(String(e))
+        setRecording(false)
+      }
+    })
     window.addEventListener('keydown', handleKeyDown, true)
     window.addEventListener('keyup', handleKeyUp, true)
     return () => {
+      active = false
+      // Wait for an in-flight pause before restoring the saved shortcut.
+      void paused
+        .then(() => resumeHotkey())
+        .catch((e) => {
+          setError(String(e))
+        })
       window.removeEventListener('keydown', handleKeyDown, true)
       window.removeEventListener('keyup', handleKeyUp, true)
       if (autoConfirmTimer.current) clearTimeout(autoConfirmTimer.current)
@@ -154,10 +161,8 @@ function HotkeyRecorder() {
       setPending(null)
       setModifierHint(null)
       if (autoConfirmTimer.current) clearTimeout(autoConfirmTimer.current)
-      resumeHotkey().catch(() => {})
     } else {
       // Start recording — unregister global shortcut so webview can capture keys
-      pauseHotkey().catch(() => {})
       setRecording(true)
       setPending(null)
       setError(null)

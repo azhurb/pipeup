@@ -186,11 +186,8 @@ export async function loadOnboardingCompleted(): Promise<boolean> {
 }
 
 export async function saveOnboardingCompleted(): Promise<void> {
-  try {
-    const { load } = await import('@tauri-apps/plugin-store')
-    const store = await load('settings.json')
-    await store.set('onboarding_completed', true)
-  } catch (e) {
-    console.error('Failed to persist onboarding state:', e)
-  }
+  const { load } = await import('@tauri-apps/plugin-store')
+  const store = await load('settings.json')
+  await store.set('onboarding_completed', true)
+  await store.save()
 }

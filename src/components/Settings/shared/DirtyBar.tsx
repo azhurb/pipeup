@@ -1,8 +1,9 @@
+import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Loader2 } from 'lucide-react'
 import { useAppStore } from '../../../stores/appStore'
-import { updateConfig, setAutoStart } from '../../../lib/tauri'
+import { updateConfig } from '../../../lib/tauri'
 import { refreshCredentialStatus, writeKeyDrafts } from '../../../lib/credentials'
 
 export function useDirtyConfig() {
@@ -21,8 +22,8 @@ export function useDirtyConfig() {
 type SaveResult = 'idle' | 'success' | 'error'
 
 export function DirtyBar() {
+  const { t } = useTranslation()
   const config = useAppStore((s) => s.config)
-  const savedConfig = useAppStore((s) => s.savedConfig)
   const resetConfig = useAppStore((s) => s.resetConfig)
   const setSavedConfig = useAppStore((s) => s.setSavedConfig)
   const clearKeyDrafts = useAppStore((s) => s.clearKeyDrafts)
@@ -41,10 +42,6 @@ export function DirtyBar() {
       // after a "saved" confirmation that quietly dropped the key.
       await writeKeyDrafts()
       await updateConfig(config)
-      // Sync system auto-start only when the value actually changed
-      if (savedConfig?.auto_start !== config.auto_start) {
-        await setAutoStart(config.auto_start)
-      }
       setSavedConfig(config)
       clearKeyDrafts()
       await refreshCredentialStatus()
@@ -53,7 +50,7 @@ export function DirtyBar() {
         setSaveResult('idle')
       }, 1500)
     } catch (e) {
-      const msg = e instanceof Error ? e.message : 'Failed to save settings'
+      const msg = e instanceof Error ? e.message : t('common.saveFailed')
       setErrorMsg(msg)
       setSaveResult('error')
     } finally {
@@ -77,10 +74,10 @@ export function DirtyBar() {
 
   const labelText =
     saveResult === 'success'
-      ? 'Settings saved'
+      ? t('common.settingsSaved')
       : saveResult === 'error'
-        ? errorMsg || 'Save failed'
-        : 'Unsaved changes'
+        ? errorMsg || t('common.saveFailed')
+        : t('common.unsavedChanges')
 
   const labelColor =
     saveResult === 'success'
@@ -105,7 +102,7 @@ export function DirtyBar() {
             disabled={saving}
             className="px-3 py-1.5 text-[12px] text-text-secondary hover:text-text-primary bg-transparent border-none cursor-pointer rounded-[10px] hover:bg-bg-tertiary transition-colors disabled:opacity-50"
           >
-            Reset
+            {t('common.discardChanges')}
           </button>
           <button
             onClick={handleSave}
@@ -120,7 +117,7 @@ export function DirtyBar() {
                 <Loader2 size={12} />
               </motion.div>
             )}
-            {saving ? 'Saving...' : 'Save'}
+            {saving ? t('common.saving') : t('common.save')}
           </button>
         </div>
       )}

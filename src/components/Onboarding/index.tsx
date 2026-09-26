@@ -1,11 +1,13 @@
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useAppStore } from '../../stores/appStore'
 import { saveOnboardingCompleted, updateConfig as saveConfig } from '../../lib/tauri'
 import { refreshCredentialStatus, writeKeyDrafts } from '../../lib/credentials'
 import { OnboardingLayout } from './OnboardingLayout'
 import { WelcomeStep } from './WelcomeStep'
-import { SttSetupStep } from './SttSetupStep'
-import { LlmSetupStep } from './LlmSetupStep'
+import { SttPane } from '../Settings/SttPane'
+import { LlmPane } from '../Settings/LlmPane'
 import { PermissionsStep } from './PermissionsStep'
 import { QuickTestStep } from './QuickTestStep'
 import { DoneStep } from './DoneStep'
@@ -25,6 +27,10 @@ const STEP_QUICK_TEST = isMac ? 4 : 3
 const STEP_DONE = isMac ? 5 : 4
 
 export function Onboarding() {
+  const { t } = useTranslation()
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
+  const config = useAppStore((s) => s.config)
   const step = useAppStore((s) => s.onboardingStep)
   const setStep = useAppStore((s) => s.setOnboardingStep)
   const setOnboardingCompleted = useAppStore((s) => s.setOnboardingCompleted)
@@ -34,7 +40,7 @@ export function Onboarding() {
   const canNext = (() => {
     if (step === 0) return true // Welcome
     if (step === 1) return sttTestStatus === 'success'
-    if (step === 2) return llmTestStatus === 'success'
+    if (step === 2) return !config.polish_enabled || llmTestStatus === 'success'
     if (step === STEP_PERMISSIONS) return true // optional grants
     if (step === STEP_QUICK_TEST) return true
     if (step === STEP_DONE) return true
@@ -42,32 +48,19 @@ export function Onboarding() {
   })()
 
   const titles: Record<number, { title: string; subtitle?: string }> = {
-    0: {
-      title: 'Welcome to Pipeup',
-      subtitle: 'A few quick steps to get started with voice input',
-    },
-    1: {
-      title: 'Speech Recognition',
-      subtitle: 'Configure your ASR service to convert speech to text',
-    },
-    2: {
-      title: 'AI Polish',
-      subtitle: 'Configure an LLM service to polish transcribed text',
-    },
-    [STEP_QUICK_TEST]: {
-      title: 'How It Works',
-      subtitle: 'See the full pipeline in action — from voice to polished text',
-    },
-    [STEP_DONE]: { title: 'Setup Complete', subtitle: undefined },
+    0: { title: t('onboarding.welcomeTitle'), subtitle: t('onboarding.welcomeSubtitle') },
+    1: { title: t('onboarding.speechTitle'), subtitle: t('onboarding.speechSubtitle') },
+    2: { title: t('onboarding.aiTitle'), subtitle: t('onboarding.aiSubtitle') },
+    [STEP_QUICK_TEST]: { title: t('onboarding.demoTitle'), subtitle: t('onboarding.demoSubtitle') },
+    [STEP_DONE]: { title: t('onboarding.doneTitle') },
   }
   if (STEP_PERMISSIONS >= 0) {
     titles[STEP_PERMISSIONS] = {
-      title: 'macOS Permissions',
-      subtitle: 'Grant Microphone and Accessibility so dictation works on first try',
+      title: t('permissions.title'),
+      subtitle: t('permissions.description'),
     }
   }
 
-  const config = useAppStore((s) => s.config)
   const clearKeyDrafts = useAppStore((s) => s.clearKeyDrafts)
 
   /**
@@ -85,36 +78,23 @@ export function Onboarding() {
     await refreshCredentialStatus()
   }
 
-  const handleNext = async () => {
-    if (step < TOTAL_STEPS - 1) {
-      try {
-        await persistStep()
-      } catch {
-        // Best-effort save — continue navigation even if save fails
-      }
-      setStep(step + 1)
-    } else {
+  const navigate = async (destination: number | 'complete') => {
+    if (saving) return
+    setSaving(true)
+    setSaveError(null)
+    try {
       await persistStep()
-      await saveOnboardingCompleted()
-      setOnboardingCompleted(true)
-    }
-  }
-
-  const handleBack = async () => {
-    if (step > 0) {
-      try {
-        await persistStep()
-      } catch {
-        // Best-effort save
+      if (destination === 'complete') {
+        await saveOnboardingCompleted()
+        setOnboardingCompleted(true)
+      } else {
+        setStep(destination)
       }
-      setStep(step - 1)
+    } catch (error) {
+      setSaveError(`${t('onboarding.saveFailed')} ${String(error)}`)
+    } finally {
+      setSaving(false)
     }
-  }
-
-  const handleSkip = async () => {
-    await persistStep()
-    await saveOnboardingCompleted()
-    setOnboardingCompleted(true)
   }
 
   return (
@@ -123,13 +103,24 @@ export function Onboarding() {
       totalSteps={TOTAL_STEPS}
       title={titles[step].title}
       subtitle={titles[step].subtitle}
-      canNext={canNext}
-      canBack={step > 0}
-      nextLabel={step === TOTAL_STEPS - 1 ? 'Get Started' : 'Next'}
-      onNext={handleNext}
-      onBack={handleBack}
-      onSkip={handleSkip}
+      canNext={canNext && !saving}
+      canBack={step > 0 && !saving}
+      nextLabel={
+        saving
+          ? t('common.saving')
+          : step === TOTAL_STEPS - 1
+            ? t('onboarding.getStarted')
+            : t('onboarding.next')
+      }
+      onNext={() => void navigate(step === TOTAL_STEPS - 1 ? 'complete' : step + 1)}
+      onBack={() => void navigate(step - 1)}
+      onSkip={saving ? undefined : () => void navigate('complete')}
     >
+      {saveError && (
+        <p role="alert" className="text-[13px] text-error mb-4">
+          {saveError}
+        </p>
+      )}
       <AnimatePresence mode="wait">
         <motion.div
           key={step}
@@ -140,8 +131,8 @@ export function Onboarding() {
           transition={{ duration: 0.2 }}
         >
           {step === 0 && <WelcomeStep />}
-          {step === 1 && <SttSetupStep />}
-          {step === 2 && <LlmSetupStep />}
+          {step === 1 && <SttPane />}
+          {step === 2 && <LlmPane />}
           {step === STEP_PERMISSIONS && <PermissionsStep />}
           {step === STEP_QUICK_TEST && <QuickTestStep />}
           {step === STEP_DONE && <DoneStep />}

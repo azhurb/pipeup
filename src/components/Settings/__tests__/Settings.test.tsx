@@ -68,7 +68,13 @@ vi.mock('react-i18next', async (importOriginal) => {
   return {
     ...actual,
     useTranslation: () => ({
-      t: (key: string) => key,
+      t: (key: string) =>
+        ({
+          'common.unsavedChanges': 'Unsaved changes',
+          'common.save': 'Save',
+          'common.discardChanges': 'Discard changes',
+          'common.saveFailed': 'Failed to save settings',
+        })[key] ?? key,
       i18n: { language: 'en', changeLanguage: vi.fn() },
     }),
   }
@@ -98,7 +104,9 @@ vi.mock('@tauri-apps/plugin-opener', () => ({ openUrl: vi.fn() }))
 
 // ─── Mock @tauri-apps/api/app ───────────────────────────────────────────────
 // AboutPane reads the version from the bundle; there is no IPC under vitest.
-vi.mock('@tauri-apps/api/app', () => ({ getVersion: vi.fn().mockResolvedValue('9.9.9') }))
+vi.mock('@tauri-apps/api/app', () => ({
+  getVersion: vi.fn().mockResolvedValue('9.9.9'),
+}))
 
 // ─── Import components AFTER mocks ───────────────────────────────────────────
 import { Settings } from '../index'
@@ -406,7 +414,7 @@ describe('DirtyBar behavior', () => {
       expect(screen.getByText('Unsaved changes')).toBeDefined()
     })
 
-    fireEvent.click(screen.getByText('Reset'))
+    fireEvent.click(screen.getByText('Discard changes'))
 
     await waitFor(() => {
       expect(screen.queryByText('Unsaved changes')).toBeNull()
@@ -420,7 +428,7 @@ describe('DirtyBar behavior', () => {
     })
     await waitFor(() => {
       expect(screen.getByText('Save')).toBeDefined()
-      expect(screen.getByText('Reset')).toBeDefined()
+      expect(screen.getByText('Discard changes')).toBeDefined()
     })
   })
 
@@ -474,7 +482,7 @@ describe('DirtyBar behavior', () => {
       expect(screen.getByText('Unsaved changes')).toBeDefined()
     })
 
-    fireEvent.click(screen.getByText('Reset'))
+    fireEvent.click(screen.getByText('Discard changes'))
 
     await waitFor(() => {
       expect(screen.queryByText('Unsaved changes')).toBeNull()
@@ -484,7 +492,10 @@ describe('DirtyBar behavior', () => {
 
   it('Save sends the typed key to the vault, never to the config', async () => {
     const { setApiKey, updateConfig, getCredentialStatus } = await import('../../../lib/tauri')
-    vi.mocked(getCredentialStatus).mockResolvedValue({ stt: 'saved', llm: 'missing' })
+    vi.mocked(getCredentialStatus).mockResolvedValue({
+      stt: 'saved',
+      llm: 'missing',
+    })
 
     renderSettings()
     act(() => {
@@ -503,7 +514,10 @@ describe('DirtyBar behavior', () => {
     expect(JSON.stringify(savedConfig)).not.toContain('sk-fresh')
     // Drafts clear once the vault accepted the key.
     await waitFor(() => {
-      expect(useAppStore.getState().keyDrafts).toEqual({ stt: null, llm: null })
+      expect(useAppStore.getState().keyDrafts).toEqual({
+        stt: null,
+        llm: null,
+      })
     })
   })
 

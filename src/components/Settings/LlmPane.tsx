@@ -93,6 +93,11 @@ export function LlmPane() {
 
   return (
     <div className="space-y-5">
+      <Toggle
+        checked={config.polish_enabled}
+        onChange={(checked) => updateConfig({ polish_enabled: checked })}
+        label={t('settings.enableAiPolish')}
+      />
       <FormField label={t('settings.provider')}>
         <select
           value={config.llm_provider}
@@ -195,6 +200,7 @@ export function LlmPane() {
               value={config.llm_model}
               onChange={(e) => {
                 updateConfig({ llm_model: e.target.value })
+                setLlmTestStatus('idle')
                 setLlmLatencyMs(null)
               }}
               placeholder="e.g. gpt-4o-mini"
@@ -225,7 +231,11 @@ export function LlmPane() {
       <FormField label={t('settings.baseUrl')}>
         <input
           value={config.llm_base_url}
-          onChange={(e) => updateConfig({ llm_base_url: e.target.value })}
+          onChange={(e) => {
+            updateConfig({ llm_base_url: e.target.value })
+            setLlmTestStatus('idle')
+            setLlmLatencyMs(null)
+          }}
           placeholder="https://open.bigmodel.cn/api/paas/v4"
           className="w-full px-3 py-2.5 bg-bg-secondary border border-border rounded-[10px] font-mono text-[13px] text-text-primary outline-none focus:border-border-focus transition-colors"
         />
@@ -233,15 +243,16 @@ export function LlmPane() {
 
       <div className="space-y-3 pt-1">
         <Toggle
-          checked={config.polish_enabled}
-          onChange={(checked) => updateConfig({ polish_enabled: checked })}
-          label={t('settings.enableAiPolish')}
-        />
-        <Toggle
-          checked={config.translate_enabled}
+          checked={config.polish_enabled && config.translate_enabled}
           onChange={(checked) => updateConfig({ translate_enabled: checked })}
           label={t('settings.translationMode')}
+          disabled={!config.polish_enabled}
         />
+        {!config.polish_enabled && (
+          <p className="text-[11px] text-text-tertiary -mt-1 ml-[52px]">
+            {t('settings.translationRequiresAi', 'Enable AI processing to translate dictation.')}
+          </p>
+        )}
         {/* Only the LLM request ever reads the captured selection, so with polish
             off this setting is a silent no-op — hence disabled rather than merely
             documented. The pipeline enforces the same rule independently. Off
@@ -270,7 +281,7 @@ export function LlmPane() {
         )}
       </div>
 
-      {config.translate_enabled && (
+      {config.polish_enabled && config.translate_enabled && (
         <FormField label={t('settings.targetLanguage')}>
           <select
             value={config.target_lang}

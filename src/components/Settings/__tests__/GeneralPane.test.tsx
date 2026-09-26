@@ -177,3 +177,42 @@ describe('GeneralPane history controls', () => {
     })
   })
 })
+
+describe('keyboard shortcut capture', () => {
+  afterEach(() => cleanup())
+
+  it('restores the saved shortcut after unmount, even if pausing is still pending', async () => {
+    const api = await import('../../../lib/tauri')
+    let finishPause!: () => void
+    vi.mocked(api.pauseHotkey).mockImplementation(
+      () =>
+        new Promise<void>((resolve) => {
+          finishPause = resolve
+        }),
+    )
+    vi.mocked(api.resumeHotkey).mockResolvedValue(undefined)
+    vi.mocked(api.resumeHotkey).mockClear()
+    const { unmount } = render(<GeneralPane />)
+    fireEvent.click(screen.getByText('Alt+/'))
+    unmount()
+    expect(api.resumeHotkey).not.toHaveBeenCalled()
+    finishPause()
+    await waitFor(() => expect(api.resumeHotkey).toHaveBeenCalledOnce())
+  })
+
+  it('keeps the new shortcut as an unsaved draft and resumes the saved shortcut', async () => {
+    const api = await import('../../../lib/tauri')
+    vi.mocked(api.pauseHotkey).mockResolvedValue(undefined)
+    vi.mocked(api.resumeHotkey).mockResolvedValue(undefined)
+    vi.mocked(api.updateHotkey).mockClear()
+    vi.mocked(api.resumeHotkey).mockClear()
+    mockAppStore.updateConfig.mockClear()
+    render(<GeneralPane />)
+    fireEvent.click(screen.getByText('Alt+/'))
+    fireEvent.keyDown(window, { key: 'k', ctrlKey: true })
+    fireEvent.click(screen.getByText('Ctrl+K'))
+    expect(mockAppStore.updateConfig).toHaveBeenCalledWith({ hotkey: 'Ctrl+K' })
+    expect(api.updateHotkey).not.toHaveBeenCalled()
+    await waitFor(() => expect(api.resumeHotkey).toHaveBeenCalledOnce())
+  })
+})

@@ -1,6 +1,5 @@
 import { X } from 'lucide-react'
-import { motion } from 'framer-motion'
-import { spring } from '../../lib/animations'
+import { useTranslation } from 'react-i18next'
 import { StepIndicator } from './StepIndicator'
 
 interface Props {
@@ -30,6 +29,7 @@ export function OnboardingLayout({
   onSkip,
   children,
 }: Props) {
+  const { t } = useTranslation()
   const handleClose = () => {
     import('@tauri-apps/api/core')
       .then(({ invoke }) => invoke('plugin:process|exit', { code: 0 }))
@@ -43,7 +43,7 @@ export function OnboardingLayout({
         <button
           onClick={handleClose}
           className="p-1.5 rounded-[6px] hover:bg-bg-tertiary transition-colors bg-transparent border-none cursor-pointer text-text-tertiary hover:text-text-primary"
-          aria-label="Close"
+          aria-label={t('common.close')}
         >
           <X size={14} />
         </button>
@@ -58,7 +58,7 @@ export function OnboardingLayout({
             onClick={onSkip}
             className="w-16 text-right text-[12px] text-text-tertiary hover:text-text-primary bg-transparent border-none cursor-pointer transition-colors"
           >
-            Skip
+            {t('onboarding.skipSetup')}
           </button>
         ) : (
           <div className="w-16" />
@@ -78,26 +78,20 @@ export function OnboardingLayout({
 
       {/* Navigation — jelly buttons */}
       <div className="flex items-center justify-between px-8 py-4">
-        <motion.button
+        <button
           onClick={onBack}
           disabled={!canBack}
-          whileHover={canBack ? { scale: 1.04 } : undefined}
-          whileTap={canBack ? { scaleX: 1.06, scaleY: 0.94 } : undefined}
-          transition={spring.jellyGentle}
           className="px-4 py-2 text-[13px] text-text-secondary hover:text-text-primary bg-transparent border-none cursor-pointer disabled:opacity-0 disabled:cursor-default transition-colors"
         >
-          Back
-        </motion.button>
-        <motion.button
+          {t('onboarding.back')}
+        </button>
+        <button
           onClick={onNext}
           disabled={!canNext}
-          whileHover={canNext ? { scale: 1.04 } : undefined}
-          whileTap={canNext ? { scaleX: 1.06, scaleY: 0.94 } : undefined}
-          transition={spring.jellyGentle}
           className="px-6 py-2 text-[13px] font-medium text-white bg-accent rounded-full border-none cursor-pointer hover:bg-accent-hover disabled:opacity-40 disabled:cursor-not-allowed transition-colors jelly-btn-accent"
         >
           {nextLabel}
-        </motion.button>
+        </button>
       </div>
     </div>
   )

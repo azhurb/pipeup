@@ -216,8 +216,6 @@ impl ConfigManager {
     }
 
     pub async fn save(&self, config: &AppConfig) -> Result<()> {
-        *self.cache.lock().unwrap_or_else(|e| e.into_inner()) = Some(config.clone());
-
         let store = self
             .app_handle
             .store("settings.json")
@@ -236,8 +234,20 @@ impl ConfigManager {
                 }
             }
         }
+        let previous = store.get("app_config");
         store.set("app_config", val);
-        store.save().map_err(|e| anyhow::anyhow!("{}", e))?;
+        if let Err(error) = store.save() {
+            // The plugin mutates its in-memory store before writing to disk.
+            // Restore that value so later loads/autosaves cannot adopt a failed
+            // preference transaction. Keep our cache at the last saved value.
+            if let Some(previous) = previous {
+                store.set("app_config", previous);
+            } else {
+                store.delete("app_config");
+            }
+            return Err(anyhow::anyhow!("{}", error));
+        }
+        *self.cache.lock().unwrap_or_else(|e| e.into_inner()) = Some(config.clone());
 
         Ok(())
     }
