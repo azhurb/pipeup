@@ -1545,7 +1545,7 @@ pub fn run() {
                     }
                     "settings" => {
                         if let Some(window) = app.get_webview_window("main") {
-                            let _ = window.emit("tray:settings", ());
+                            let _ = window.emit_to("main", "tray:settings", ());
                             let _ = window.show();
                             let _ = window.set_focus();
                             refresh_tray(app);
@@ -1553,7 +1553,7 @@ pub fn run() {
                     }
                     "history" => {
                         if let Some(window) = app.get_webview_window("main") {
-                            let _ = window.emit("tray:history", ());
+                            let _ = window.emit_to("main", "tray:history", ());
                             let _ = window.show();
                             let _ = window.set_focus();
                             refresh_tray(app);
@@ -1561,7 +1561,7 @@ pub fn run() {
                     }
                     "about" => {
                         if let Some(window) = app.get_webview_window("main") {
-                            let _ = window.emit("tray:about", ());
+                            let _ = window.emit_to("main", "tray:about", ());
                             let _ = window.show();
                             let _ = window.set_focus();
                             refresh_tray(app);

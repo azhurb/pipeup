@@ -10,8 +10,9 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, waitFor, cleanup } from '@testing-library/react'
+import { render, waitFor, cleanup, act, screen } from '@testing-library/react'
 import { useAppStore } from '../stores/appStore'
+import { listen } from '@tauri-apps/api/event'
 
 afterEach(() => {
   cleanup()
@@ -65,7 +66,9 @@ vi.mock('../components/MainLayout', () => ({
 vi.mock('../components/HomePage', () => ({ HomePage: () => null }))
 vi.mock('../components/Settings', () => ({ Settings: () => null }))
 vi.mock('../components/History', () => ({ History: () => null }))
-vi.mock('../components/Capsule', () => ({ Capsule: () => null }))
+vi.mock('../components/Capsule', () => ({
+  Capsule: () => <div data-testid="capsule" />,
+}))
 vi.mock('../components/Toast', () => ({ ToastContainer: () => null }))
 
 vi.mock('react-i18next', async (importOriginal) => {
@@ -191,5 +194,30 @@ describe('MainApp initial load — config preservation', () => {
       expect(getHistory).toHaveBeenCalled()
       expect(getDictionary).toHaveBeenCalled()
     })
+  })
+})
+
+describe('capsule navigation regression', () => {
+  beforeEach(() => {
+    resetAll()
+    vi.mocked(listen).mockClear()
+  })
+
+  it('keeps the capsule rendered after tray navigation and a remount', async () => {
+    window.location.hash = '#capsule'
+    const first = render(<App />)
+    await waitFor(() => expect(getConfig).toHaveBeenCalled())
+    await act(async () => {
+      for (const [event, handler] of vi.mocked(listen).mock.calls) {
+        if (event.startsWith('tray:') || event === 'navigate') {
+          handler({ event, id: 0, payload: '#/settings/about' })
+        }
+      }
+    })
+    expect(window.location.hash).toBe('#capsule')
+    first.unmount()
+    render(<App />)
+    await waitFor(() => expect(screen.getByTestId('capsule')).toBeInTheDocument())
+    expect(loadOnboardingCompleted).not.toHaveBeenCalled()
   })
 })
