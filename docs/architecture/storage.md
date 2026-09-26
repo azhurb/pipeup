@@ -1,6 +1,6 @@
 # Storage
 
-OpenTypeless uses local app data for config, history, dictionary, and window/onboarding state, plus the OS credential vault for provider API keys. See [Feature map](../domain/features.md) and [Pipeline](pipeline.md) for how stored values feed user-facing behavior.
+Pipeup uses local app data for config, history, dictionary, and window/onboarding state, plus the OS credential vault for provider API keys. See [Feature map](../domain/features.md) and [Pipeline](pipeline.md) for how stored values feed user-facing behavior.
 
 Evidence: `src-tauri/src/storage/mod.rs`, `src-tauri/src/credentials.rs`, `src-tauri/migrations/001_init.sql`, `src/lib/tauri.ts`, `src/lib/credentials.ts`, `src/App.tsx`.
 

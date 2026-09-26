@@ -14,18 +14,16 @@ Your report should include:
 - Steps to reproduce
 - Impact description
 
-We will acknowledge your report within 72 hours and aim to release a fix within 14 days for critical issues.
+## Security model
 
-## Security Model
+Pipeup uses a bring-your-own-key model. There is no Pipeup account service or cloud proxy.
 
-OpenTypeless follows a **Bring Your Own Key (BYOK)** model:
+- Audio is sent directly to the configured speech provider. Optional AI processing sends transcript text and relevant context directly to the configured LLM provider.
+- API keys are stored separately from settings. macOS uses an unencrypted, owner-only file (`0600`). Windows and Linux use the OS credential store with a local file fallback if unavailable.
+- Settings, dictionary, and optional history stay on the local machine. Provider privacy and retention policies apply to requests sent to them.
+- The application does not collect telemetry or usage data. CSP is enabled in the Tauri webview.
 
-- All API keys are stored locally on the user's machine via `tauri-plugin-store`
-- No cloud account or server-side storage is required for the core product
-- Audio data is sent directly from the user's machine to the chosen STT/LLM provider
-- Cloud proxy mode requires authentication via session token
-- The application does not collect telemetry or usage data
-- CSP is enabled in the Tauri webview
+See the [storage reference](docs/architecture/storage.md) for credential migration and persistence details. Do not include real API keys or personal dictation in vulnerability reports.
 
 ## Out of Scope
 

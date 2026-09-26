@@ -22,6 +22,7 @@ Repository-local system of record for architecture, domain knowledge, decisions,
 
 ## References
 
+- [Release preparation](references/release-preparation.md) - product checks, upgrade compatibility, and repository rebrand operations.
 - [Commands](references/commands.md) — canonical local dev / CI-equivalent commands.
 - [Repository map](references/repo-map.md) — where important files live.
 - [Conventions](references/conventions.md) — formatting, commits, translations.

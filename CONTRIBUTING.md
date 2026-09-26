@@ -1,69 +1,35 @@
-# Contributing to OpenTypeless
+# Contributing to Pipeup
 
-Thanks for your interest in contributing! This guide covers everything you need to get started.
+Pipeup is a desktop voice input app for people comfortable configuring their own providers. Changes should make dictation reliable, configuration understandable, and the interface consistent.
 
-## Development Setup
+## Development setup
 
-1. Install prerequisites: Node.js 20+, Rust stable toolchain, and [Tauri prerequisites](https://v2.tauri.app/start/prerequisites/)
-2. Clone the repo and run `npm install`
-3. Start development: `npm run tauri dev`
+Install Node.js 20.19+ or 22.12+, Rust stable, and the [Tauri prerequisites](https://v2.tauri.app/start/prerequisites/). Clone the repository, run `npm ci`, then `npm run tauri dev`.
 
-## How to Contribute
+Start with the [documentation index](docs/index.md) for architecture and behavior. [Commands](docs/references/commands.md) is the canonical source for builds and validation.
 
-| Type | Process |
-|------|---------|
-| Bug fix / small improvement | Open a PR directly |
-| New feature / architecture change | Start a [Discussion](https://github.com/azhurb/opentypeless/discussions/categories/ideas) first |
-| Question / help | Post in [Q&A Discussions](https://github.com/azhurb/opentypeless/discussions/categories/q-a) |
+## Making changes
 
-## Making Changes
+1. Fork the repository and create a branch for one coherent change.
+2. Make the change and add meaningful regression coverage for behavior changes.
+3. Update matching documentation in the same PR. See [documentation maintenance](docs/references/documentation-maintenance.md).
+4. Run the relevant checks from the [command reference](docs/references/commands.md).
+5. Open a pull request against `main` with the problem, resulting behavior, and actual verification results.
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feat/my-feature`
-3. Make your changes
-4. Run the pre-submit checklist (see below)
-5. Commit with a descriptive message following [Conventional Commits](https://www.conventionalcommits.org/)
-6. Open a pull request against `main`
+For a substantial feature, describe the proposed behavior in a draft PR before investing in the full implementation. Small fixes can go straight to a PR. Do not include API keys, personal dictation, or unredacted logs in reports or screenshots. Security reports follow [SECURITY.md](SECURITY.md).
 
-## Pre-Submit Checklist
+## Review expectations
 
-Run the canonical command list before opening a PR: [`docs/references/commands.md`](docs/references/commands.md). It mirrors `.github/workflows/ci.yml` and is the single source of truth — please don't copy the commands into other docs or PR templates.
+- Keep existing settings, credentials, history, and dictionary compatible unless a migration is explicitly part of the change.
+- Check keyboard navigation, accessible control names, light/dark themes, reduced motion, and English/Chinese text for UI changes. Include screenshots where appearance changes.
+- Report platforms actually tested and anything skipped or failing. A check that did not run is not a passing check.
+- If documentation is unaffected, say `Docs: not affected.` in the PR description.
+- AI-assisted contributions follow the same standard. Disclose substantial AI assistance and review the result before submitting it.
 
-Also: if your change touches behavior, providers, commands/events, storage, or workflows described under `docs/`, update the matching doc in the same PR. Trigger list: [`docs/references/documentation-maintenance.md`](docs/references/documentation-maintenance.md). If your change is doc-irrelevant, add `Docs: not affected.` to the PR description so reviewers don't have to guess.
+## Code and commits
 
-## Commit Message Format
+TypeScript uses strict mode, React, Tailwind, and Zustand. Rust formatting and Clippy checks must pass. Prettier formats frontend code. See [conventions](docs/references/conventions.md).
 
-We use [Conventional Commits](https://www.conventionalcommits.org/):
+Use [Conventional Commits](https://www.conventionalcommits.org/), for example `fix: restore shortcut after cancelling capture` or `feat: add a speech provider`. Keep titles specific and avoid bundling unrelated changes.
 
-```
-<type>: <description>
-
-[optional body]
-```
-
-Types: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`, `perf`, `ci`
-
-Examples:
-- `feat: add Groq Whisper STT provider`
-- `fix: resolve audio recording crash on macOS`
-- `docs: update README installation steps`
-
-## Code Style
-
-- **TypeScript**: strict mode, no `any` types
-- **Rust**: `cargo fmt` and `cargo clippy` must pass
-- **Frontend**: Tailwind CSS for styling, Zustand for state
-- **Formatting**: Prettier for TypeScript/JavaScript/CSS
-
-## AI-Assisted Contributions
-
-We welcome contributions made with the help of AI tools (GitHub Copilot, Claude, ChatGPT, etc.). If your PR was substantially generated by AI, please mention it in the PR description. The same quality standards apply to all contributions regardless of how they were written.
-
-## Current Priorities
-
-- Stability and reliability across all platforms
-- User experience improvements
-- Additional STT and LLM provider integrations
-- Internationalization coverage
-
-See [VISION.md](VISION.md) for the project's long-term direction.
+See [VISION.md](VISION.md) for product direction and [release preparation](docs/references/release-preparation.md) for the rebrand's release checks.

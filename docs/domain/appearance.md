@@ -5,7 +5,7 @@ Pipeup is the displayed product name. The developer-focused interface uses warm 
 ## Interface
 
 - `src/styles/globals.css` owns the palette and shared surface styles. Existing `jelly-*` class names are compatibility hooks; their appearance is now flat.
-- `MainLayout` owns the primary sidebar. Settings panes use a wrapping row of navigation buttons, preserving the existing provider options and explicit Save/Reset behavior.
+- `MainLayout` owns the primary sidebar. Overview, History, and Dictionary are primary destinations; Settings stays at the bottom of the sidebar. Settings has General, Dictation, AI processing, Privacy, and About pages with addressable routes and explicit Save/Discard changes behavior.
 - Active recording, transcription, polishing, and completion all use an 88 by 32 logical-pixel capsule. `useCapsuleResize` adds the native window padding. Recovery messages retain their larger sizes.
 - Normal recording and processing have no visible text. State labels remain available to assistive technology. See [Voice input](voice-input.md#recording-feedback) for cancellation, recording limits, and recovery behavior.
 
@@ -21,6 +21,8 @@ The display name, native window titles, permission copy, and tray tooltip use Pi
 
 The bundle identifier (`com.opentypeless.app`), credential namespace, database filenames, Cargo executable name, and existing signing certificate identities are deliberately unchanged. This visual rebrand does not move or reset local data and does not detach the repository from its fork network.
 
-The macOS bundle is named `Pipeup.app`; its executable remains `opentypeless`. The previous `OpenTypeless.app` will not be overwritten by that differently named bundle. The [installation instructions](../../README.md#macos) cover retiring the old app copy without deleting its data.
+The macOS bundle is named `Pipeup.app`; its executable remains `opentypeless`. The previous `OpenTypeless.app` will not be overwritten by that differently named bundle. The [upgrade instructions](../../README.md#upgrading-from-opentypeless) cover retiring the old app copy without deleting its data.
+
+The frontend npm package is named `pipeup`; this does not change the native executable or data paths. Repository rename and fork detachment are separate, approval-dependent operations. See [release preparation](../references/release-preparation.md).
 
 Name availability and trademark clearance are outside this implementation and remain unverified.

@@ -11,6 +11,18 @@ This repository is a fork of [Tover0314/opentypeless](https://github.com/tover03
 ## [Unreleased]
 
 ### Changed
+
+- Reorganized the desktop into Overview, History, Dictionary, and focused Settings pages. Added appearance controls, consistent English/Chinese labels, and direct About navigation.
+- Reworked onboarding around speech setup and optional AI processing, with a minimal capsule demonstration and visible save errors.
+- Improved keyboard navigation, field labels, confirmation dialogs, and local-date History search. Search explicitly covers the latest 200 entries.
+- Refreshed repository presentation, current screenshots, security documentation, and release migration guidance for Pipeup.
+
+### Fixed
+
+- Keyboard shortcut edits now respect Save and Discard changes. Capture restoration and preference saving are serialized, and failed saves preserve the previous configuration.
+- Translation controls explain their dependency on AI processing.
+
+### Changed
 - Renamed the displayed product to Pipeup, with a warm light/dark interface, simplified app and tray icons, and a single primary sidebar with settings navigation across the top. The bundle identifier and existing local data remain unchanged. On macOS, quit and remove the old OpenTypeless app copy after installing Pipeup.
 - Made the active capsule compact and text-free. Recording uses five audio-reactive bars; transcription and polishing use processing dots. Cancel appears on hover or keyboard focus, while recording limits and actionable recovery messages remain available.
 

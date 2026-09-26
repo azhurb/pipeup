@@ -6,12 +6,12 @@ Short list of failure modes that surface in user reports.
 
 ### Microphone is denied or restricted
 
-OpenTypeless refuses to start the pipeline when macOS reports the Microphone authorization status as `denied` or `restricted` — letting `cpal` try to open the input device would fail silently and the macOS prompt is one-shot per install.
+Pipeup refuses to start the pipeline when macOS reports the Microphone authorization status as `denied` or `restricted` — letting `cpal` try to open the input device would fail silently and the macOS prompt is one-shot per install.
 
 Fix:
 
 1. System Settings → Privacy & Security → **Microphone**
-2. Toggle OpenTypeless on (or add it if it isn't listed)
+2. Toggle Pipeup on (or add it if it isn't listed)
 3. Re-press the hotkey
 
 The main window also shows a red **Microphone denied** banner with a one-click deeplink to the right pane.
@@ -20,48 +20,23 @@ The main window also shows a red **Microphone denied** banner with a one-click d
 
 macOS keys Accessibility (TCC) grants by bundle ID *plus* code signature. When a new build with a different signing identity replaces an older OpenTypeless.app — common for self-signed local builds, ad-hoc-signed dev builds, or fork-built bundles — the entry remains in System Settings but the OS silently denies it because the signature hash doesn't match. CGEventPost then drops every synthesised key without surfacing an error.
 
-OpenTypeless detects this on the next paste attempt (`AXIsProcessTrusted()` returns false even though the entry exists) and surfaces the Accessibility banner. The user-visible symptom is "I granted permission but paste still doesn't work."
+Pipeup detects this on the next paste attempt (`AXIsProcessTrusted()` returns false even though the entry exists) and surfaces the Accessibility banner. The user-visible symptom is "I granted permission but paste still doesn't work."
 
 Fix:
 
 1. System Settings → Privacy & Security → **Accessibility**
-2. Select OpenTypeless, click the `-` to remove it
+2. Select Pipeup, click the `-` to remove it
 3. Trigger a dictation; the in-app banner re-prompts and macOS re-adds the entry
 4. Toggle the new entry on
 5. Dictate again
 
-## macOS: "It keeps asking for my password to access the keychain"
+## macOS: credential prompts after an upgrade
 
-API keys live in the login keychain (see [Storage → Credentials](../architecture/storage.md#credentials-os-credential-vault)). A keychain item's ACL matches on the app's **designated requirement**, so which builds it trusts depends on how they were signed:
+Current macOS builds store provider keys in an owner-only file, not the login Keychain. This avoids repeated Keychain prompts for self-signed builds. See [Storage](../architecture/storage.md#credentials-os-credential-vault) for the exact persistence and migration behavior.
 
-- **Release builds** are signed with the "OpenTypeless Release" certificate, giving a requirement of `certificate leaf = H"…"`. That is stable across versions, so updating the app does *not* re-prompt.
-- **Local builds** (`npm run tauri build` with no certificate) are ad-hoc signed, giving `cdhash H"…"` — a different identity on every rebuild. Each rebuild is a stranger to the previous build's keychain items and prompts once. This is expected while developing; click **Always Allow**.
+A Keychain prompt may come from an older app copy or a custom build using the system vault. Quit any old OpenTypeless copy and confirm which app is requesting access. Keep credential files and application data intact; removing them is not part of the Pipeup upgrade.
 
-Two things that look like this bug but aren't:
-
-- Running `security find-generic-password -s com.opentypeless.app …` from a terminal prompts every time. `/usr/bin/security` is not on the item's ACL — that dialog says "**security** wants to use your confidential information", not "OpenTypeless". Read the app's own log instead: it reports `stt_key_len` at dictation time.
-- Choosing **Allow** rather than **Always Allow** grants a single access. Reads are cached per session, so this costs at most one prompt per key per launch rather than one per dictation.
-
-### Stopping the per-rebuild prompt while developing
-
-Each ad-hoc build appends its own hash to the item's ACL once you click "Always Allow", so the prompts never stop — the next rebuild is a new stranger. Observed directly in `securityd`'s log: the ACL had accumulated the hashes of two earlier builds while a third, freshly built binary was the one asking.
-
-Sign local builds with a stable self-signed certificate instead, and the ACL pins to the certificate rather than the hash:
-
-1. Keychain Access → Certificate Assistant → **Create a Certificate…**
-2. Name it (e.g. `OpenTypeless Dev`), Identity Type **Self Signed Root**, Certificate Type **Code Signing**.
-3. Find it in **login**, open it, and set **Trust → Code Signing: Always Trust**.
-4. Build with it:
-
-```bash
-APPLE_SIGNING_IDENTITY="OpenTypeless Dev" npm run tauri build
-```
-
-Every subsequent build signed with that certificate satisfies the same ACL entry, so you approve once. Delete existing entries first (Keychain Access, search `com.opentypeless.app`) so they get recreated against the certificate rather than an old hash.
-
-If prompts genuinely repeat for a *released* build, the signing certificate has likely been rotated; every existing ACL entry then needs one "Always Allow" again.
-
-Inspect what a bundle claims with:
+Release signing still uses the existing `OpenTypeless Release` certificate. The certificate name is an internal compatibility identifier. Inspect a bundle's designated requirement with:
 
 ```bash
 codesign -d -r- /Applications/Pipeup.app

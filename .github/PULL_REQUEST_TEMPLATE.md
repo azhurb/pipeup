@@ -1,31 +1,18 @@
 ## Summary
 
-<!-- What does this PR do and why? -->
+<!-- Describe the problem and resulting behavior. Keep one coherent scope. -->
 
-## Change Type
+## Validation
 
-- [ ] Bug fix
-- [ ] New feature
-- [ ] Refactor
-- [ ] Documentation
-- [ ] CI / Infrastructure
+<!-- List commands and results, tested platforms, and any failures or skipped checks.
+Use docs/references/commands.md as the canonical checklist. -->
 
-## Changes
+## Screenshots
 
--
+<!-- For UI changes, include relevant light/dark screenshots without personal data. -->
 
-## Test Plan
+## Documentation and release impact
 
-- [ ] Tested locally on [OS]
-- [ ] `npm run build` passes
-- [ ] `npx vitest run` passes
-- [ ] `cargo clippy -- -D warnings` passes
-- [ ] No regressions in existing functionality
-
-## Screenshots / Recordings
-
-<!-- If UI changes, attach before/after screenshots -->
-
-## Related Issues
-
-<!-- Fixes #123, Closes #456 -->
+<!-- Link updated docs or state "Docs: not affected."
+Describe compatibility, migration, and any steps required after release. Say "None" if none.
+Disclose substantial AI assistance. -->

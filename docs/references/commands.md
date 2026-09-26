@@ -132,7 +132,7 @@ Releases are tag-driven. `.github/workflows/release.yml` triggers on tags matchi
 
 5. The `Release` workflow runs four parallel builds: Windows (`x86_64-pc-windows-msvc`), macOS arm64 (`aarch64-apple-darwin`), macOS x86_64 (`x86_64-apple-darwin`), Linux (`x86_64-unknown-linux-gnu`).
 6. CI strips the leading `v` and writes the version into `package.json`, `src-tauri/tauri.conf.json`, and `src-tauri/Cargo.toml` *during the build only* — these files stay at `0.1.0` in git. **Do not commit version bumps.**
-7. `tauri-apps/tauri-action@v0` uploads the artifacts to a **draft** GitHub Release with a stub body. Replace the body with proper release notes (sections from the `CHANGELOG.md` entry plus a Downloads section that includes the macOS Gatekeeper `xattr -dr com.apple.quarantine` workaround — the build is signed but not notarized, so Sequoia / Tahoe block first launch). Use a prior release as a style reference. Smoke-test the artifacts, then publish from the Releases page (default to non-prerelease for visibility).
+7. `tauri-apps/tauri-action@v0` uploads the artifacts to a **draft** GitHub Release with download and upgrade instructions plus a draft-only publishing checklist. Add the release highlights, verified platforms, and known issues using the `CHANGELOG.md` entry. Complete [release preparation](release-preparation.md), smoke-test the artifacts, and remove the draft-only section before publishing from the Releases page (default to non-prerelease for visibility).
 
 ### Re-running a build for an existing tag
 
