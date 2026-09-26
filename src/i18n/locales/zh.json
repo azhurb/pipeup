@@ -140,7 +140,7 @@
       "title": "辅助功能",
       "required": "粘贴听写文本所必需",
       "grantedHint": "已授予",
-      "afterClickHint": "请在系统设置 → 辅助功能中开启 Pipeup，然后返回。"
+      "settingsHint": "请在系统设置 > 隐私与安全性 > 辅助功能中启用 Pipeup。升级后，macOS 可能仍将其显示为旧名称 OpenTypeless。"
     },
     "openSettings": "打开系统设置",
     "grant": "授权",

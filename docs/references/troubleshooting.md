@@ -2,6 +2,16 @@
 
 Short list of failure modes that surface in user reports.
 
+## macOS: Accessibility lists OpenTypeless instead of Pipeup
+
+Pipeup was previously named OpenTypeless. After an upgrade, macOS may still show **OpenTypeless** in System Settings > Privacy & Security > Accessibility. Enable that entry if Pipeup is absent, then return to Pipeup and try dictation. The onboarding card and main-window permission banner explain both names before opening Settings.
+
+The packaged app declares `CFBundleName` and `CFBundleDisplayName` as `Pipeup`. It retains `com.opentypeless.app` for upgrade compatibility. On 2026-09-26, the local Pipeup debug bundle and `/Applications/OpenTypeless.app` both existed with this identifier; the maintainer confirmed that enabling the OpenTypeless entry allowed Pipeup to dictate.
+
+Inference: the legacy label is associated with existing macOS registration or the old installed copy, rather than a missing Pipeup display name. The exact label selection is not verified. Changing the identifier solely to rename this entry is not a supported fix.
+
+Follow the [upgrade instructions](../../README.md#upgrading-from-opentypeless) to avoid keeping both app copies installed. If the permission remains ineffective, use the recovery steps below and explicitly select the Pipeup bundle you intend to run. A development bundle can live outside Applications; select that exact bundle when testing it. Do not reset all macOS permissions or delete application data to refresh a label.
+
 ## macOS: "I press the hotkey but nothing happens"
 
 ### Microphone is denied or restricted
@@ -25,9 +35,9 @@ Pipeup detects this on the next paste attempt (`AXIsProcessTrusted()` returns fa
 Fix:
 
 1. System Settings → Privacy & Security → **Accessibility**
-2. Select Pipeup, click the `-` to remove it
-3. Trigger a dictation; the in-app banner re-prompts and macOS re-adds the entry
-4. Toggle the new entry on
+2. Select the ineffective Pipeup entry (it may still be labeled OpenTypeless), then click `-` to remove that entry
+3. Click `+` and select the exact `Pipeup.app` bundle you intend to run
+4. Toggle that entry on; quit and reopen Pipeup if macOS asks
 5. Dictate again
 
 ## macOS: credential prompts after an upgrade
