@@ -10,6 +10,10 @@ This repository is a fork of [Tover0314/opentypeless](https://github.com/tover03
 
 ## [Unreleased]
 
+### Changed
+- Renamed the displayed product to Pipeup, with a warm light/dark interface, simplified app and tray icons, and a single primary sidebar with settings navigation across the top. The bundle identifier and existing local data remain unchanged. On macOS, quit and remove the old OpenTypeless app copy after installing Pipeup.
+- Made the active capsule compact and text-free. Recording uses five audio-reactive bars; transcription and polishing use processing dots. Cancel appears on hover or keyboard focus, while recording limits and actionable recovery messages remain available.
+
 ### Added
 - **Gemini 3.5 Transcribe is available as a speech provider.** Pick it under Settings → Speech Recognition and paste a Google AI Studio key. It transcribes a whole dictation in one request when you release the hotkey, the same way the Whisper-based providers do, and it has been checked end to end against the live API rather than only against the documentation. Pricing at the time of writing is roughly half a cent per minute of audio, with a free tier. Pressing **Test** costs nothing: it reads the model instead of transcribing, the same as the OpenAI Whisper probe, so it also tells you whether your key actually has access to the transcription model rather than only that the key is valid.
 

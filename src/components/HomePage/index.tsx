@@ -1,7 +1,5 @@
-import { Mic, Settings, History } from 'lucide-react'
-import { motion } from 'framer-motion'
+import { Settings, History } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { spring } from '../../lib/animations'
 import { useAppStore } from '../../stores/appStore'
 import { useRoute } from '../../lib/router'
 
@@ -16,23 +14,15 @@ export function HomePage() {
   const todayCount = history.filter((h) => h.created_at.startsWith(today)).length
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Welcome */}
-      <div className="rounded-[18px] p-5 jelly-card">
-        <div className="flex items-center gap-3 mb-2">
-          <div
-            className="w-9 h-9 rounded-[10px] flex items-center justify-center"
-            style={{
-              background: 'linear-gradient(145deg, rgba(42,187,167,0.15), rgba(42,187,167,0.08))',
-            }}
-          >
-            <Mic size={18} className="text-text-secondary" />
-          </div>
-          <h2 className="text-[17px] font-semibold">{t('home.welcome')}</h2>
-        </div>
-        <p className="text-[13px] text-text-secondary leading-relaxed">
+    <div className="p-7 space-y-7 max-w-[900px] mx-auto">
+      <div className="pt-3 pb-2">
+        <h2 className="text-[28px] font-semibold tracking-tight mb-3">{t('home.welcome')}</h2>
+        <p className="text-[14px] text-text-secondary leading-relaxed max-w-[520px]">
           {t('home.description', { hotkey: config.hotkey })}
         </p>
+        <kbd className="inline-flex mt-5 px-3 py-1.5 bg-bg-elevated border border-border rounded-md font-mono text-[13px] shadow-sm">
+          {config.hotkey}
+        </kbd>
       </div>
 
       {/* Stats */}
@@ -74,26 +64,20 @@ export function HomePage() {
 
       {/* Quick actions */}
       <div className="grid grid-cols-2 gap-3">
-        <motion.button
+        <button
           onClick={() => navigate('settings')}
-          whileHover={{ scale: 1.04 }}
-          whileTap={{ scaleX: 1.06, scaleY: 0.94 }}
-          transition={spring.jellyGentle}
           className="flex items-center gap-2.5 rounded-[14px] p-4 cursor-pointer text-left jelly-btn"
         >
           <Settings size={16} className="text-text-secondary" />
           <span className="text-[13px] font-medium">{t('nav.settings')}</span>
-        </motion.button>
-        <motion.button
+        </button>
+        <button
           onClick={() => navigate('history')}
-          whileHover={{ scale: 1.04 }}
-          whileTap={{ scaleX: 1.06, scaleY: 0.94 }}
-          transition={spring.jellyGentle}
           className="flex items-center gap-2.5 rounded-[14px] p-4 cursor-pointer text-left jelly-btn"
         >
           <History size={16} className="text-text-secondary" />
           <span className="text-[13px] font-medium">{t('nav.history')}</span>
-        </motion.button>
+        </button>
       </div>
     </div>
   )

@@ -81,7 +81,7 @@ fn build_tray_menu(
     let settings = MenuItem::with_id(app, "settings", "Settings", true, None::<&str>)?;
     let history = MenuItem::with_id(app, "history", "History", true, None::<&str>)?;
     let sep3 = PredefinedMenuItem::separator(app)?;
-    let about = MenuItem::with_id(app, "about", "About OpenTypeless", true, None::<&str>)?;
+    let about = MenuItem::with_id(app, "about", "About Pipeup", true, None::<&str>)?;
     let quit = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
 
     let menu = Menu::with_items(
@@ -1130,7 +1130,7 @@ fn parse_hotkey(s: &str) -> Option<Shortcut> {
 
 /// Decide whether to surface the main window on app startup.
 ///
-/// OpenTypeless lives in the system tray, so the main window stays hidden
+/// Pipeup lives in the system tray, so the main window stays hidden
 /// most of the time. The exception is when the user is still in onboarding —
 /// either because the STT API key is unset (a fresh install) or because the
 /// `onboarding_completed` flag is missing / false (a re-test or a flag drop).
@@ -1407,14 +1407,18 @@ pub fn run() {
             let tray_menu = build_tray_menu(&app_handle, false, true)
                 .map_err(|e| anyhow::anyhow!("Failed to build tray menu: {}", e))?;
 
+            let tray_icon = if cfg!(target_os = "macos") {
+                tauri::include_image!("icons/tray-icon.png")
+            } else {
+                app.default_window_icon()
+                    .expect("default window icon missing")
+                    .clone()
+            };
             let tray = TrayIconBuilder::new()
-                .icon(
-                    app.default_window_icon()
-                        .expect("default window icon missing")
-                        .clone(),
-                )
+                .icon(tray_icon)
+                .icon_as_template(cfg!(target_os = "macos"))
                 .menu(&tray_menu)
-                .tooltip("OpenTypeless")
+                .tooltip("Pipeup")
                 .on_menu_event(move |app, event| match event.id.as_ref() {
                     "quit" => {
                         app.exit(0);
@@ -1561,7 +1565,7 @@ pub fn run() {
                 }
             }
 
-            // OpenTypeless lives in the tray, so launches stay hidden by default.
+            // Pipeup lives in the tray, so launches stay hidden by default.
             // We surface the window when the user is still in onboarding —
             // either no STT key yet, or `onboarding_completed` missing / false.
             // Predicate lives in `should_show_window_on_launch` so the decision
@@ -1602,7 +1606,7 @@ pub fn run() {
             //   3. App activation policy `.accessory` — `.regular` apps are
             //      excluded from other apps' fullscreen Spaces by macOS,
             //      regardless of window flags. Switching to `.accessory`
-            //      models OpenTypeless as a status-bar utility (no Dock icon),
+            //      models Pipeup as a status-bar utility (no Dock icon),
             //      which is consistent with the tray-driven UX.
             #[cfg(target_os = "macos")]
             {
@@ -1616,7 +1620,7 @@ pub fn run() {
                 }
             }
 
-            tracing::info!("OpenTypeless started");
+            tracing::info!("Pipeup started");
 
             // P1-2: Pre-warm HTTP connection pool in background
             let warm_handle = app_handle.clone();

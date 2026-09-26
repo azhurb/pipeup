@@ -1,10 +1,10 @@
 # CLAUDE.md
 
-Short agent entrypoint for OpenTypeless. Keep this file stable: project summary, where the docs live, and the small set of rules an agent must apply on every change. Anything else belongs under `docs/`.
+Short agent entrypoint for Pipeup. Keep this file stable: project summary, where the docs live, and the small set of rules an agent must apply on every change. Anything else belongs under `docs/`.
 
 ## Project
 
-OpenTypeless is a Tauri 2 desktop app (Windows/macOS/Linux) for AI voice input: hold a hotkey, speak, and the app transcribes via an STT provider, polishes via an LLM, and types the result into the foreground app.
+Pipeup is a Tauri 2 desktop app (Windows/macOS/Linux) for AI voice input: hold a hotkey, speak, and the app transcribes via an STT provider, polishes via an LLM, and types the result into the foreground app.
 
 - Frontend: React 19 + TypeScript + Tailwind 4 + Vite, Zustand, i18next.
 - Backend: Rust 2021 + Tokio + Tauri 2. Audio: `cpal`. Output: `enigo`, `arboard`. Storage: `tauri-plugin-store` + `rusqlite`. HTTP/streaming: `reqwest`, `tokio-tungstenite`.

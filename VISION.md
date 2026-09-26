@@ -1,12 +1,14 @@
 # Vision
 
-## What is OpenTypeless?
+## What is Pipeup?
 
-OpenTypeless is an open-source, cross-platform desktop application that converts speech to polished text using AI. It combines real-time speech-to-text with LLM-powered refinement, letting users speak naturally and get well-structured written output.
+Pipeup is an open-source, cross-platform desktop application that converts speech to polished text using AI. It combines real-time speech-to-text with LLM-powered refinement, letting users speak naturally and get well-structured written output.
 
-## Origin
+## Origin and audience
 
-OpenTypeless was built in a single day with the help of Claude Code — demonstrating that AI-assisted development can produce real, usable software rapidly. The project is now open source so the community can shape its future.
+Pipeup builds on [OpenTypeless](https://github.com/tover0314-w/opentypeless) by Tover0314. It keeps the local, bring-your-own-key dictation pipeline and develops its own product identity and interface. See the [README credits](README.md#credits) and original copyright notice in [LICENSE](LICENSE).
+
+The first audience is developers and people comfortable configuring API keys and models. The interface should make that control clear, with a quiet recording capsule and useful recovery messages. Broader onboarding can follow without hiding the provider choices.
 
 ## Core Principles
 

@@ -5,7 +5,7 @@
     "delete": "删除"
   },
   "app": {
-    "name": "OpenTypeless",
+    "name": "Pipeup",
     "tagline": "AI 语音输入",
     "loading": "加载中...",
     "failedToLoad": "加载应用数据失败。",
@@ -17,7 +17,7 @@
     "history": "历史记录"
   },
   "home": {
-    "welcome": "欢迎使用 OpenTypeless",
+    "welcome": "欢迎使用 Pipeup",
     "description": "按住 {{hotkey}} 开始语音录制。语音将被转录并可选择由 AI 润色。",
     "totalRecordings": "总录音数",
     "today": "今日",
@@ -29,7 +29,7 @@
     "disabled": "已禁用"
   },
   "onboarding": {
-    "welcomeTitle": "欢迎使用 OpenTypeless",
+    "welcomeTitle": "欢迎使用 Pipeup",
     "welcomeSubtitle": "几个简单步骤，即可开始语音输入",
     "speechRecognition": "语音识别",
     "speechRecognitionDesc": "配置 ASR 服务，将语音转换为文字",
@@ -78,18 +78,21 @@
     "cancelProcessing": "取消处理",
     "cancelPolishing": "取消润色",
     "errorOccurred": "发生错误",
-    "accessibilityRequired": "需要辅助功能权限 — 点击打开设置",
-    "microphoneDenied": "麦克风已被拒绝 — 点击打开设置",
+    "accessibilityRequired": "启用辅助功能权限",
+    "microphoneDenied": "启用麦克风权限",
     "clipboardTip": "已复制 — 按 {{shortcut}} 粘贴",
     "editedTip": "已编辑 — 按 {{shortcut}} 撤销",
     "openMainWindow": "打开主窗口",
     "settings": "设置",
     "history": "历史记录",
-    "exit": "退出"
+    "exit": "退出",
+    "cancel": "取消听写",
+    "recording": "正在录音",
+    "processing": "正在处理"
   },
   "permissions": {
     "title": "权限",
-    "description": "OpenTypeless 需要两项 macOS 权限以进行录音与粘贴。现在授予后，首次听写即可正常工作。",
+    "description": "Pipeup 需要两项 macOS 权限以进行录音与粘贴。现在授予后，首次听写即可正常工作。",
     "microphone": {
       "title": "麦克风",
       "required": "听写所必需",
@@ -100,7 +103,7 @@
       "title": "辅助功能",
       "required": "粘贴听写文本所必需",
       "grantedHint": "已授予",
-      "afterClickHint": "请在系统设置 → 辅助功能中开启 OpenTypeless，然后返回。"
+      "afterClickHint": "请在系统设置 → 辅助功能中开启 Pipeup，然后返回。"
     },
     "openSettings": "打开系统设置",
     "grant": "授权",
@@ -181,7 +184,7 @@
     "noEntries": "暂无条目。添加专有名词以提高识别准确度。",
     "learnFromCorrections": {
       "label": "Learn from corrections (experimental)",
-      "description": "After dictation, OpenTypeless watches your edits for ~15 s and offers to add fixed names and terms here. Reads the focused text field via macOS Accessibility — you'll be prompted to grant the permission on first use."
+      "description": "After dictation, Pipeup watches your edits for ~15 s and offers to add fixed names and terms here. Reads the focused text field via macOS Accessibility — you'll be prompted to grant the permission on first use."
     },
     "failedToAdd": "添加词典条目失败",
     "failedToRemove": "删除词典条目失败",

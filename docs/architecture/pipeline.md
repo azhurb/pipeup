@@ -141,7 +141,7 @@ Detecting "landed" from outside the receiving app is **fundamentally limited on 
 ## Important Invariants
 
 - `output_text()` normalizes through `normalize_for_output(text, replaced_selection)`. An **inserted** dictation is trimmed and gets a single trailing space, so successive dictations don't glue together. Text that **replaces a selection** is trimmed only: the paste has to occupy the selected range exactly, and an appended space would nudge the following word out of place on every edit. History stores the un-normalized text.
-- LLM polish output is batched: the capsule renders streamed `llm:chunk` events for a live indicator, but the paste only fires once polish completes.
+- LLM polish output is batched: the frontend still receives streamed `llm:chunk` events, while the capsule shows processing dots. The paste only fires once polish completes.
 - `pipeline_lock` serializes `start()` and `stop()`.
 - `abort()` sets the abort flag, drops the audio handle, notifies `stt_done`, clears accumulated text, and forces `Idle`.
 - **Edit mode requires the Accessibility preflight.** No clipboard-derived selection is ever passed to the LLM: a copy keystroke cannot distinguish a real selection from an app copying the current line, and guessing wrong silently rewrites text the user did not select. See [Selected-Text Capture](#selected-text-capture).

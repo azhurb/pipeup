@@ -138,6 +138,20 @@ Releases are tag-driven. `.github/workflows/release.yml` triggers on tags matchi
 
 Run the workflow via `workflow_dispatch` and pass the tag name (e.g. `v0.1.25`). This rebuilds without retagging.
 
+## Brand icons
+
+The SVG files are the editable sources. Generate the desktop app assets, then regenerate the monochrome macOS tray sizes in a temporary output directory:
+
+```bash
+npx tauri icon src-tauri/icons/app-icon.svg --output /tmp/pipeup-app-icons
+cp /tmp/pipeup-app-icons/{32x32.png,64x64.png,128x128.png,128x128@2x.png,icon.png,icon.ico,icon.icns} src-tauri/icons/
+npx tauri icon src-tauri/icons/tray-icon.svg --output /tmp/pipeup-tray-icons --png 44 --png 128
+cp /tmp/pipeup-tray-icons/44x44.png src-tauri/icons/tray-icon.png
+cp /tmp/pipeup-tray-icons/128x128.png src-tauri/icons/tray-mark.png
+```
+
+Inspect the generated assets before committing. The tray PNG must retain transparency; an opaque background makes macOS template rendering a solid square.
+
 ## Needs confirmation
 
 - No docs-only validation command (link checker, freshness check) exists yet. A simple grep-based check would catch the "Tauri command exists in `lib.rs` but no TS wrapper" class of bug.

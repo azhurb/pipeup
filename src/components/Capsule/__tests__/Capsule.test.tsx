@@ -14,7 +14,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, cleanup } from '@testing-library/react'
+import { render, cleanup, fireEvent, screen, act } from '@testing-library/react'
 import React from 'react'
 import { useAppStore, type PipelineState } from '../../../stores/appStore'
 
@@ -151,4 +151,81 @@ describe('Capsule — edited tip', () => {
     const { container } = render(<Capsule />)
     expect(container.textContent).not.toContain('capsule.editedTip')
   })
+})
+
+describe('Capsule compact interactions', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    useAppStore.setState(useAppStore.getInitialState())
+  })
+
+  afterEach(() => vi.useRealTimers())
+
+  it('still stops at the configured limit without showing a timer', async () => {
+    vi.useFakeTimers()
+    const { invoke } = await import('@tauri-apps/api/core')
+    setUp('recording', false)
+    useAppStore.getState().updateConfig({ max_recording_seconds: 2 })
+    const { container } = render(<Capsule />)
+    expect(container.textContent).toBe('')
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(2000)
+    })
+    expect(invoke).toHaveBeenCalledWith('stop_recording')
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(2000)
+    })
+    expect(
+      vi.mocked(invoke).mock.calls.filter(([command]) => command === 'stop_recording'),
+    ).toHaveLength(1)
+  })
+
+  it('clears the old deadline when recording ends and starts a fresh one for the next dictation', async () => {
+    vi.useFakeTimers()
+    const { invoke } = await import('@tauri-apps/api/core')
+    setUp('recording', false)
+    useAppStore.getState().updateConfig({ max_recording_seconds: 2 })
+    render(<Capsule />)
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1000)
+    })
+    act(() => useAppStore.getState().setPipelineState('transcribing'))
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(2000)
+    })
+    expect(invoke).not.toHaveBeenCalledWith('stop_recording')
+    act(() => useAppStore.getState().setPipelineState('recording'))
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1999)
+    })
+    expect(invoke).not.toHaveBeenCalledWith('stop_recording')
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1)
+    })
+    expect(invoke).toHaveBeenCalledWith('stop_recording')
+  })
+
+  it('cancels without letting pointer-up submit the recording', async () => {
+    const { invoke } = await import('@tauri-apps/api/core')
+    setUp('recording', false)
+    render(<Capsule />)
+    const cancel = screen.getByRole('button', { name: 'capsule.cancel' })
+    fireEvent.pointerDown(cancel, { button: 0 })
+    fireEvent.pointerUp(cancel, { button: 0 })
+    fireEvent.click(cancel)
+    expect(invoke).toHaveBeenCalledWith('abort_recording')
+    expect(invoke).not.toHaveBeenCalledWith('stop_recording')
+  })
+
+  it.each<PipelineState>(['transcribing', 'polishing'])(
+    'keeps %s text-free even with a partial transcript',
+    (state) => {
+      setUp(state, false)
+      useAppStore.setState({ partialTranscript: 'Private unfinished words' })
+      const { container } = render(<Capsule />)
+      expect(container.textContent).toBe('')
+      expect(screen.getByRole('status')).toHaveAttribute('aria-label', 'capsule.processing')
+      expect(screen.getByRole('button', { name: 'capsule.cancel' })).toBeEnabled()
+    },
+  )
 })

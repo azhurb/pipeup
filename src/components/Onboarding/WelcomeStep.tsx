@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import i18n from '../../i18n'
+import { BrandIcon } from '../BrandIcon'
 import { useAppStore } from '../../stores/appStore'
 
 const UI_LANGUAGES = [
@@ -23,7 +24,9 @@ export function WelcomeStep() {
   return (
     <div className="space-y-6">
       <div className="text-center py-4">
-        <div className="text-[40px] mb-2">🎙</div>
+        <div className="flex justify-center mb-5">
+          <BrandIcon size={72} />
+        </div>
         <p className="text-[15px] text-text-secondary leading-relaxed">
           {t('onboarding.speakToWrite')}
         </p>

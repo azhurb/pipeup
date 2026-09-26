@@ -135,7 +135,7 @@ export function LlmPane() {
                   ? t('settings.apiKeySaved')
                   : t('settings.enterApiKey')
             }
-            className="flex-1 px-3 py-2.5 bg-bg-secondary border border-border rounded-[10px] text-[13px] text-text-primary outline-none focus:border-border-focus transition-colors"
+            className="flex-1 px-3 py-2.5 bg-bg-secondary border border-border rounded-[10px] font-mono text-[13px] text-text-primary outline-none focus:border-border-focus transition-colors"
           />
           <button
             onClick={handleTest}
@@ -198,7 +198,7 @@ export function LlmPane() {
                 setLlmLatencyMs(null)
               }}
               placeholder="e.g. gpt-4o-mini"
-              className="w-full px-3 py-2.5 bg-bg-secondary border border-border rounded-[10px] text-[13px] text-text-primary outline-none focus:border-border-focus transition-colors"
+              className="w-full px-3 py-2.5 bg-bg-secondary border border-border rounded-[10px] font-mono text-[13px] text-text-primary outline-none focus:border-border-focus transition-colors"
             />
             <datalist id="llm-model-list">
               {models.map((m) => (
@@ -227,7 +227,7 @@ export function LlmPane() {
           value={config.llm_base_url}
           onChange={(e) => updateConfig({ llm_base_url: e.target.value })}
           placeholder="https://open.bigmodel.cn/api/paas/v4"
-          className="w-full px-3 py-2.5 bg-bg-secondary border border-border rounded-[10px] text-[13px] text-text-primary outline-none focus:border-border-focus transition-colors"
+          className="w-full px-3 py-2.5 bg-bg-secondary border border-border rounded-[10px] font-mono text-[13px] text-text-primary outline-none focus:border-border-focus transition-colors"
         />
       </FormField>
 

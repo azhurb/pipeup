@@ -1,72 +1,46 @@
 @import 'tailwindcss';
 
 @theme {
-  /* Clean neutral palette */
-  --color-bg-primary: #f5f5f5;
-  --color-bg-secondary: #ebebeb;
-  --color-bg-tertiary: #e0e0e0;
-  --color-bg-elevated: #fafafa;
-
-  --color-text-primary: #1a1a1a;
-  --color-text-secondary: #666666;
-  --color-text-tertiary: #999999;
-
-  --color-accent: #2abba7;
-  --color-accent-hover: #22a08e;
-  --color-accent-light: #e6f7f5;
-
-  --color-success: #34c759;
-  --color-warning: #ff9500;
-  --color-error: #ff3b30;
-
-  --color-border: rgba(0, 0, 0, 0.08);
-  --color-border-focus: #2abba7;
-
-  /* Jelly palette tokens */
-  --color-jelly-primary: rgba(42, 187, 167, 0.2);
-  --color-jelly-glow: rgba(42, 187, 167, 0.3);
-
-  /* Font */
+  --color-bg-primary: #fcfaf6;
+  --color-bg-secondary: #f3efe8;
+  --color-bg-tertiary: #e8e1d8;
+  --color-bg-elevated: #fffdfa;
+  --color-text-primary: #29231f;
+  --color-text-secondary: #6b6057;
+  --color-text-tertiary: #807369;
+  --color-accent: #c43f26;
+  --color-accent-hover: #a9301b;
+  --color-accent-light: #fbe8e1;
+  --color-success: #28734c;
+  --color-warning: #a96509;
+  --color-error: #bf3030;
+  --color-border: #e5ded4;
+  --color-border-focus: #c43f26;
   --font-sans:
-    system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
-    'Open Sans', 'Helvetica Neue', sans-serif;
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans',
+    'Helvetica Neue', sans-serif;
   --font-mono: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
-
-  /* Font sizes */
   --text-caption: 11px;
   --text-footnote: 13px;
   --text-body: 15px;
   --text-headline: 17px;
   --text-title: 22px;
-
-  /* Border radius */
-  --radius-xs: 6px;
-  --radius-sm: 10px;
-  --radius-md: 14px;
-  --radius-lg: 22px;
+  --radius-xs: 5px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
   --radius-full: 9999px;
-
-  /* Shadows - neutral */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
-  --shadow-lg: 0 8px 28px rgba(0, 0, 0, 0.1), 0 4px 8px rgba(0, 0, 0, 0.06);
-  --shadow-float: 0 16px 48px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08);
-
-  /* Easing */
+  --shadow-sm: 0 1px 2px #29231f0a;
+  --shadow-md: 0 3px 12px #29231f0c;
+  --shadow-lg: 0 8px 24px #29231f12;
+  --shadow-float: 0 10px 30px #17130f26;
   --ease-out: cubic-bezier(0.33, 1, 0.68, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
 }
 
-/* Base styles */
-
-/* Tell the platform which palette to render native widgets in. Without this,
-   `<select>` dropdown popups, scrollbars, and focus rings stay light while the
-   rest of the app is dark, because the UA has no way to know the theme —
-   `useTheme` only toggles a `.dark` class, which native widgets can't see. */
 html {
   color-scheme: light;
 }
-
 html.dark {
   color-scheme: dark;
 }
@@ -79,7 +53,7 @@ body,
   width: 100%;
   height: 100%;
   font-family: var(--font-sans);
-  font-weight: 450;
+  font-weight: 400;
   letter-spacing: -0.01em;
   background: transparent;
   color: var(--color-text-primary);
@@ -89,549 +63,157 @@ body,
   user-select: none;
 }
 
-/* ─── Dark Mode ─── */
 .dark {
-  --color-bg-primary: #1a1a1a;
-  --color-bg-secondary: #242424;
-  --color-bg-tertiary: #2e2e2e;
-  --color-bg-elevated: #2a2a2a;
-
-  --color-text-primary: #f0f0f0;
-  --color-text-secondary: #a0a0a0;
-  --color-text-tertiary: #707070;
-
-  --color-accent-light: #1a3d37;
-
-  --color-border: rgba(255, 255, 255, 0.08);
-
-  --color-jelly-primary: rgba(42, 187, 167, 0.25);
-  --color-jelly-glow: rgba(42, 187, 167, 0.35);
-
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.15);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.25), 0 2px 4px rgba(0, 0, 0, 0.15);
-  --shadow-lg: 0 8px 28px rgba(0, 0, 0, 0.3), 0 4px 8px rgba(0, 0, 0, 0.2);
-  --shadow-float: 0 16px 48px rgba(0, 0, 0, 0.35), 0 8px 16px rgba(0, 0, 0, 0.25);
+  --color-bg-primary: #211e1b;
+  --color-bg-secondary: #292520;
+  --color-bg-tertiary: #39332d;
+  --color-bg-elevated: #2e2924;
+  --color-text-primary: #f6efe5;
+  --color-text-secondary: #c0b4a6;
+  --color-text-tertiary: #a29586;
+  --color-accent: #e47758;
+  --color-accent-hover: #ed896c;
+  --color-accent-light: #432a22;
+  --color-success: #7bbf96;
+  --color-warning: #e9b15f;
+  --color-error: #f18a80;
+  --color-border: #3b342d;
+  --color-border-focus: #e47758;
+  --shadow-sm: 0 1px 2px #00000020;
+  --shadow-md: 0 3px 12px #00000020;
+  --shadow-lg: 0 8px 24px #00000030;
+  --shadow-float: 0 10px 30px #00000050;
 }
 
-/* Drag region */
 [data-tauri-drag-region] {
-  cursor: move;
+  cursor: default;
 }
 
-/* ─── Dark Jelly Overrides ─── */
-.dark .jelly-surface {
-  background: linear-gradient(145deg, #2a2a2a 0%, #222222 50%, #1c1c1c 100%);
-  box-shadow:
-    inset 0 2px 8px rgba(255, 255, 255, 0.04),
-    inset 0 -2px 6px rgba(0, 0, 0, 0.3);
+:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 3px;
 }
 
-.dark .jelly-card {
-  background: linear-gradient(155deg, #2e2e2e 0%, #272727 50%, #212121 100%);
-  box-shadow:
-    inset 0 1.5px 4px rgba(255, 255, 255, 0.04),
-    0 4px 16px rgba(0, 0, 0, 0.3);
+input,
+textarea {
+  user-select: text;
 }
-.dark .jelly-card::before {
-  background: radial-gradient(
-    ellipse at 30% 20%,
-    rgba(255, 255, 255, 0.04) 0%,
-    rgba(255, 255, 255, 0.01) 40%,
-    transparent 70%
-  );
-}
-.dark .jelly-card:hover {
-  box-shadow:
-    inset 0 1.5px 4px rgba(255, 255, 255, 0.06),
-    0 6px 24px rgba(0, 0, 0, 0.35);
+input,
+select,
+textarea {
+  min-width: 0;
 }
 
-.dark .jelly-btn {
-  background: linear-gradient(155deg, #333333 0%, #2a2a2a 50%, #222222 100%);
-  box-shadow:
-    inset 0 1.5px 3px rgba(255, 255, 255, 0.05),
-    0 3px 10px rgba(0, 0, 0, 0.25);
-}
-.dark .jelly-btn::before {
-  background: radial-gradient(
-    ellipse at 30% 20%,
-    rgba(255, 255, 255, 0.04) 0%,
-    rgba(255, 255, 255, 0.01) 40%,
-    transparent 70%
-  );
-}
-.dark .jelly-btn:hover {
-  box-shadow:
-    inset 0 1.5px 3px rgba(255, 255, 255, 0.07),
-    0 6px 18px rgba(0, 0, 0, 0.3);
-}
-
-.dark .jelly-btn-accent {
-  box-shadow:
-    inset 0 2px 3px rgba(255, 255, 255, 0.15),
-    0 3px 12px rgba(0, 0, 0, 0.3);
-}
-.dark .jelly-btn-accent:hover {
-  box-shadow:
-    inset 0 2px 3px rgba(255, 255, 255, 0.15),
-    0 6px 20px rgba(0, 0, 0, 0.4);
-}
-
-.dark .jelly-surface-flat {
-  background: linear-gradient(180deg, #262626 0%, #202020 50%, #1c1c1c 100%);
-  box-shadow:
-    inset 2px 0 8px rgba(255, 255, 255, 0.03),
-    inset -2px 0 8px rgba(0, 0, 0, 0.2);
-}
-
-.dark .jelly-capsule {
-  background: linear-gradient(160deg, #2e2e2e 0%, #262626 50%, #1e1e1e 100%);
-  box-shadow:
-    inset 0 2px 6px rgba(255, 255, 255, 0.04),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.3),
-    0 4px 16px rgba(0, 0, 0, 0.3);
-}
-.dark .jelly-capsule::before {
-  background: radial-gradient(
-    ellipse at 35% 25%,
-    rgba(255, 255, 255, 0.04) 0%,
-    rgba(255, 255, 255, 0.01) 40%,
-    transparent 70%
-  );
-}
-.dark .jelly-capsule::after {
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.2), transparent);
-}
-
-.dark .jelly-capsule-error {
-  background: linear-gradient(160deg, #4a2020 0%, #3a1818 50%, #2e1212 100%);
-  box-shadow:
-    inset 0 2px 6px rgba(255, 255, 255, 0.04),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.3),
-    0 4px 16px rgba(0, 0, 0, 0.3);
-}
-.dark .jelly-capsule-error::before {
-  background: radial-gradient(
-    ellipse at 40% 30%,
-    rgba(255, 255, 255, 0.05) 0%,
-    rgba(255, 255, 255, 0.01) 40%,
-    transparent 70%
-  );
-}
-
-.dark .capsule-shimmer::after {
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.06) 40%,
-    rgba(255, 255, 255, 0.1) 50%,
-    rgba(255, 255, 255, 0.06) 60%,
-    transparent 100%
-  );
-}
-
-.dark .capsule-progress-bar {
-  background: rgba(255, 255, 255, 0.04);
-}
-.dark .capsule-progress-bar::after {
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.4) 50%,
-    transparent 100%
-  );
-}
-
-/* ─── Jelly Surface — rich gel with strong inner glow ─── */
-.jelly-surface {
-  position: relative;
-  background: linear-gradient(145deg, #f6f6f6 0%, #eeeeee 50%, #e6e6e6 100%);
-  box-shadow:
-    inset 0 2px 8px rgba(255, 255, 255, 0.9),
-    inset 0 -2px 8px rgba(0, 0, 0, 0.06),
-    0 4px 20px rgba(0, 0, 0, 0.08),
-    0 10px 40px rgba(0, 0, 0, 0.04);
-  border: none;
-  border-radius: 22px;
-  transition:
-    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
-    box-shadow 0.3s ease;
-  overflow: hidden;
-}
-
-/* ─── Jelly Card — 3D gel panel with specular highlight ─── */
+/* Existing surface class names are retained for shared component compatibility. */
+.jelly-surface,
 .jelly-card {
   position: relative;
-  background: linear-gradient(155deg, #ededed 0%, #e4e4e4 50%, #dadada 100%);
-  border: none;
-  border-radius: 20px;
-  box-shadow:
-    0 4px 20px rgba(0, 0, 0, 0.07),
-    0 10px 40px rgba(0, 0, 0, 0.03),
-    inset 0 2px 6px rgba(255, 255, 255, 0.8),
-    inset 0 -2px 6px rgba(0, 0, 0, 0.05);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
   overflow: hidden;
-  transition:
-    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
-    box-shadow 0.3s ease;
-}
-/* Card specular highlight band */
-.jelly-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 40%;
-  background: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 0.5) 0%,
-    rgba(255, 255, 255, 0.1) 60%,
-    transparent 100%
-  );
-  border-radius: 20px 20px 0 0;
-  pointer-events: none;
-  z-index: 0;
-}
-.jelly-card:hover {
-  transform: scale(1.02) translateY(-2px);
-  box-shadow:
-    0 8px 28px rgba(0, 0, 0, 0.1),
-    0 16px 50px rgba(0, 0, 0, 0.05),
-    inset 0 2px 6px rgba(255, 255, 255, 0.8),
-    inset 0 -2px 6px rgba(0, 0, 0, 0.05);
 }
 
-/* ─── Jelly Button — tactile 3D gel button ─── */
-.jelly-btn {
-  position: relative;
-  background: linear-gradient(155deg, #ececec 0%, #e2e2e2 50%, #d8d8d8 100%);
-  box-shadow:
-    0 3px 12px rgba(0, 0, 0, 0.07),
-    0 6px 24px rgba(0, 0, 0, 0.03),
-    inset 0 2px 4px rgba(255, 255, 255, 0.8),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.05);
-  border: none;
-  border-radius: 14px;
-  overflow: hidden;
-  transition:
-    transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
-    box-shadow 0.25s ease;
+.jelly-surface-flat {
+  background: var(--color-bg-secondary);
 }
-.jelly-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 50%;
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.45) 0%, transparent 100%);
-  border-radius: 14px 14px 0 0;
-  pointer-events: none;
+
+.jelly-btn {
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  transition:
+    background 150ms ease,
+    border-color 150ms ease;
 }
 .jelly-btn:hover {
-  transform: scale(1.04);
-  box-shadow:
-    0 6px 20px rgba(0, 0, 0, 0.1),
-    0 10px 36px rgba(0, 0, 0, 0.04),
-    inset 0 2px 4px rgba(255, 255, 255, 0.8),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.06);
+  background: var(--color-bg-secondary);
 }
-.jelly-btn:active {
-  transform: scaleX(1.06) scaleY(0.94);
+.jelly-btn-accent {
+  border-radius: 8px;
+  transition: background 150ms ease;
 }
-
-/* ─── Jelly Nav Active — accent gel indicator ─── */
 .jelly-nav-active {
-  background: linear-gradient(145deg, #2abba7 0%, #22a08e 100%);
-  box-shadow:
-    inset 0 1px 4px rgba(255, 255, 255, 0.3),
-    inset 0 -1px 4px rgba(0, 0, 0, 0.15),
-    0 2px 10px rgba(42, 187, 167, 0.3);
-  border-radius: 12px;
-  color: white !important;
+  background: var(--color-accent-light);
+  border-radius: 7px;
+  color: var(--color-accent);
 }
 
-/* ─── Jelly Capsule — minimal white/grey gel orb ─── */
-.jelly-capsule {
-  position: relative;
-  background: linear-gradient(160deg, #fafafa 0%, #f0f0f0 50%, #e8e8e8 100%);
-  border-radius: 9999px;
-  border: none;
-  box-shadow:
-    inset 0 1px 4px rgba(255, 255, 255, 0.8),
-    inset 0 -1px 3px rgba(0, 0, 0, 0.05),
-    0 2px 8px rgba(0, 0, 0, 0.08),
-    0 4px 16px rgba(0, 0, 0, 0.04);
-  overflow: hidden;
+/* Use a dark accent for filled buttons in both themes to retain white-text contrast. */
+.dark button.bg-accent {
+  background: #b23b25;
 }
-/* Capsule specular highlight — subtle top-left reflection */
-.jelly-capsule::before {
-  content: '';
-  position: absolute;
-  top: 8%;
-  left: 12%;
-  width: 55%;
-  height: 40%;
-  background: radial-gradient(
-    ellipse at 40% 30%,
-    rgba(255, 255, 255, 0.15) 0%,
-    rgba(255, 255, 255, 0.05) 40%,
-    transparent 70%
-  );
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 1;
-}
-/* Capsule bottom depth gradient */
-.jelly-capsule::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 50%;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.08), transparent);
-  border-radius: inherit;
-  pointer-events: none;
-  z-index: 1;
+.dark button.bg-accent:hover {
+  background: #c3462e;
 }
 
-/* ─── Jelly Capsule — recording active (dark grey/black gel) ─── */
-.jelly-capsule-active {
-  position: relative;
-  background: linear-gradient(160deg, #3a3a3a 0%, #2a2a2a 50%, #1a1a1a 100%);
-  border-radius: 9999px;
-  border: none;
-  box-shadow:
-    inset 0 1px 4px rgba(255, 255, 255, 0.12),
-    inset 0 -1px 3px rgba(0, 0, 0, 0.2),
-    0 2px 8px rgba(0, 0, 0, 0.15),
-    0 4px 16px rgba(0, 0, 0, 0.08);
-  overflow: hidden;
-}
-.jelly-capsule-active::before {
-  content: '';
-  position: absolute;
-  top: 8%;
-  left: 12%;
-  width: 55%;
-  height: 40%;
-  background: radial-gradient(
-    ellipse at 40% 30%,
-    rgba(255, 255, 255, 0.1) 0%,
-    rgba(255, 255, 255, 0.03) 40%,
-    transparent 70%
-  );
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 1;
-}
-.jelly-capsule-active::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 50%;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.15), transparent);
-  border-radius: inherit;
-  pointer-events: none;
-  z-index: 1;
-}
-
-/* ─── Jelly Capsule — editing a selection (amber ring) ───
-   Composes with .jelly-capsule-active and must stay after it: both are
-   single-class selectors, so source order is what decides the winner.
-
-   The ring is an inset shadow rather than a border on purpose. .jelly-capsule-active
-   sets `border: none` with `overflow: hidden`, and giving it a real 1px border would
-   change the box model and resize the pill mid-run. box-shadow replaces rather than
-   merges, so the four layers above are repeated verbatim and the ring appended.
-   The amber is --color-warning: this dictation will overwrite text you already have. */
-.jelly-capsule-editing {
-  box-shadow:
-    inset 0 1px 4px rgba(255, 255, 255, 0.12),
-    inset 0 -1px 3px rgba(0, 0, 0, 0.2),
-    0 2px 8px rgba(0, 0, 0, 0.15),
-    0 4px 16px rgba(0, 0, 0, 0.08),
-    inset 0 0 0 1px rgba(255, 149, 0, 0.9);
-}
-
-/* ─── Jelly Capsule — error state (mid-grey gel) ─── */
+/* The capsule remains warm charcoal in either theme. */
+.jelly-capsule,
+.jelly-capsule-active,
 .jelly-capsule-error {
   position: relative;
-  background: linear-gradient(160deg, #666 0%, #555 50%, #444 100%);
+  background: #292420;
+  color: #fff4e6;
   border-radius: 9999px;
   border: none;
-  box-shadow:
-    inset 0 1px 4px rgba(255, 255, 255, 0.1),
-    inset 0 -1px 3px rgba(0, 0, 0, 0.15),
-    0 2px 8px rgba(0, 0, 0, 0.12),
-    0 4px 16px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 8px #17130f25;
   overflow: hidden;
 }
-.jelly-capsule-error::before {
-  content: '';
+.jelly-capsule-error {
+  background: #4c2925;
+}
+.jelly-capsule-editing {
+  box-shadow:
+    0 2px 8px #17130f25,
+    inset 0 0 0 1px #eab25f;
+}
+.capsule-activity {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 88px;
+  height: 32px;
+}
+.capsule-cancel {
   position: absolute;
-  top: 8%;
-  left: 12%;
-  width: 55%;
-  height: 40%;
-  background: radial-gradient(
-    ellipse at 40% 30%,
-    rgba(255, 255, 255, 0.08) 0%,
-    rgba(255, 255, 255, 0.02) 40%,
-    transparent 70%
-  );
+  right: 3px;
+  top: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
   border-radius: 50%;
+  background: #292420;
+  color: #fff4e6;
+  opacity: 0;
   pointer-events: none;
-  z-index: 1;
-}
-.jelly-capsule-error::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 50%;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.12), transparent);
-  border-radius: inherit;
-  pointer-events: none;
-  z-index: 1;
-}
-
-/* ─── Jelly Surface Flat — no border-radius, for sidebars ─── */
-.jelly-surface-flat {
-  background: linear-gradient(180deg, #f0f0f0 0%, #e8e8e8 50%, #e0e0e0 100%);
-  box-shadow:
-    inset 2px 0 8px rgba(255, 255, 255, 0.5),
-    inset -2px 0 8px rgba(0, 0, 0, 0.04);
-  border: none;
-  transition: box-shadow 0.3s ease;
-}
-
-/* ─── Jelly Button Accent — for primary CTA buttons ─── */
-.jelly-btn-accent {
-  box-shadow:
-    inset 0 2px 3px rgba(255, 255, 255, 0.3),
-    0 3px 12px rgba(0, 0, 0, 0.12);
-  border: none;
-  border-radius: 9999px;
+  cursor: pointer;
   transition:
-    transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
-    box-shadow 0.25s ease;
+    opacity 120ms ease,
+    background 120ms ease;
 }
-.jelly-btn-accent:hover {
-  transform: scale(1.04);
-  box-shadow:
-    inset 0 2px 3px rgba(255, 255, 255, 0.3),
-    0 6px 20px rgba(0, 0, 0, 0.18);
+.capsule-activity:hover .capsule-cancel,
+.capsule-activity:focus-within .capsule-cancel {
+  opacity: 1;
+  pointer-events: auto;
 }
-.jelly-btn-accent:active {
-  transform: scaleX(1.06) scaleY(0.94);
+.capsule-cancel:hover {
+  background: #443a32;
 }
-
-/* ─── Shimmer sweep — left-to-right loading bar ─── */
-@keyframes shimmer-sweep {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
+.capsule-cancel:focus-visible {
+  outline-color: #e9b15f;
+  outline-offset: -2px;
 }
-.capsule-shimmer {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  border-radius: inherit;
-  pointer-events: none;
-  z-index: 2;
-}
-.capsule-shimmer::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.12) 40%,
-    rgba(255, 255, 255, 0.2) 50%,
-    rgba(255, 255, 255, 0.12) 60%,
-    transparent 100%
-  );
-  animation: shimmer-sweep 1.5s ease-in-out infinite;
-}
-
-/* ─── Polishing progress bar — bottom sweep ─── */
-@keyframes progress-sweep {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(200%);
-  }
-}
-.capsule-progress-bar {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  overflow: hidden;
-  border-radius: 0 0 9999px 9999px;
-  pointer-events: none;
-  z-index: 3;
-  background: rgba(255, 255, 255, 0.08);
-}
-.capsule-progress-bar::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 50%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.7) 50%,
-    transparent 100%
-  );
-  animation: progress-sweep 1.2s ease-in-out infinite;
-}
-
-/* ─── Jelly Keyframes ─── */
-@keyframes jelly-wobble {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  25% {
-    transform: scaleX(1.05) scaleY(0.95);
-  }
-  50% {
-    transform: scaleX(0.97) scaleY(1.03);
-  }
-  75% {
-    transform: scaleX(1.02) scaleY(0.98);
+@media (hover: none) {
+  .capsule-cancel {
+    opacity: 1;
+    pointer-events: auto;
   }
 }
 
-@keyframes jelly-breathe {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.04) scaleX(1.02);
-  }
-}
-
-/* ─── Reduced Motion ─── */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -640,6 +222,7 @@ body,
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+  /* Framer Motion writes transforms inline; CSS duration limits alone do not stop it. */
   .jelly-card:hover,
   .jelly-btn:hover,
   .jelly-btn:active,
@@ -649,7 +232,6 @@ body,
   }
 }
 
-/* macOS-style scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -657,9 +239,9 @@ body,
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-text-tertiary);
+  background: var(--color-bg-tertiary);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text-secondary);
+  background: var(--color-text-tertiary);
 }

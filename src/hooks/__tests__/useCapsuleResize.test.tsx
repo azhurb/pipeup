@@ -215,3 +215,21 @@ describe('useCapsuleResize — the edited tip keeps the capsule on screen', () =
     expect(result.current).toEqual({ width: 220, height: 220 })
   })
 })
+
+describe('compact capsule dimensions', () => {
+  beforeEach(() => {
+    useAppStore.setState(useAppStore.getInitialState())
+    setSize.mockClear()
+  })
+
+  it.each(['recording', 'transcribing', 'polishing', 'outputting'] as const)(
+    'keeps %s content and native window dimensions in sync',
+    async (pipelineState) => {
+      useAppStore.setState({ pipelineState, configLoaded: true })
+      const { result } = renderHook(() => useCapsuleResize())
+      await flushAsync()
+      expect(result.current).toEqual({ width: 88, height: 32 })
+      expect(setSize).toHaveBeenCalledWith(expect.objectContaining({ width: 112, height: 56 }))
+    },
+  )
+})

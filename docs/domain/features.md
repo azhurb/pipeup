@@ -104,7 +104,7 @@ GLM is the one model family this app turns thinking *on* for: left off, the API 
 
 **2. Strip whatever reasons anyway** (`llm::think`). When a provider is in "raw" reasoning mode the scratchpad arrives inside the ordinary `content` field wrapped in `<think>…</think>` — Groq's default for Qwen3, and the norm for DeepSeek-R1, GLM and local Ollama/OpenRouter reasoning models. This is the layer that has to hold for providers the table above has never heard of, and for a user who types any model name they like into Settings.
 
-The strip runs on the **stream**, not on the finished string: chunks are forwarded to the capsule as they arrive, so trimming at the end would be too late — the user has already watched the scratchpad appear. The filter therefore holds back any trailing text that could still grow into a tag (`<thi` may be one chunk away from `<think>`) and releases it as ordinary text when it turns out not to be. A response that is nothing but an unterminated block — `max_tokens` spent mid-thought — is reported as a failure rather than an empty string, so a dictation falls back to pasting the raw transcript and a selection is left untouched.
+The strip runs on the **stream**, not on the finished string: chunks are forwarded to the frontend as they arrive, so filtering happens before they enter the frontend store. The compact capsule displays a processing animation rather than streamed text. The filter therefore holds back any trailing text that could still grow into a tag (`<thi` may be one chunk away from `<think>`) and releases it as ordinary text when it turns out not to be. A response that is nothing but an unterminated block — `max_tokens` spent mid-thought — is reported as a failure rather than an empty string, so a dictation falls back to pasting the raw transcript and a selection is left untouched.
 
 Needs confirmation:
 
@@ -252,3 +252,7 @@ Repo evidence:
 Needs confirmation:
 
 - The current repo does not expose a clearly named local STT provider. Local Whisper support may depend on OpenAI-compatible endpoints or external setup not documented here.
+
+## Desktop appearance
+
+Pipeup uses warm neutral surfaces with a vermilion accent in light and dark themes, flat controls, and a single primary sidebar. Settings panes use a wrapping row of navigation buttons rather than a second sidebar. The compact capsule and preserved recovery states are described in [Voice input](voice-input.md#recording-feedback). Brand assets, compatibility identifiers, and regeneration commands live in [Appearance](appearance.md).

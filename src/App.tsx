@@ -30,7 +30,7 @@ function CapsuleApp() {
   const setConfig = useAppStore((s) => s.setConfig)
 
   useEffect(() => {
-    // Load config so DurationTimer gets the correct max_recording_seconds
+    // Load theme, language, and capsule visibility preferences.
     getConfig()
       .then((config) => {
         setConfig(config)
