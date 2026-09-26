@@ -1,20 +1,11 @@
 # Support
 
-Looking for help with OpenTypeless? Here's where to go:
+For help with Pipeup, start with the [setup and upgrade instructions](README.md) and [troubleshooting guide](docs/references/troubleshooting.md). Provider API keys, quotas, and billing are managed by your chosen providers.
 
-## Community
+GitHub Issues and Discussions are currently disabled for this repository. There is no advertised community support channel. The upstream project's Discord is not a Pipeup support channel.
 
-- **Discord**: [Join our server](https://discord.gg/V6rRpJ4RGD) for real-time chat and quick help
-- **GitHub Discussions**: [Q&A](https://github.com/azhurb/pipeup/discussions/categories/q-a) for questions and troubleshooting
-
-## Bug Reports
-
-If you've found a bug, please [open an issue](https://github.com/azhurb/pipeup/issues/new?template=bug_report.yml) with steps to reproduce.
-
-## Feature Requests
-
-Have an idea? Start a [discussion](https://github.com/azhurb/pipeup/discussions/categories/ideas) first, or [open a feature request](https://github.com/azhurb/pipeup/issues/new?template=feature_request.yml).
+For development and contributions, see [CONTRIBUTING.md](CONTRIBUTING.md) and the [documentation index](docs/index.md).
 
 ## Security
 
-Found a security vulnerability? Please report it privately via [GitHub Security Advisories](https://github.com/azhurb/pipeup/security/advisories/new). See [SECURITY.md](SECURITY.md) for details.
+Follow [SECURITY.md](SECURITY.md) to report a vulnerability privately. Do not include API keys or personal dictation in reports.

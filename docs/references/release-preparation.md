@@ -33,7 +33,7 @@ See GitHub's [rename guidance](https://docs.github.com/en/repositories/creating-
 
 ## Publish and verify
 
-Follow [Cutting a release](commands.md#cutting-a-release). The workflow creates a draft with installation and migration copy; it does not verify the artifacts or publish automatically.
+Merge the permission guidance PR and release-preparation PR before tagging. Follow [Cutting a release](commands.md#cutting-a-release). Manual dispatch must use the explicit repository and hardened workflow on `main`; it checks out the requested existing tag before syncing versions. The workflow creates a draft with installation and migration copy; it does not verify the artifacts or publish automatically.
 
 Before publishing, add release highlights, tested platforms, and known limitations. Confirm Windows, both macOS architectures, and Linux artifacts match the intended version and show Pipeup branding. Record any untested platform explicitly. Remove the workflow's draft-only checklist from the public release body.
 

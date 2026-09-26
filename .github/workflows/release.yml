@@ -8,7 +8,6 @@ on:
       tag:
         description: 'Release tag (e.g. v0.1.14)'
         required: true
-        default: 'v0.1.14'
 
 permissions:
   contents: write
@@ -34,25 +33,28 @@ jobs:
 
     runs-on: ${{ matrix.platform }}
     steps:
+      - name: Validate release tag
+        id: release
+        shell: bash
+        env:
+          REQUESTED_TAG: ${{ github.event.inputs.tag || github.ref_name }}
+        run: |
+          if [[ ! "$REQUESTED_TAG" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
+            echo "::error::Expected a release tag like v1.2.3."
+            exit 1
+          fi
+          echo "tag=$REQUESTED_TAG" >> "$GITHUB_OUTPUT"
+          echo "version=${REQUESTED_TAG#v}" >> "$GITHUB_OUTPUT"
+
       - uses: actions/checkout@v4
+        with:
+          ref: refs/tags/${{ steps.release.outputs.tag }}
 
       - name: Sync version from tag
         shell: bash
+        env:
+          VERSION: ${{ steps.release.outputs.version }}
         run: |
-          TAG_VERSION="${{ github.event.inputs.tag || github.ref_name }}"
-
-          # Refuse anything that is not a release tag. Dispatching this workflow
-          # on a *branch* used to fall through to `github.ref_name`, which sailed
-          # past every check and produced a release versioned from nowhere — the
-          # About page in that build reported it, and the bogus draft had to be
-          # deleted by hand. Fail here instead, where the reason is obvious.
-          if [[ ! "$TAG_VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "::error::Expected a release tag like v1.2.3, got '${TAG_VERSION}'."
-            echo "::error::Dispatch this workflow with --field tag=vX.Y.Z, or run it from a tag push."
-            exit 1
-          fi
-
-          VERSION="${TAG_VERSION#v}"
           echo "Syncing version: $VERSION"
 
           node -e "const fs=require('fs');const p=JSON.parse(fs.readFileSync('package.json','utf8'));p.version='$VERSION';fs.writeFileSync('package.json',JSON.stringify(p,null,2)+'\n');"
@@ -120,14 +122,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           APPLE_SIGNING_IDENTITY: ${{ env.APPLE_SIGNING_IDENTITY }}
         with:
-          tagName: ${{ github.event.inputs.tag || github.ref_name }}
-          releaseName: 'Pipeup ${{ github.event.inputs.tag || github.ref_name }}'
+          tagName: ${{ steps.release.outputs.tag }}
+          releaseName: 'Pipeup ${{ steps.release.outputs.tag }}'
           releaseBody: |
             ## Pipeup
 
             Voice input for desktop with your own speech and AI providers. A speech provider API key is required; AI processing is optional.
 
-            See the [changelog](https://github.com/${{ github.repository }}/blob/${{ github.event.inputs.tag || github.ref_name }}/CHANGELOG.md) for changes in this release.
+            See the [changelog](https://github.com/${{ github.repository }}/blob/${{ steps.release.outputs.tag }}/CHANGELOG.md) for changes in this release.
 
             ## Downloads
 
@@ -139,11 +141,11 @@ jobs:
 
             Disable Launch at Startup in the old app, quit it, and remove the old app copy after installing Pipeup. Keep the existing application data. Settings, credentials, history, and dictionary retain their existing storage identities. Re-enable Launch at Startup in Pipeup if needed.
 
-            macOS Accessibility may still list Pipeup as OpenTypeless after upgrading. If Pipeup is absent, enable the old-name entry. If paste still fails, follow the [permission recovery steps](https://github.com/${{ github.repository }}/blob/${{ github.event.inputs.tag || github.ref_name }}/docs/references/troubleshooting.md#macos-accessibility-lists-opentypeless-instead-of-pipeup).
+            macOS Accessibility may still list Pipeup as OpenTypeless after upgrading. If Pipeup is absent, enable the old-name entry. If paste still fails, follow the [permission recovery steps](https://github.com/${{ github.repository }}/blob/${{ steps.release.outputs.tag }}/docs/references/troubleshooting.md#macos-accessibility-lists-opentypeless-instead-of-pipeup).
 
             ## Before publishing this draft
 
-            The maintainer must add the release highlights, verified platforms, and known issues after completing the [release checks](https://github.com/${{ github.repository }}/blob/${{ github.event.inputs.tag || github.ref_name }}/docs/references/release-preparation.md). Remove this draft-only section before publication.
+            The maintainer must add the release highlights, verified platforms, and known issues after completing the [release checks](https://github.com/${{ github.repository }}/blob/${{ steps.release.outputs.tag }}/docs/references/release-preparation.md). Remove this draft-only section before publication.
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}

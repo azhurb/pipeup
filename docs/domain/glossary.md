@@ -22,7 +22,7 @@ User-defined terms injected into the LLM prompt so exact spellings are preserved
 
 ## Feature Map
 
-Repo-local inventory of user-facing features reconciled against code evidence and public website claims: [`features.md`](features.md).
+Repo-local inventory of user-facing features reconciled against code evidence and the README: [`features.md`](features.md).
 
 ## LLM
 

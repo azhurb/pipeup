@@ -12,6 +12,9 @@ This repository is a fork of [Tover0314/opentypeless](https://github.com/tover03
 
 ### Changed
 
+- Renamed the displayed product to Pipeup, with a warm light/dark interface, simplified app and tray icons, and a single primary sidebar with settings navigation across the top. The bundle identifier and existing local data remain unchanged. On macOS, quit and remove the old OpenTypeless app copy after installing Pipeup.
+- Made the active capsule compact and text-free. Recording uses five audio-reactive bars; transcription and polishing use processing dots. Cancel appears on hover or keyboard focus, while recording limits and actionable recovery messages remain available.
+
 - Reorganized the desktop into Overview, History, Dictionary, and focused Settings pages. Added appearance controls, consistent English/Chinese labels, and direct About navigation.
 - Reworked onboarding around speech setup and optional AI processing, with a minimal capsule demonstration and visible save errors.
 - Improved keyboard navigation, field labels, confirmation dialogs, and local-date History search. Search explicitly covers the latest 200 entries.
@@ -19,15 +22,15 @@ This repository is a fork of [Tover0314/opentypeless](https://github.com/tover03
 
 ### Fixed
 
+- Kept tray navigation in the main window so it cannot replace the capsule interface after a reload.
+- Clarified that macOS Accessibility may retain the OpenTypeless name after upgrading to Pipeup.
+- Made manual release builds check out the requested existing tag and use the same validated tag for versioning and release metadata.
 - Keyboard shortcut edits now respect Save and Discard changes. Capture restoration and preference saving are serialized, and failed saves preserve the previous configuration.
 - Translation controls explain their dependency on AI processing.
 
-### Changed
-- Renamed the displayed product to Pipeup, with a warm light/dark interface, simplified app and tray icons, and a single primary sidebar with settings navigation across the top. The bundle identifier and existing local data remain unchanged. On macOS, quit and remove the old OpenTypeless app copy after installing Pipeup.
-- Made the active capsule compact and text-free. Recording uses five audio-reactive bars; transcription and polishing use processing dots. Cancel appears on hover or keyboard focus, while recording limits and actionable recovery messages remain available.
 
 ### Added
-- **Gemini 3.5 Transcribe is available as a speech provider.** Pick it under Settings → Speech Recognition and paste a Google AI Studio key. It transcribes a whole dictation in one request when you release the hotkey, the same way the Whisper-based providers do, and it has been checked end to end against the live API rather than only against the documentation. Pricing at the time of writing is roughly half a cent per minute of audio, with a free tier. Pressing **Test** costs nothing: it reads the model instead of transcribing, the same as the OpenAI Whisper probe, so it also tells you whether your key actually has access to the transcription model rather than only that the key is valid.
+- **Gemini 3.5 Transcribe is available as a speech provider.** Pick it under Settings > Dictation and paste a Google AI Studio key. It transcribes a whole dictation in one request when you release the hotkey, the same way the Whisper-based providers do, and it has been checked end to end against the live API rather than only against the documentation. Pricing at the time of writing is roughly half a cent per minute of audio, with a free tier. Pressing **Test** costs nothing: it reads the model instead of transcribing, the same as the OpenAI Whisper probe, so it also tells you whether your key actually has access to the transcription model rather than only that the key is valid.
 
   **Two things it is sent that the other providers are not, and neither currently does anything.** Your dictionary words go along with the audio as recognition hints, and the provider is asked to clean up fillers and false starts before the text reaches the polish step. Google's API accepts both, and they are definitely the right parameters, since it rejects a misspelled one outright. They simply have no effect. Paired runs with and without them produce byte-identical transcripts, on synthetic speech and on a real microphone recording alike. The clearest case: dictating a string of digits comes back as "1 2 3 4 5" whether the cleanup mode is on or off, and turning spoken numbers into clean text is the one thing that mode most specifically promises.
 

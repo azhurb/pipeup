@@ -49,6 +49,12 @@ npx vitest run path/to/file
 npx vitest -t "pattern"
 ```
 
+Release dispatch regression checks (also run in frontend CI):
+
+```bash
+node --test scripts/tests/release-workflow.test.mjs
+```
+
 ## Rust Checks (mirrors `check-rust` in CI on Windows / macOS / Linux)
 
 ```bash
@@ -93,24 +99,22 @@ Releases are tag-driven. `.github/workflows/release.yml` triggers on tags matchi
 
 ### Cutting a release
 
-1. Pick the next version above the highest existing `vX.Y.Z` tag (`git tag --sort=-version:refname | head -1`).
+1. Refresh tags with `git fetch origin --tags`, then pick the next version above the highest existing `vX.Y.Z` tag (`git tag --sort=-version:refname | head -1`). Check existing drafts with `gh release list --repo azhurb/pipeup`. Replace `vX.Y.Z` below with the chosen version; it is a placeholder, not a runnable version.
 2. **Fold the changelog before tagging.** Open a small PR that renames the `[Unreleased]` section in `CHANGELOG.md` to `[X.Y.Z] - YYYY-MM-DD` and merge it. Without this step, `git checkout vX.Y.Z` shows the release's changes under `[Unreleased]` even though they have shipped — the tag points at a commit where the file disagrees with reality.
 3. Tag the fold's merge commit on `main` and push the tag:
 
    ```bash
-   git tag v0.1.25 <merge-commit-sha>
-   git push origin v0.1.25
+   git tag vX.Y.Z <merge-commit-sha>
+   git push origin vX.Y.Z
    ```
 
 4. **If the release workflow doesn't trigger automatically** (tag-push triggers can stall on this fork), kick it manually:
 
    ```bash
-   gh workflow run release.yml --field tag=v0.1.25
+   gh workflow run release.yml --repo azhurb/pipeup --ref main --field tag=vX.Y.Z
    ```
 
-   The `tag` field is required in that form and must be `vX.Y.Z`. Dispatching without it used to
-   fall through to the branch name, which passed every check and produced a release versioned
-   out of nowhere; the workflow now fails fast instead.
+   The required input must name an existing tag in `vX.Y.Z` form. The hardened workflow on `main` validates it before checkout and builds `refs/tags/<input>`, regardless of the workflow dispatch ref. Missing tags fail checkout; branch names cannot substitute for tags. Release metadata and package versions use the same validated input. The explicit repository prevents the GitHub CLI from dispatching to the upstream fork parent.
 
 5. The `Release` workflow runs four parallel builds: Windows (`x86_64-pc-windows-msvc`), macOS arm64 (`aarch64-apple-darwin`), macOS x86_64 (`x86_64-apple-darwin`), Linux (`x86_64-unknown-linux-gnu`).
 6. CI strips the leading `v` and writes the version into `package.json`, `src-tauri/tauri.conf.json`, and `src-tauri/Cargo.toml` *during the build only* — these files stay at `0.1.0` in git. **Do not commit version bumps.**
@@ -118,7 +122,7 @@ Releases are tag-driven. `.github/workflows/release.yml` triggers on tags matchi
 
 ### Re-running a build for an existing tag
 
-Run the workflow via `workflow_dispatch` and pass the tag name (e.g. `v0.1.25`). This rebuilds without retagging.
+Use the explicit manual command above after this workflow change is merged into `main`. The workflow definition comes from `main`; source code comes from the requested existing tag. This rebuilds without retagging and can replace draft assets. Inspect the existing release and obtain authorization before rerunning; do not silently overwrite published assets. Dispatching an older workflow ref uses that older workflow and does not acquire these safeguards.
 
 ## Brand icons
 
