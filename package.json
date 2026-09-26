@@ -14,11 +14,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/azhurb/opentypeless"
+    "url": "https://github.com/azhurb/pipeup"
   },
-  "homepage": "https://github.com/azhurb/opentypeless",
+  "homepage": "https://github.com/azhurb/pipeup",
   "bugs": {
-    "url": "https://github.com/azhurb/opentypeless/issues"
+    "url": "https://github.com/azhurb/pipeup/issues"
   },
   "author": "Pipeup Contributors",
   "license": "MIT",

@@ -20,12 +20,11 @@ Test an upgrade with existing settings, a saved credential, history, and diction
 
 ## Repository changes
 
-The repository currently uses `azhurb/opentypeless`. Product and npm package branding use Pipeup. Keep published links on the current repository until a rename is approved and completed.
+The repository was renamed to `azhurb/pipeup` on 2026-09-26. Origin, package metadata, app source links, templates, active documentation, and stacked PR links use the new name. The fork relationship and upstream attribution are preserved.
 
 A maintainer must separately authorize outward changes:
 
-- Rename the repository to `pipeup`, update its description and topics, and decide whether to enable Issues. Suggested description: "Voice input for desktop with your own speech and AI providers." Suggested topics: `voice-input`, `speech-to-text`, `tauri`, `macos`, `windows`, `linux`, `byok`.
-- After a rename, update origin URLs, package metadata, source links, badges, templates, and active documentation. Verify release downloads and repository links resolve. Preserve upstream links and historical attribution.
+- Update the repository description and topics, and decide whether to enable Issues. Suggested description: "Voice input for desktop with your own speech and AI providers." Suggested topics: `voice-input`, `speech-to-text`, `tauri`, `macos`, `windows`, `linux`, `byok`.
 - Decide independently whether to detach the fork. Detachment is permanent and can remove repository metadata. Review the actual repository history and GitHub's current [detachment guidance](https://docs.github.com/en/pull-requests/how-tos/work-with-forks/detaching-a-fork) before authorizing it. A product rebrand does not require detachment.
 
 See GitHub's [rename guidance](https://docs.github.com/en/repositories/creating-and-managing-repositories/renaming-a-repository) for redirect behavior and exceptions. Name and trademark clearance still needs maintainer judgment.
@@ -47,7 +46,7 @@ The preparation is split into stacked local branches, in review order:
 3. `codex/pipeup-navigation`: information architecture, accessibility, localization, and screen consistency.
 4. `codex/pipeup-repository`: repository presentation, screenshots, and release guidance.
 
-The final branch contains all four layers. Pushes and pull requests still need authorization, as do repository rename and fork detachment. No database migration is part of this stack.
+The final branch contains all four layers. The branches are pushed as PRs [#58](https://github.com/azhurb/pipeup/pull/58), [#59](https://github.com/azhurb/pipeup/pull/59), [#60](https://github.com/azhurb/pipeup/pull/60), and [#61](https://github.com/azhurb/pipeup/pull/61). Merge in order with merge commits, retargeting each dependent PR to `main` after its predecessor merges. Keep parent branches until dependents are retargeted. Squash merges require rebasing the remaining stack. Merging, release publication, and fork detachment still need separate authorization. No database migration is part of this stack.
 
 Local verification on macOS: 253 frontend tests passed; 317 Rust tests passed with one existing ignored test. TypeScript, Prettier, Rust formatting, and Clippy passed. ESLint passed with six pre-existing warnings. An unsigned debug `Pipeup.app` bundle built successfully. The interaction branch was also tested independently: 236 frontend tests passed.
 

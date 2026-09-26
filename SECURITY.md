@@ -2,7 +2,7 @@
 
 ## Reporting a Vulnerability
 
-Please report security vulnerabilities through [GitHub Security Advisories](https://github.com/azhurb/opentypeless/security/advisories/new).
+Please report security vulnerabilities through [GitHub Security Advisories](https://github.com/azhurb/pipeup/security/advisories/new).
 
 **Do not open a public issue for security vulnerabilities.**
 

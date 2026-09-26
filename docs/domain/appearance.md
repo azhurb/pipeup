@@ -17,7 +17,7 @@ Regenerate assets using the commands in [Commands](../references/commands.md#bra
 
 ## Identity compatibility
 
-The display name, native window titles, permission copy, and tray tooltip use Pipeup. The repository remains `azhurb/opentypeless`; historical upstream attribution and copyright are retained.
+The display name, native window titles, permission copy, and tray tooltip use Pipeup. The repository is `azhurb/pipeup`; historical upstream attribution and copyright are retained.
 
 The bundle identifier (`com.opentypeless.app`), credential namespace, database filenames, Cargo executable name, and existing signing certificate identities are deliberately unchanged. This visual rebrand does not move or reset local data and does not detach the repository from its fork network.
 

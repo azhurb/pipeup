@@ -24,4 +24,4 @@ jobs:
           pr-message: |
             Thanks for contributing to Pipeup.
 
-            Please include the problem, resulting behavior, and checks you actually ran. See the [contributing guide](https://github.com/azhurb/opentypeless/blob/main/CONTRIBUTING.md) for review expectations.
+            Please include the problem, resulting behavior, and checks you actually ran. See the [contributing guide](https://github.com/azhurb/pipeup/blob/main/CONTRIBUTING.md) for review expectations.

@@ -7,7 +7,7 @@
 <p align="center">Voice input for people who want control over their tools.</p>
 
 <p align="center">
-  <a href="https://github.com/azhurb/opentypeless/releases">Download</a> ·
+  <a href="https://github.com/azhurb/pipeup/releases">Download</a> ·
   <a href="docs/index.md">Documentation</a> ·
   <a href="CONTRIBUTING.md">Contribute</a>
 </p>
@@ -33,7 +33,7 @@ Screenshots use the real interface with preview data.
 
 ## Download and setup
 
-Get an installer from [Releases](https://github.com/azhurb/opentypeless/releases). Check the release title: older releases are named OpenTypeless.
+Get an installer from [Releases](https://github.com/azhurb/pipeup/releases). Check the release title: older releases are named OpenTypeless.
 
 | Platform | Download |
 | --- | --- |
@@ -62,7 +62,7 @@ Grant **Microphone** and **Accessibility** permissions when prompted. Repeat the
 
 Turn off Launch at Startup in the old app if enabled, then quit it. Install Pipeup and move the old `OpenTypeless.app` to Trash so both copies cannot start. Re-enable Launch at Startup in Pipeup if you use it.
 
-Keep the existing application data. Pipeup retains the bundle identifier, credential storage identifiers, settings, history, and dictionary. This release changes the product name without resetting your setup. The repository URL is still `azhurb/opentypeless`.
+Keep the existing application data. Pipeup retains the bundle identifier, credential storage identifiers, settings, history, and dictionary. This release changes the product name without resetting your setup. The repository URL is `azhurb/pipeup`.
 
 ## Data and privacy
 

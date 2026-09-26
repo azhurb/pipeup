@@ -4,8 +4,8 @@ export const APP_NAME = 'Pipeup'
 // package.json / tauri.conf.json / Cargo.toml at build time and never commits
 // it, so any constant in this file is permanently stale. AboutPane reads the
 // real version from the bundle via `getVersion()`.
-export const APP_REPO_URL = 'https://github.com/azhurb/opentypeless'
-export const APP_LICENSE_URL = 'https://github.com/azhurb/opentypeless/blob/main/LICENSE'
+export const APP_REPO_URL = 'https://github.com/azhurb/pipeup'
+export const APP_LICENSE_URL = 'https://github.com/azhurb/pipeup/blob/main/LICENSE'
 
 export const STT_PROVIDERS = [
   { value: 'deepgram', label: 'Deepgram Nova-3' },
