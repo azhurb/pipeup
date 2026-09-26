@@ -1,6 +1,6 @@
 # Storage
 
-Pipeup uses local app data for config, history, dictionary, and window/onboarding state, plus the OS credential vault for provider API keys. See [Feature map](../domain/features.md) and [Pipeline](pipeline.md) for how stored values feed user-facing behavior.
+Pipeup uses local app data for config, history, dictionary, and window/onboarding state, plus platform-specific credential storage for provider API keys. See [Feature map](../domain/features.md) and [Pipeline](pipeline.md) for how stored values feed user-facing behavior.
 
 Evidence: `src-tauri/src/storage/mod.rs`, `src-tauri/src/credentials.rs`, `src-tauri/migrations/001_init.sql`, `src/lib/tauri.ts`, `src/lib/credentials.ts`, `src/App.tsx`.
 
@@ -12,9 +12,9 @@ Evidence: `src-tauri/src/storage/mod.rs`, `src-tauri/src/credentials.rs`, `src-t
 | --- | --- | --- |
 | Windows | Credential Manager | user-scoped, no prompts |
 | Linux | Secret Service, file fallback | unlocks with the login session |
-| **macOS** | **`credentials.json`, `0600`** | the Keychain would prompt for a password after every app update — see [below](#macos-deliberately-does-not-use-the-keychain) |
+| **macOS** | **`credentials.json`, `0600`** | the Keychain would prompt for a password after every app update - see [below](#macos-deliberately-does-not-use-the-keychain) |
 
-Everything else on this page is non-secret configuration.
+The Config and SQLite sections describe non-secret settings and local content. The Credentials section describes API key persistence.
 
 ## Config (`tauri-plugin-store`)
 
@@ -50,15 +50,15 @@ If you add or change a default, update this table in the same PR.
 
 `ConfigManager::load` runs two migrations on the raw JSON value before deserializing into `AppConfig`. Both are idempotent, and a mutated value is written back on the same load.
 
-- `migrate_legacy_config` — pre-multi-language installs persisted `stt_language: String` (with the sentinel `"multi"`). Converts `"multi"` / `""` to `stt_languages = []` and any other code to `[code]`, then removes the legacy key.
-- `credentials::migrate_legacy_config_secrets` — moves plaintext `stt_api_key` / `llm_api_key` into the credential vault. Covered under [Credentials](#credentials-os-credential-vault).
+- `migrate_legacy_config` - pre-multi-language installs persisted `stt_language: String` (with the sentinel `"multi"`). Converts `"multi"` / `""` to `stt_languages = []` and any other code to `[code]`, then removes the legacy key.
+- `credentials::migrate_legacy_config_secrets` - moves plaintext `stt_api_key` / `llm_api_key` into the credential vault. Covered under [Credentials](#credentials-os-credential-vault).
 
 Add new migrations to `migrate_legacy_config` rather than re-mapping fields downstream; tests live in `storage::config_migration_tests` and `credentials::tests`.
 
 ### Load failures fail open, loudly
 
 If `app_config` cannot be deserialized, `ConfigManager::load` falls back to
-`AppConfig::default()` — the app has to start. That fallback re-enables anything the user
+`AppConfig::default()` - the app has to start. That fallback re-enables anything the user
 opted out of, including `history_enabled`, and if the value also needed legacy migration the
 defaults are then written back over their settings. It therefore logs at `error` with the
 serde message. If you add another privacy-relevant flag, this is the fail-open path to think
@@ -66,14 +66,13 @@ about.
 
 ## Credentials (OS credential vault)
 
-Provider API keys live in `src-tauri/src/credentials.rs`, backed by the `keyring` crate:
-macOS Keychain, Windows Credential Manager, Linux Secret Service. Before this, they were
-plain strings in `settings.json` — for a BYOK, local-first app that was the widest gap
-between what the README claims and what the app did.
+Provider API key storage is implemented in `src-tauri/src/credentials.rs`. macOS uses
+an owner-only file; Windows and Linux use the `keyring` crate with a file fallback.
+Legacy plaintext keys in `settings.json` are migrated as described below.
 
 - **Service name**: `com.opentypeless.app` (matches the `tauri.conf.json` bundle identifier,
   so entries are attributable in Keychain Access / Credential Manager).
-- **Account**: `<namespace>:<provider>` — `stt:deepgram`, `llm:openrouter`. Changing this
+- **Account**: `<namespace>:<provider>` - `stt:deepgram`, `llm:openrouter`. Changing this
   format orphans every entry a previous version wrote.
 - **Payload**: JSON `{ "version": 1, "secret": "…" }`. The version stamp is forward
   compatibility only; a bare (hand-written) secret is also accepted on read.
@@ -81,8 +80,8 @@ between what the README claims and what the app did.
 ### Credentials are per provider
 
 Keys are filed under `(namespace, provider)`, not per namespace. Switching STT provider and
-switching back remembers the earlier key instead of overwriting it, and `siliconflow` — which
-is both an STT and an LLM provider id — gets two independent slots.
+switching back remembers the earlier key instead of overwriting it, and `siliconflow` - which
+is both an STT and an LLM provider id - gets two independent slots.
 
 ### Keys are write-only from the webview's perspective
 
@@ -97,9 +96,9 @@ Consequences worth knowing:
 | Concern | How it works |
 | --- | --- |
 | Store unavailable | Falls back to an unencrypted `credentials.json`, reported as `saved_unencrypted` and shown as a warning. See [above](#the-credential-store-may-never-break-the-app). |
-| Settings / onboarding input | The field is genuinely **empty** with a "saved" placeholder — not a masked value. `keyDrafts[ns] === null` means untouched, so the unsaved-changes bar cannot mistake a placeholder for an edit (the `0.5.0` bug in `CHANGELOG.md`). |
+| Settings / onboarding input | The field is genuinely **empty** with a "saved" placeholder - not a masked value. `keyDrafts[ns] === null` means untouched, so the unsaved-changes bar cannot mistake a placeholder for an edit (the `0.5.0` bug in `CHANGELOG.md`). |
 | Removing a key | "Remove" stages an empty-string draft; Save calls `set_api_key` with `""`, which deletes the entry. It is a pending change like any other setting, not an immediate side effect. |
-| Testing a key | `test_*` / `bench_*` / `fetch_llm_models` take `api_key: Option<String>`. `Some(candidate)` probes an unsaved key — required by onboarding, where nothing is saved yet, and by Settings, where probing the stored key right after pasting a new one would report on the wrong credential. `None` means "use the vault". A candidate is never persisted as a side effect of testing. |
+| Testing a key | `test_*` / `bench_*` / `fetch_llm_models` take `api_key: Option<String>`. `Some(candidate)` probes an unsaved key - required by onboarding, where nothing is saved yet, and by Settings, where probing the stored key right after pasting a new one would report on the wrong credential. `None` means "use the vault". A candidate is never persisted as a side effect of testing. |
 | `fetch_llm_models` | Gained a `provider` parameter, purely to name the vault entry to fall back on. |
 | Onboarding gate | `should_show_window_on_launch` takes "the vault has no entry for the selected STT provider" instead of `stt_api_key.is_empty()`. An unreadable vault counts as no key, erring toward showing onboarding rather than starting hidden and broken. |
 | Logging | `pipeline.rs` logs key **length** only. Never log the value. |
@@ -115,7 +114,7 @@ provider, then removes the plaintext field.
 user keeps a working key and the migration retries next launch. Clearing first would destroy
 the only copy of a secret the user may never have written down.
 
-Because `AppConfig` no longer models those fields, serializing it would drop them — so a
+Because `AppConfig` no longer models those fields, serializing it would drop them - so a
 launch with a locked vault followed by *any* Settings save would erase the key anyway.
 `ConfigManager` therefore holds `pending_legacy_secrets`: whatever the migration could not
 vault is re-attached by every `save` until a later launch succeeds.
@@ -128,7 +127,7 @@ the plaintext in place, since there is nothing to file it under.
 
 A Keychain item carries a XARA **partition list** naming the code identities allowed to read
 it. Entries are keyed by `teamid:` only when the app is signed with an Apple Developer ID;
-without one macOS falls back to `cdhash:` — the hash of that exact binary.
+without one macOS falls back to `cdhash:` - the hash of that exact binary.
 
 This project signs with a self-signed certificate and has no Apple team, so every release is
 a different identity to the partition list. Measured with two pipeline-signed builds that
@@ -144,7 +143,7 @@ than what the app did before this change (a plaintext config file and no prompts
 `credentials::default_store` uses [`FileVault`] on macOS: owner-only (`0600`), no prompts,
 and still not the world-readable `settings.json` keys used to live in.
 
-Note the same certificate is **not** enough — it is the Team ID that makes partition entries
+Note the same certificate is **not** enough - it is the Team ID that makes partition entries
 stable. `certificate leaf = H"…"` in the designated requirement governs the *ACL*; the
 partition list is a separate check and is what actually prompts here.
 
@@ -155,24 +154,25 @@ partition entries stable across versions, `default_store` should then use
 
 ### The credential store may never break the app
 
-`FallbackVault` wraps the real vault and falls back to `FileVault` — a `0600`
-JSON file at `<app_data_dir>/credentials.json` — when the store is genuinely
+`FallbackVault` wraps the real vault and falls back to `FileVault` - a `0600`
+JSON file at `<app_data_dir>/credentials.json` - when the store is genuinely
 unavailable.
 
 This is not optional polish. On Linux, `keyring`'s `linux-native-sync-persistent`
 writes keyutils *and* Secret Service, and **reverts the keyutils write if the
 Secret Service write fails** (verified in `keyring-3.6.3/src/keyutils_persistent.rs`).
 On a minimal WM or headless box with no Secret Service provider, a fresh install
-could not save an API key at all — the app would be unusable, which is strictly
+could not save an API key at all - the app would be unusable, which is strictly
 worse than the plaintext config this change replaced.
 
-The rule: the OS credential store is the default and strongly preferred home,
-but it may never be the reason the app stops working.
+On Windows and Linux, the OS credential store is preferred but must not prevent
+the app from saving credentials. The following fallback rules apply on those platforms;
+macOS uses the file directly.
 
 - A key only reaches the file when the store **refuses the write**.
 - **The contents are not encrypted**, so on Windows and Linux `get_credential_status` reports
   `saved_unencrypted` and both Settings panes show a visible warning. On macOS it is the
-  intended store, so it reports plain `saved` — warning on every launch would cry wolf.
+  intended store, so it reports plain `saved` - warning on every launch would cry wolf.
   Storing a secret in the clear silently would be worse than the old
   `settings.json`, because it would be invisible.
 - If the store later starts working, the next save **promotes** the key into it
@@ -187,28 +187,21 @@ but it may never be the reason the app stops working.
 so a session touches the OS credential store roughly twice instead of twice per
 dictation (the pipeline resolves an STT key and an LLM key every time).
 
-This is a macOS usability fix. A Keychain prompt offers Deny / Allow / **Always
-Allow**, and plain "Allow" grants exactly one access — so without the cache, a
-user who did not pick "Always Allow" was re-prompted on every dictation, which
-reasonably reads as something malicious.
+The cache originally reduced repeated macOS Keychain prompts. Current macOS builds
+use the file store, so this history does not describe their normal permission flow.
 
 Only successful reads are cached. Errors are not, so a locked keychain keeps
 reporting itself instead of being remembered as a failure for the session;
 misses are not, so a key added out of band is still picked up. `write` and
 `delete` update the cache after the store accepts the change, never before.
 
-### When macOS actually prompts
+### Legacy macOS Keychain prompts
 
-The Keychain ACL matches on the app's **designated requirement**, which differs
-by how the build is signed:
-
-| Build | Designated requirement | Prompt behavior |
-| --- | --- | --- |
-| Release (`.github/workflows/release.yml` imports the "OpenTypeless Release" cert) | `identifier "com.opentypeless.app" and certificate leaf = H"…"` | Stable across versions — an update does **not** re-prompt |
-| Local `npm run tauri build` (no cert) | `cdhash H"…"` | Changes every rebuild, so each local rebuild prompts once |
-
-So repeated prompts while developing are expected and are not a defect. They
-would only reach users if the release signing certificate were rotated.
+Current macOS builds do not read provider keys from the Keychain. Older builds or
+custom builds using `SystemCredentialVault` can prompt. The release signing certificate
+is still named `OpenTypeless Release` and the bundle identifier remains
+`com.opentypeless.app` for compatibility, but a stable designated requirement alone does
+not prevent partition-list prompts. See [the macOS storage decision](#macos-deliberately-does-not-use-the-keychain).
 
 Windows and Linux have no equivalent per-app prompt: Credential Manager is
 scoped to the user account, and Secret Service unlocks with the login session.
@@ -224,17 +217,17 @@ surfaces a distinct message and aborts; the LLM path logs a warning and skips po
 failing the dictation outright would throw away a transcript the user already spoke.
 
 The same distinction reaches the UI. `get_credential_status` returns a four-state
-`KeyPresence` per namespace — `saved` / `saved_unencrypted` / `missing` /
-`unreadable` — not a boolean. Reporting an
+`KeyPresence` per namespace - `saved` / `saved_unencrypted` / `missing` /
+`unreadable` - not a boolean. Reporting an
 unreadable vault as `missing` renders an empty field, which invites the user to retype the key
-or press Remove, destroying a credential that was fine. On macOS that is one declined prompt
-away. The `unreadable` state shows an explicit "couldn't read your keychain" message and
+or press Remove, destroying a credential that was fine. The `unreadable` state shows
+an explicit "Could not read your saved credential" message and
 hides Remove, since offering to delete a key whose existence is unknown is not a safe option.
 
 ### Testing
 
 `CredentialVault` is a trait so tests can substitute `MemoryVault`. **Tests must never touch
-the real vault** — CI runs `cargo test` on three OSes, where a real vault either prompts for
+the real vault** - CI runs `cargo test` on three OSes, where a real vault either prompts for
 authorization or fails on a headless runner. `MemoryVault::failing(msg)` exercises the
 vault-rejects-the-write path.
 
@@ -255,14 +248,14 @@ Columns currently created by Rust code:
 #### Writes are opt-out
 
 The pipeline writes a row only when `history_enabled` is true (`src-tauri/src/pipeline.rs`).
-With it false, dictations are still transcribed, polished, and typed — nothing is recorded.
-Rows already stored stay readable and searchable, **but retention still applies to them** —
-turning saving off is not a way to freeze the archive. Because `HomePage`'s counters are
-derived from the history list, they stop advancing while history is off.
+With it false, dictations are still transcribed, polished, and typed - nothing is recorded.
+Rows already stored stay readable and searchable, **but retention still applies to them** -
+turning saving off is not a way to freeze the archive. The Overview page shows saved provider settings; it does not present the loaded history
+length as a lifetime total.
 
 The flag is re-read at write time rather than taken from the recording-start config snapshot
-(`preloaded_config`), so a user who opts out mid-dictation — possible in `toggle` hotkey mode
-— is honored for that dictation. The read is cache-backed and effectively free.
+(`preloaded_config`), so a user who opts out mid-dictation - possible in `toggle` hotkey mode
+- is honored for that dictation. The read is cache-backed and effectively free.
 
 The UI must consult the **persisted** config for this, not the Zustand `config`, which
 carries unsaved Settings edits: `src/components/History/index.tsx` reads
@@ -273,9 +266,9 @@ stopped recording before the change is actually saved.
 
 Two rules:
 
-1. **Count backstop** — `MAX_HISTORY_ENTRIES` is 5000, read from a constant inside
+1. **Count backstop** - `MAX_HISTORY_ENTRIES` is 5000, read from a constant inside
    `HistoryStore::add`, so it cannot be bypassed by a caller.
-2. **Age limit** — `history_retention_days` (`0` = forever). Settings → General offers
+2. **Age limit** - `history_retention_days` (`0` = forever). Settings > Privacy offers
    Forever / 7 / 30 / 90. This one is *caller-supplied* as `add(entry, retention_days)`; a
    caller passing `0` skips it, which is what the tests do deliberately. Any new history
    writer must pass the real config value.
@@ -287,27 +280,27 @@ runs at four points:
 | --- | --- |
 | `HistoryStore::add` | Trims during a long-running session. |
 | After a dictation with saving **off** (`pipeline.rs`) | There is no insert, so `add`'s prune never fires; without this a session left running for weeks would honor the window only at launch. |
-| App startup (`lib.rs` `setup`) | Catches a machine that was off past the window. Logs its row count even on success — it is the one destructive prune that runs unattended, so "my history is gone" has to be distinguishable from corruption. |
+| App startup (`lib.rs` `setup`) | Catches a machine that was off past the window. Logs its row count even on success - it is the one destructive prune that runs unattended, so "my history is gone" has to be distinguishable from corruption. |
 | `update_config` | A lowered retention applies on Save, not at next launch. Emits `history:changed` when it deleted anything, because `config:changed` only replaces each webview's config copy and the History pane would otherwise keep listing deleted rows. |
 
-Prune failures are logged, never propagated — in `update_config` the config is already
+Prune failures are logged, never propagated - in `update_config` the config is already
 persisted, so failing the save over a `DELETE` would be worse than a stale row.
 
 Narrowing the window is confirmed in the UI before it is applied
-(`settings.retentionConfirm`), matching the confirm already required by "Clear All History"
+(`settings.retentionConfirm`), matching the confirm already required by "Clear history"
 for the same data. Widening, or switching to Forever, deletes nothing and is not confirmed.
 
 **`history_retention_days` is clamped** to `MAX_RETENTION_DAYS` (~100 years) before it
 reaches chrono, and the subtraction uses `checked_sub_signed`. chrono *panics* on
 out-of-range durations, and the startup prune runs inside Tauri `setup` where a panic aborts
-launch with no in-app recovery — so a hand-edited or corrupted `settings.json` must not be
+launch with no in-app recovery - so a hand-edited or corrupted `settings.json` must not be
 able to reach it. Overflow yields "prune nothing", the safe direction.
 
 **Deleted rows are scrubbed, not just unlinked.** `HistoryStore::new` sets
 `PRAGMA secure_delete=ON` so freed pages are overwritten instead of returned to the freelist
 readable, and `prune_older_than` / `clear` run `PRAGMA wal_checkpoint(TRUNCATE)` when they
 removed anything so the text does not linger in the `-wal` sidecar. Note this scrubs content
-but does not shrink the file — that would need a `VACUUM`, which is not worth blocking a
+but does not shrink the file - that would need a `VACUUM`, which is not worth blocking a
 delete on.
 
 **Timestamp invariant.** `created_at` is naive **local** time in the fixed-width format
@@ -315,7 +308,7 @@ delete on.
 and the prune cutoff. Fixed width means lexicographic ordering equals chronological
 ordering, so pruning is a plain `WHERE created_at < ?` string comparison. Building the
 cutoff in UTC instead would skew it by the machine's offset. Rows written in one timezone
-and pruned in another are off by that difference — accepted, since the error is bounded by
+and pruned in another are off by that difference - accepted, since the error is bounded by
 hours against windows measured in days.
 
 ### Dictionary (`DictionaryStore`)
@@ -327,15 +320,15 @@ Columns:
 - `id INTEGER PRIMARY KEY AUTOINCREMENT`
 - `word TEXT NOT NULL`
 - `pronunciation TEXT` (optional, used by manual entries)
-- `source TEXT NOT NULL DEFAULT 'manual'` — one of `manual` (added via Settings → Dictionary) or `user_edits` (auto-learned from a correction by the watcher in `src-tauri/src/correction/`).
-- `observed_source TEXT` (nullable) — for `user_edits` rows, the STT-produced word the user replaced. Surfaced in the Settings UI tooltip and in the toast copy.
-- `frequency_used INTEGER NOT NULL DEFAULT 0` — initialized to `1` for `user_edits` inserts (the edit itself counts as the first use); `0` for manual inserts. Not yet bumped on subsequent dictation use — see the [learn-from-corrections handoff](../superpowers/notes/2026-05-14-learn-from-corrections-handoff.md) for the follow-up plan.
-- `last_used TEXT` (nullable) — SQLite `CURRENT_TIMESTAMP` (UTC), set at insert time for `user_edits`, `NULL` for manual.
+- `source TEXT NOT NULL DEFAULT 'manual'` - one of `manual` (added via the Dictionary page) or `user_edits` (auto-learned from a correction by the watcher in `src-tauri/src/correction/`).
+- `observed_source TEXT` (nullable) - for `user_edits` rows, the STT-produced word the user replaced. Surfaced in the Settings UI tooltip and in the toast copy.
+- `frequency_used INTEGER NOT NULL DEFAULT 0` - initialized to `1` for `user_edits` inserts (the edit itself counts as the first use); `0` for manual inserts. Not yet bumped on subsequent dictation use - see the [learn-from-corrections handoff](../superpowers/notes/2026-05-14-learn-from-corrections-handoff.md) for the follow-up plan.
+- `last_used TEXT` (nullable) - SQLite `CURRENT_TIMESTAMP` (UTC), set at insert time for `user_edits`, `NULL` for manual.
 
 Insert API has two intents:
 
-- `DictionaryStore::add_manual(word, pronunciation)` — Settings → Dictionary "Add" form.
-- `DictionaryStore::add_learned(word, observed_source)` — correction watcher.
+- `DictionaryStore::add_manual(word, pronunciation)` - the Dictionary page "Add" form.
+- `DictionaryStore::add_learned(word, observed_source)` - correction watcher.
 
 Words are loaded before recording and injected into prompt building so custom terms are preserved (see `src-tauri/src/llm/prompt.rs`). `DictionaryStore::words()` returns only the `word` column, ignoring provenance.
 
@@ -343,7 +336,7 @@ Migration ladder: at `DictionaryStore::new`, the runtime ensures the legacy thre
 
 ## `migrations/001_init.sql` is reference-only
 
-`src-tauri/migrations/001_init.sql` declares richer schemas (`stt_provider`, `llm_provider`, `usage_count`, `idx_history_created`, `idx_dictionary_word`). Grep confirms the file is not loaded by any runtime code — the runtime always uses the narrower `CREATE TABLE IF NOT EXISTS` blocks above. Treat the SQL file as a future-schema sketch, not as an executed migration.
+`src-tauri/migrations/001_init.sql` declares richer schemas (`stt_provider`, `llm_provider`, `usage_count`, `idx_history_created`, `idx_dictionary_word`). Grep confirms the file is not loaded by any runtime code - the runtime always uses the narrower `CREATE TABLE IF NOT EXISTS` blocks above. Treat the SQL file as a future-schema sketch, not as an executed migration.
 
 If the runtime ever starts executing migrations, this section must be updated.
 

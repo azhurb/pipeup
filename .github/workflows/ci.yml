@@ -24,6 +24,7 @@ jobs:
           cache: 'npm'
 
       - run: npm ci
+      - run: node --test scripts/tests/release-workflow.test.mjs
       - run: npx tsc --noEmit
       - run: npx eslint src/
       - run: npx prettier --check src/
