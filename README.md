@@ -95,6 +95,6 @@ Use the [command reference](docs/references/commands.md) for production builds a
 
 ## Credits
 
-Pipeup builds on [OpenTypeless](https://github.com/tover0314-w/opentypeless) by [Tover0314](https://github.com/tover0314-w). This fork retains the local bring-your-own-key pipeline and develops its own interface and product identity. The original author's copyright and MIT license are preserved.
+Pipeup builds on [OpenTypeless](https://github.com/tover0314-w/opentypeless) by [Tover0314](https://github.com/tover0314-w). Pipeup is an independent project that retains the local bring-your-own-key pipeline and develops its own interface and product identity. The original author's copyright and MIT license are preserved.
 
 [MIT license](LICENSE) · [Security policy](SECURITY.md) · [Product direction](VISION.md)

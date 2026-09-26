@@ -6,9 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## Fork
 
-This repository is a fork of [Tover0314/opentypeless](https://github.com/tover0314-w/opentypeless). The entry for `0.1.0` describes the upstream baseline; `0.2.0` is the fork's first release, marking the BYOK-only direction and the changes listed below.
+Pipeup originated as a fork of [Tover0314/opentypeless](https://github.com/tover0314-w/opentypeless). The entry for `0.1.0` describes the upstream baseline; `0.2.0` is the fork's first release, marking the BYOK-only direction and the changes listed below.
 
 ## [Unreleased]
+
+## [0.9.0] - 2026-09-26
 
 ### Changed
 
@@ -27,7 +29,6 @@ This repository is a fork of [Tover0314/opentypeless](https://github.com/tover03
 - Made manual release builds check out the requested existing tag and use the same validated tag for versioning and release metadata.
 - Keyboard shortcut edits now respect Save and Discard changes. Capture restoration and preference saving are serialized, and failed saves preserve the previous configuration.
 - Translation controls explain their dependency on AI processing.
-
 
 ### Added
 - **Gemini 3.5 Transcribe is available as a speech provider.** Pick it under Settings > Dictation and paste a Google AI Studio key. It transcribes a whole dictation in one request when you release the hotkey, the same way the Whisper-based providers do, and it has been checked end to end against the live API rather than only against the documentation. Pricing at the time of writing is roughly half a cent per minute of audio, with a free tier. Pressing **Test** costs nothing: it reads the model instead of transcribing, the same as the OpenAI Whisper probe, so it also tells you whether your key actually has access to the transcription model rather than only that the key is valid.

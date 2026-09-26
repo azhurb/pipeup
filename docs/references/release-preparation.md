@@ -20,14 +20,11 @@ Test an upgrade with existing settings, a saved credential, history, and diction
 
 ## Repository changes
 
-The repository was renamed to `azhurb/pipeup` on 2026-09-26. Origin, package metadata, app source links, templates, active documentation, and stacked PR links use the new name. The fork relationship and upstream attribution are preserved.
+The repository was renamed to `azhurb/pipeup` on 2026-09-26. Origin, package metadata, app source links, templates, active documentation, and stacked PR links use the new name. The repository left the GitHub fork network on 2026-09-26 and is now standalone. Upstream attribution and the MIT license are preserved.
 
 The repository description is "Voice input for desktop with your own speech and AI providers." Topics are `voice-input`, `speech-to-text`, `tauri`, `macos`, `windows`, `linux`, and `byok`, applied and verified on 2026-09-26.
 
-A maintainer must separately authorize remaining outward changes:
-
-- Decide whether to enable Issues.
-- Decide independently whether to detach the fork. Detachment is permanent and can remove repository metadata. Review the actual repository history and GitHub's current [detachment guidance](https://docs.github.com/en/pull-requests/how-tos/work-with-forks/detaching-a-fork) before authorizing it. A product rebrand does not require detachment.
+Issues remain disabled; enabling them is a separate product decision. Fork detachment is complete, verified through the GitHub API (`fork: false`, no parent).
 
 See GitHub's [rename guidance](https://docs.github.com/en/repositories/creating-and-managing-repositories/renaming-a-repository) for redirect behavior and exceptions. Name and trademark clearance still needs maintainer judgment.
 
@@ -39,14 +36,14 @@ Before publishing, add release highlights, tested platforms, and known limitatio
 
 After publication, verify the download links and the README's release destination. No database migration or data cleanup is required by this rebrand. Do not delete legacy data directories or credential files.
 
-## Release status, 2026-09-26
+## Release verification record, 2026-09-26
 
-The rebrand stack is merged into `main`: [#58](https://github.com/azhurb/pipeup/pull/58) (design), [#59](https://github.com/azhurb/pipeup/pull/59) (interactions), [#60](https://github.com/azhurb/pipeup/pull/60) (navigation), and [#61](https://github.com/azhurb/pipeup/pull/61) (repository presentation and capsule routing). Post-merge CI, CodeQL, and Typos passed. No Pipeup release has been published; the latest public release remains v0.8.2, with an existing v0.9.0 draft. Recheck remote state before choosing a release version.
+The rebrand and follow-up PRs #58 through #63 are merged. CI passed, and [release run 36258627560](https://github.com/azhurb/pipeup/actions/runs/36258627560) successfully built macOS arm64, macOS x64, Windows, and Linux artifacts from tag `v0.9.0`, commit `6cc4f4dc745a978b04e7f2878f123e3d7173af71`.
 
-The final stack passed all five CI jobs. Local frontend verification passed 259 tests, including capsule routing regressions. An unsigned debug `Pipeup.app` bundle built successfully. The maintainer confirmed dictation works and the capsule looks correct in that bundle. Cancellation was not separately confirmed.
+The maintainer installed the Apple Silicon prerelease and reported that it works. Earlier local debug checks confirmed dictation and capsule appearance. Browser checks covered the redesigned screens with synthetic data in light/dark themes at 900 by 700 and 720 by 480. Frontend regression coverage passed 259 tests, and four release-dispatch tests passed.
 
-Browser verification used the real React components with synthetic local data at 900 by 700 and 720 by 480. Light/dark appearance, discard, navigation, and refreshed screenshots were checked. Native UI automation could not attach to the packaged app.
+Windows, Linux, and Intel Mac runtime checks are not confirmed. Detailed data preservation, startup, cancellation, and shortcut-conflict checks are not separately confirmed by the general installation report. Release notes disclose these limits. macOS builds remain self-signed rather than notarized, and Accessibility may retain the previous OpenTypeless label.
 
-The permission follow-up explains the legacy OpenTypeless label in onboarding, the main-window warning, and upgrade guidance. It does not rename macOS's stored permission entry. Packaged fresh-install and upgrade verification, native shortcut conflicts and cancellation, and release artifact checks on Windows, both macOS architectures, and Linux remain outstanding. Follow the full product and upgrade checks above before publication.
+The maintainer authorized stable publication after the documentation/rebranding review. Promotion reuses the exact prerelease assets and tag that were tested. The versioned changelog is recorded on `main` after the prerelease tag; the existing tag is not moved or rebuilt for this documentation-only update. Future releases should fold the changelog before tagging as described in [Commands](commands.md#cutting-a-release).
 
-Release publication and optional fork detachment still require separate authorization. No database migration, backfill, or cache cleanup is required by the rebrand. After publication, verify download links, a single app instance at login, and successful dictation.
+After promotion, verify the latest-release destination and download links. No SQL, database migration, backfill, or cache cleanup is required. The current P icon is retained; a further icon redesign is separate optional work.
