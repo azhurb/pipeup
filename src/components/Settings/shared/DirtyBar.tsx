@@ -1,3 +1,5 @@
+import { useHotkeyCaptureBusy, isHotkeyCaptureBusy } from '../../../lib/hotkeyCapture'
+import i18n from '../../../i18n'
 import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
@@ -23,6 +25,7 @@ type SaveResult = 'idle' | 'success' | 'error'
 
 export function DirtyBar() {
   const { t } = useTranslation()
+  const capturingShortcut = useHotkeyCaptureBusy()
   const config = useAppStore((s) => s.config)
   const resetConfig = useAppStore((s) => s.resetConfig)
   const setSavedConfig = useAppStore((s) => s.setSavedConfig)
@@ -32,7 +35,7 @@ export function DirtyBar() {
   const [errorMsg, setErrorMsg] = useState('')
 
   const handleSave = async () => {
-    if (saving) return
+    if (saving || isHotkeyCaptureBusy()) return
     setSaving(true)
     setSaveResult('idle')
     setErrorMsg('')
@@ -43,6 +46,10 @@ export function DirtyBar() {
       await writeKeyDrafts()
       await updateConfig(config)
       setSavedConfig(config)
+      if (config.ui_language && config.ui_language !== i18n.language) {
+        await i18n.changeLanguage(config.ui_language)
+        localStorage.setItem('ui_language', config.ui_language)
+      }
       clearKeyDrafts()
       await refreshCredentialStatus()
       setSaveResult('success')
@@ -59,6 +66,7 @@ export function DirtyBar() {
   }
 
   const handleReset = () => {
+    if (isHotkeyCaptureBusy()) return
     setSaveResult('idle')
     setErrorMsg('')
     resetConfig()
@@ -99,14 +107,14 @@ export function DirtyBar() {
         <div className="flex items-center gap-2 flex-shrink-0">
           <button
             onClick={handleReset}
-            disabled={saving}
+            disabled={saving || capturingShortcut}
             className="px-3 py-1.5 text-[12px] text-text-secondary hover:text-text-primary bg-transparent border-none cursor-pointer rounded-[10px] hover:bg-bg-tertiary transition-colors disabled:opacity-50"
           >
             {t('common.discardChanges')}
           </button>
           <button
             onClick={handleSave}
-            disabled={saving}
+            disabled={saving || capturingShortcut}
             className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] text-white bg-accent rounded-[10px] border-none cursor-pointer hover:opacity-90 transition-opacity disabled:opacity-70"
           >
             {saving && (

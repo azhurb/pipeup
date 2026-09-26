@@ -1,3 +1,4 @@
+import i18n from '../i18n'
 import { useEffect } from 'react'
 import { listen } from '@tauri-apps/api/event'
 import { useAppStore } from '../stores/appStore'
@@ -121,7 +122,7 @@ export function useTauriEvents() {
       window.location.hash = hash
     })
     addListener<void>('tray:about', () => {
-      window.location.hash = '#/settings'
+      window.location.hash = '#/settings/about'
     })
 
     addListener<{ rowId: number; old: string; new: string; autoConfirmMs: number }>(
@@ -161,7 +162,13 @@ export function useTauriEvents() {
     // show/hide is derived from `config.capsule_auto_hide`, so without
     // this dispatch the "Hide capsule when idle" toggle wouldn't take
     // effect until the next app launch.
-    addListener<AppConfig>('config:changed', setConfig)
+    addListener<AppConfig>('config:changed', (config) => {
+      setConfig(config)
+      if (config.ui_language && config.ui_language !== i18n.language) {
+        void i18n.changeLanguage(config.ui_language)
+        localStorage.setItem('ui_language', config.ui_language)
+      }
+    })
 
     return () => {
       cancelled = true

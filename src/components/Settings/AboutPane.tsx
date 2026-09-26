@@ -1,24 +1,13 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import i18n from '../../i18n'
+import { BrandIcon } from '../BrandIcon'
 import { ExternalLink } from 'lucide-react'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { getVersion } from '@tauri-apps/api/app'
-import { useAppStore } from '../../stores/appStore'
 import { APP_NAME, APP_REPO_URL } from '../../lib/constants'
-
-const UI_LANGUAGES = [
-  { code: 'en', label: 'English', native: 'English' },
-  { code: 'zh', label: 'Chinese', native: '中文' },
-] as const
 
 export function AboutPane() {
   const { t } = useTranslation()
-  const config = useAppStore((s) => s.config)
-  const updateConfig = useAppStore((s) => s.updateConfig)
-
-  const currentLang = config.ui_language || i18n.language || 'en'
-
   // Read the version from the bundle rather than a checked-in constant. The
   // release workflow rewrites tauri.conf.json from the tag, so this is the only
   // value that tracks the actual release; a constant in the repo stays at
@@ -32,47 +21,26 @@ export function AboutPane() {
       .catch(() => setVersion(''))
   }, [])
 
-  const handleSelectLanguage = (code: string) => {
-    i18n.changeLanguage(code)
-    localStorage.setItem('ui_language', code)
-    updateConfig({ ui_language: code })
-  }
-
   return (
     <div className="space-y-5 text-[13px]">
       {/* Header */}
-      <div className="text-center py-6">
+      <div className="text-center py-6 flex flex-col items-center gap-2">
+        <BrandIcon size={64} />
         <h2 className="text-[22px] font-semibold text-text-primary">{APP_NAME}</h2>
         <p className="text-text-secondary mt-1 text-[13px]">{version}</p>
       </div>
 
       <p className="text-text-secondary leading-relaxed">{t('settings.aboutDescription')}</p>
 
-      {/* Language */}
-      <SectionCard title={t('settings.language')}>
-        <div className="grid grid-cols-2 gap-3 p-3">
-          {UI_LANGUAGES.map((lang) => (
-            <button
-              key={lang.code}
-              onClick={() => handleSelectLanguage(lang.code)}
-              className={`px-4 py-3 rounded-[8px] text-[13px] border cursor-pointer transition-all ${
-                currentLang === lang.code
-                  ? 'bg-accent/10 border-accent text-accent font-medium'
-                  : 'bg-bg-secondary border-border text-text-primary hover:border-text-tertiary'
-              }`}
-            >
-              <div className="font-medium">{lang.native}</div>
-              <div className="text-[11px] text-text-tertiary mt-0.5">{lang.label}</div>
-            </button>
-          ))}
-        </div>
-      </SectionCard>
-
       {/* Open Source */}
       <SectionCard title={t('settings.openSource')}>
         <InfoRow label={t('settings.license')} value={t('settings.mit')} />
         <LinkRow label={t('settings.github')} url={APP_REPO_URL} linkText={t('settings.view')} />
-        <InfoRow label={t('settings.framework')} value={t('settings.tauriReact')} />
+        <LinkRow
+          label={t('settings.originalProject')}
+          url="https://github.com/tover0314-w/opentypeless"
+          linkText="OpenTypeless"
+        />
       </SectionCard>
     </div>
   )

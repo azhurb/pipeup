@@ -228,18 +228,23 @@ export function LlmPane() {
         )}
       </FormField>
 
-      <FormField label={t('settings.baseUrl')}>
-        <input
-          value={config.llm_base_url}
-          onChange={(e) => {
-            updateConfig({ llm_base_url: e.target.value })
-            setLlmTestStatus('idle')
-            setLlmLatencyMs(null)
-          }}
-          placeholder="https://open.bigmodel.cn/api/paas/v4"
-          className="w-full px-3 py-2.5 bg-bg-secondary border border-border rounded-[10px] font-mono text-[13px] text-text-primary outline-none focus:border-border-focus transition-colors"
-        />
-      </FormField>
+      <details className="border border-border rounded-lg p-3">
+        <summary className="text-[13px] text-text-secondary cursor-pointer mb-2">
+          {t('settings.advanced')}
+        </summary>
+        <FormField label={t('settings.baseUrl')}>
+          <input
+            value={config.llm_base_url}
+            onChange={(e) => {
+              updateConfig({ llm_base_url: e.target.value })
+              setLlmTestStatus('idle')
+              setLlmLatencyMs(null)
+            }}
+            placeholder="https://open.bigmodel.cn/api/paas/v4"
+            className="w-full px-3 py-2.5 bg-bg-secondary border border-border rounded-[10px] font-mono text-[13px] text-text-primary outline-none focus:border-border-focus transition-colors"
+          />
+        </FormField>
+      </details>
 
       <div className="space-y-3 pt-1">
         <Toggle

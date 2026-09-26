@@ -17,6 +17,9 @@ import {
 } from './lib/tauri'
 import { Capsule } from './components/Capsule'
 import { Settings } from './components/Settings'
+import { DictionaryPane } from './components/Settings/DictionaryPane'
+import { DirtyBar, useDirtyConfig } from './components/Settings/shared/DirtyBar'
+import { useTranslation } from 'react-i18next'
 import { History } from './components/History'
 import { Onboarding } from './components/Onboarding'
 import { MainLayout } from './components/MainLayout'
@@ -49,6 +52,23 @@ function CapsuleApp() {
   // which works on both Windows and macOS. The previous rAF-based show approach
   // failed on macOS because WKWebView pauses requestAnimationFrame in hidden windows.
   return <Capsule />
+}
+
+function DictionaryPage() {
+  const { t } = useTranslation()
+  const dirty = useDirtyConfig()
+  return (
+    <div className="h-full flex flex-col">
+      <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        <h1 className="text-[24px] font-semibold tracking-tight">{t('settings.dictionary')}</h1>
+        <p className="text-[13px] text-text-secondary">{t('dictionary.savedImmediately')}</p>
+        <div className="max-w-[720px]">
+          <DictionaryPane />
+        </div>
+      </div>
+      {dirty && <DirtyBar />}
+    </div>
+  )
 }
 
 function MainApp() {
@@ -129,18 +149,18 @@ function MainApp() {
   if (!loaded)
     return (
       <div className="flex items-center justify-center h-screen">
-        <span className="text-text-tertiary text-[13px]">Loading...</span>
+        <span className="text-text-tertiary text-[13px]">{i18n.t('app.loading')}</span>
       </div>
     )
   if (loadError)
     return (
       <div className="flex flex-col items-center justify-center h-screen gap-3">
-        <span className="text-error text-[13px]">Failed to load application data.</span>
+        <span className="text-error text-[13px]">{i18n.t('app.failedToLoad')}</span>
         <button
           onClick={() => window.location.reload()}
           className="px-4 py-2 bg-accent text-white rounded-[10px] text-[13px] border-none cursor-pointer hover:bg-accent-hover transition-colors"
         >
-          Retry
+          {i18n.t('app.retry')}
         </button>
       </div>
     )
@@ -149,7 +169,8 @@ function MainApp() {
   return (
     <MainLayout>
       {route === 'home' && <HomePage />}
-      {route === 'settings' && <Settings />}
+      {route.startsWith('settings') && <Settings />}
+      {route === 'dictionary' && <DictionaryPage />}
       {route === 'history' && <History />}
       <ToastContainer />
     </MainLayout>

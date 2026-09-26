@@ -1,4 +1,4 @@
-import { Home, Settings, History } from 'lucide-react'
+import { Home, Settings, History, BookOpen } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useRoute, type Route } from '../../lib/router'
 import { BrandIcon } from '../BrandIcon'
@@ -7,8 +7,9 @@ import { MicDeniedBanner } from './MicDeniedBanner'
 
 const navItems: { id: Route; labelKey: string; icon: typeof Home }[] = [
   { id: 'home', labelKey: 'nav.home', icon: Home },
-  { id: 'settings', labelKey: 'nav.settings', icon: Settings },
   { id: 'history', labelKey: 'nav.history', icon: History },
+  { id: 'dictionary', labelKey: 'settings.dictionary', icon: BookOpen },
+  { id: 'settings', labelKey: 'nav.settings', icon: Settings },
 ]
 
 interface Props {
@@ -29,9 +30,9 @@ export function MainLayout({ children }: Props) {
         </div>
 
         {/* Main Nav */}
-        <nav className="flex-1 px-3 space-y-0.5 relative" aria-label="Main navigation">
+        <nav className="flex-1 px-3 pb-4 flex flex-col gap-0.5 relative" aria-label={t('nav.main')}>
           {navItems.map(({ id, labelKey, icon: Icon }) => {
-            const active = route === id
+            const active = route === id || (id === 'settings' && route.startsWith('settings/'))
             const label = t(labelKey)
             return (
               <button
@@ -39,7 +40,7 @@ export function MainLayout({ children }: Props) {
                 onClick={() => navigate(id)}
                 aria-label={label}
                 aria-current={active ? 'page' : undefined}
-                className={`flex items-center gap-2.5 w-full px-3 py-2 text-[13px] rounded-[8px] transition-colors bg-transparent border-none cursor-pointer text-left relative ${
+                className={`${id === 'settings' ? 'mt-auto' : ''} flex items-center gap-2.5 w-full px-3 py-2 text-[13px] rounded-[8px] transition-colors bg-transparent border-none cursor-pointer text-left relative ${
                   active
                     ? 'jelly-nav-active text-accent font-medium'
                     : 'text-text-secondary hover:text-text-primary'

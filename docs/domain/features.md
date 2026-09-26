@@ -190,7 +190,7 @@ Needs confirmation:
 
 ### Learn From Corrections (macOS, experimental)
 
-Off by default. When enabled (Settings → Dictionary → "Learn from corrections"), OpenTypeless watches the focused text field via macOS Accessibility for up to 60 s after each dictation. If the user replaces exactly one word inside the typed span with a proper-noun-shaped replacement (capitalized, camelCase, all-caps acronym, or alphanumeric brand), the new word is added to the dictionary optimistically and a 5 s Undo toast appears in the capsule overlay. The toast reads *Replaced "Vladislav" with "Vlad"* — showing both the STT-produced word and the user's correction. The watcher skips `AXSecureTextField` (password fields) and never logs field values.
+Off by default. When enabled (Dictionary → "Learn from corrections"), Pipeup watches the focused text field via macOS Accessibility for up to 60 s after each dictation. If the user replaces exactly one word inside the typed span with a proper-noun-shaped replacement (capitalized, camelCase, all-caps acronym, or alphanumeric brand), the new word is added to the dictionary optimistically and a 5 s Undo toast appears in the capsule overlay. The toast reads *Replaced "Vladislav" with "Vlad"* — showing both the STT-produced word and the user's correction. The watcher skips `AXSecureTextField` (password fields) and never logs field values.
 
 "Edit done" is detected via a **boundary-anchored settle predicate** — the chars flanking the dictated region in the field must still match the original surrounding context before a candidate substitution is considered. This is more robust than a pure time-based debounce, which mis-fires when the user pauses mid-edit. When dictation lands in an empty field (no surrounding context to anchor against), the watcher falls back to time-based debounce. Implementation: `src-tauri/src/correction/{mod,boundary,diff,classify}.rs`; frontend toast in `src/components/Capsule/CorrectionToast.tsx`.
 
@@ -213,7 +213,7 @@ Troubleshooting flows for the signature-mismatch and one-shot-dialog cases live 
 
 ## Privacy And Local-First BYOK
 
-User-facing promise: API keys stay local and provider requests go directly to the selected provider. There are no OpenTypeless servers in the loop.
+User-facing promise: API keys stay local and provider requests go directly to the selected provider. There are no Pipeup servers in the loop.
 
 Repo evidence:
 
@@ -256,3 +256,13 @@ Needs confirmation:
 ## Desktop appearance
 
 Pipeup uses warm neutral surfaces with a vermilion accent in light and dark themes, flat controls, and a single primary sidebar. Settings panes use a wrapping row of navigation buttons rather than a second sidebar. The compact capsule and preserved recovery states are described in [Voice input](voice-input.md#recording-feedback). Brand assets, compatibility identifiers, and regeneration commands live in [Appearance](appearance.md).
+
+## Navigation and preferences
+
+The primary pages are Overview, History, Dictionary, and Settings. Settings deep links cover General, Dictation, AI processing, Privacy, and About. The tray About command opens About directly. Interface language and appearance live in General; shortcut, recording limit, speech provider, and capsule visibility live in Dictation. Privacy owns history retention. AI endpoint overrides are under Advanced.
+
+Preferences, including keyboard shortcuts and language, apply through Save. Discard changes restores the saved preferences. Appearance previews immediately and reverts when discarded. Dictionary word additions/removals save immediately, as explained on that page. Save and Discard are disabled during shortcut capture and restoration.
+
+History searches the latest 200 loaded entries, case-insensitively, and explicitly states that scope. Dates and times use the local calendar. Clear history still deletes all entries after confirmation. Overview displays saved provider settings rather than presenting the loaded history length as a lifetime total.
+
+Form fields have accessible names, segmented options expose their selection, and confirmation dialogs trap focus and return it to the invoking control. Copy and removal actions remain available from the keyboard. English and Chinese UI labels cover navigation, setup, and the tray menu.

@@ -1,10 +1,12 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAppStore } from '../../stores/appStore'
-import type { HotkeyMode } from '../../stores/appStore'
+import type { HotkeyMode, Theme } from '../../stores/appStore'
+import { beginHotkeyCapture, useHotkeyCaptureBusy } from '../../lib/hotkeyCapture'
 import { pauseHotkey, resumeHotkey } from '../../lib/tauri'
 import { SegmentedControl } from './shared/SegmentedControl'
 import { Toggle } from './shared/Toggle'
+import { FormField } from './shared/FormField'
 import { ConfirmDialog } from '../ConfirmDialog'
 
 // Keys that can be used as hotkeys without a modifier
@@ -43,6 +45,7 @@ const STANDALONE_KEYS = new Set([
 const RETENTION_OPTIONS = [0, 7, 30, 90]
 
 function HotkeyRecorder() {
+  const capturingShortcut = useHotkeyCaptureBusy()
   const config = useAppStore((s) => s.config)
   const updateConfig = useAppStore((s) => s.updateConfig)
   const { t } = useTranslation()
@@ -127,6 +130,7 @@ function HotkeyRecorder() {
   useEffect(() => {
     if (!recording) return
     let active = true
+    const finishCapture = beginHotkeyCapture()
     const paused = pauseHotkey()
     paused.catch((e) => {
       if (active) {
@@ -144,6 +148,7 @@ function HotkeyRecorder() {
         .catch((e) => {
           setError(String(e))
         })
+        .finally(finishCapture)
       window.removeEventListener('keydown', handleKeyDown, true)
       window.removeEventListener('keyup', handleKeyUp, true)
       if (autoConfirmTimer.current) clearTimeout(autoConfirmTimer.current)
@@ -173,6 +178,8 @@ function HotkeyRecorder() {
     <div>
       <button
         onClick={handleClick}
+        disabled={capturingShortcut && !recording}
+        aria-label={t('settings.hotkey')}
         className={`w-full px-3 py-2.5 rounded-[10px] text-[13px] font-mono text-left border transition-colors cursor-pointer ${
           recording
             ? 'bg-bg-tertiary border-text-secondary text-text-primary ring-2 ring-text-secondary/20'
@@ -189,7 +196,11 @@ function HotkeyRecorder() {
   )
 }
 
-export function GeneralPane() {
+export function GeneralPane({
+  section = 'all',
+}: {
+  section?: 'general' | 'dictation' | 'privacy' | 'all'
+}) {
   const config = useAppStore((s) => s.config)
   const savedConfig = useAppStore((s) => s.savedConfig)
   const updateConfig = useAppStore((s) => s.updateConfig)
@@ -230,88 +241,120 @@ export function GeneralPane() {
 
   return (
     <div className="space-y-6">
-      <Section title={t('settings.hotkey')}>
-        <HotkeyRecorder />
-        <div className="mt-3">
-          <SegmentedControl
-            options={[
-              { value: 'hold', label: t('settings.holdToTalk') },
-              { value: 'toggle', label: t('settings.toggleOnOff') },
-            ]}
-            value={config.hotkey_mode}
-            onChange={(v) => updateConfig({ hotkey_mode: v as HotkeyMode })}
-          />
-        </div>
-      </Section>
+      {(section === 'all' || section === 'dictation') && (
+        <>
+          <Section title={t('settings.hotkey')}>
+            <HotkeyRecorder />
+            <div className="mt-3">
+              <SegmentedControl
+                options={[
+                  { value: 'hold', label: t('settings.holdToTalk') },
+                  { value: 'toggle', label: t('settings.toggleOnOff') },
+                ]}
+                value={config.hotkey_mode}
+                onChange={(v) => updateConfig({ hotkey_mode: v as HotkeyMode })}
+              />
+            </div>
+          </Section>
 
-      <Section title={t('settings.maxRecordingDuration', 'Max Recording Duration')}>
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min={10}
-            max={300}
-            step={10}
-            value={config.max_recording_seconds}
-            onChange={(e) => updateConfig({ max_recording_seconds: Number(e.target.value) })}
-            className="flex-1 accent-accent"
-          />
-          <span className="text-[13px] text-text-secondary font-mono w-12 text-right">
-            {config.max_recording_seconds}s
-          </span>
-        </div>
-      </Section>
+          <Section title={t('settings.maxRecordingDuration', 'Max Recording Duration')}>
+            <div className="flex items-center gap-3">
+              <input
+                aria-label={t('settings.maxRecordingDuration')}
+                type="range"
+                min={10}
+                max={300}
+                step={10}
+                value={config.max_recording_seconds}
+                onChange={(e) => updateConfig({ max_recording_seconds: Number(e.target.value) })}
+                className="flex-1 accent-accent"
+              />
+              <span className="text-[13px] text-text-secondary font-mono w-12 text-right">
+                {config.max_recording_seconds}s
+              </span>
+            </div>
+          </Section>
 
-      <Section title={t('settings.other')}>
-        <div className="space-y-3">
-          <Toggle
-            checked={config.auto_start}
-            onChange={(checked) => updateConfig({ auto_start: checked })}
-            label={t('settings.launchAtStartup')}
-          />
           <Toggle
             checked={config.capsule_auto_hide}
             onChange={(checked) => updateConfig({ capsule_auto_hide: checked })}
             label={t('settings.hideCapsuleWhenIdle')}
           />
-        </div>
-      </Section>
-
-      <Section title={t('settings.history')}>
-        <div className="space-y-3">
-          <Toggle
-            checked={config.history_enabled}
-            onChange={(checked) => updateConfig({ history_enabled: checked })}
-            label={t('settings.saveHistory')}
-          />
-          <div>
-            <label
-              htmlFor="history-retention"
-              className="block text-[13px] text-text-primary mb-1.5"
-            >
-              {t('settings.keepHistoryFor')}
-            </label>
+        </>
+      )}
+      {(section === 'all' || section === 'general') && (
+        <>
+          <FormField label={t('settings.appearance')}>
+            <SegmentedControl
+              options={[
+                { value: 'system', label: t('settings.system') },
+                { value: 'light', label: t('settings.light') },
+                { value: 'dark', label: t('settings.dark') },
+              ]}
+              value={config.theme}
+              onChange={(value) => updateConfig({ theme: value as Theme })}
+            />
+          </FormField>
+          <FormField label={t('settings.language')}>
             <select
-              id="history-retention"
-              value={retentionDays}
-              onChange={(e) => handleRetentionChange(Number(e.target.value))}
-              className="w-full px-3 py-2.5 bg-bg-secondary border border-border rounded-[10px] text-[13px] text-text-primary outline-none focus:border-border-focus transition-colors"
+              value={config.ui_language || 'en'}
+              onChange={(e) => updateConfig({ ui_language: e.target.value })}
+              className="w-full px-3 py-2.5 bg-bg-secondary border border-border rounded-lg text-[13px]"
             >
-              {retentionOptions.map((days) => (
-                <option key={days} value={days}>
-                  {days === 0
-                    ? t('settings.retentionForever')
-                    : t('settings.retentionDays', { days })}
-                </option>
-              ))}
+              <option value="en">English</option>
+              <option value="zh">中文</option>
             </select>
-            <p className="text-[11px] text-text-tertiary mt-1.5">
-              {retentionDays === 0
-                ? t('settings.retentionHintForever')
-                : t('settings.retentionHintDays', { days: retentionDays })}
-            </p>
-          </div>
-        </div>
-      </Section>
+          </FormField>
+          <Toggle
+            checked={config.auto_start}
+            onChange={(checked) => updateConfig({ auto_start: checked })}
+            label={t('settings.launchAtStartup')}
+          />
+        </>
+      )}
+      {(section === 'all' || section === 'privacy') && (
+        <>
+          <p className="text-[13px] text-text-secondary leading-relaxed">
+            {t('settings.privacyHint')}
+          </p>
+          <Section title={t('settings.history')}>
+            <div className="space-y-3">
+              <Toggle
+                checked={config.history_enabled}
+                onChange={(checked) => updateConfig({ history_enabled: checked })}
+                label={t('settings.saveHistory')}
+              />
+              <div>
+                <label
+                  htmlFor="history-retention"
+                  className="block text-[13px] text-text-primary mb-1.5"
+                >
+                  {t('settings.keepHistoryFor')}
+                </label>
+                <select
+                  id="history-retention"
+                  value={retentionDays}
+                  onChange={(e) => handleRetentionChange(Number(e.target.value))}
+                  className="w-full px-3 py-2.5 bg-bg-secondary border border-border rounded-[10px] text-[13px] text-text-primary outline-none focus:border-border-focus transition-colors"
+                >
+                  {retentionOptions.map((days) => (
+                    <option key={days} value={days}>
+                      {days === 0
+                        ? t('settings.retentionForever')
+                        : t('settings.retentionDays', { days })}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-[11px] text-text-tertiary mt-1.5">
+                  {retentionDays === 0
+                    ? t('settings.retentionHintForever')
+                    : t('settings.retentionHintDays', { days: retentionDays })}
+                </p>
+              </div>
+            </div>
+          </Section>
+        </>
+      )}
 
       <ConfirmDialog
         open={pendingRetention !== null}

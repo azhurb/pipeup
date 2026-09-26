@@ -19,13 +19,14 @@
     "retry": "重试"
   },
   "nav": {
-    "home": "首页",
+    "home": "概览",
     "settings": "设置",
-    "history": "历史记录"
+    "history": "历史记录",
+    "main": "主导航"
   },
   "home": {
-    "welcome": "欢迎使用 Pipeup",
-    "description": "按住 {{hotkey}} 开始语音录制。语音将被转录并可选择由 AI 润色。",
+    "welcome": "随时随地，用声音写作。",
+    "description": "按住快捷键说话，松开后将文字输入到当前应用。",
     "totalRecordings": "总录音数",
     "today": "今日",
     "currentConfig": "当前配置",
@@ -33,7 +34,10 @@
     "llmProvider": "LLM 服务",
     "aiPolish": "AI 润色",
     "enabled": "已启用",
-    "disabled": "已禁用"
+    "disabled": "已禁用",
+    "toggleDescription": "按一下快捷键开始说话，再按一下结束并输入文字。",
+    "dictionaryHint": "添加常用名称、技术术语和词汇",
+    "setupHint": "这里显示已保存的设置。首次录音前，请在听写设置中测试服务连接。"
   },
   "onboarding": {
     "welcomeTitle": "欢迎使用 Pipeup",
@@ -50,7 +54,7 @@
     "next": "下一步",
     "getStarted": "开始使用",
     "close": "关闭",
-    "speakToWrite": "说话即写作 — 实时将语音转化为润色文本",
+    "speakToWrite": "说话即写作 - 实时将语音转化为润色文本",
     "selectLanguage": "选择你的语言",
     "selectLanguageDesc": "选择应用的界面语言，之后可以在设置中更改。",
     "allSet": "可以开始听写了",
@@ -65,7 +69,7 @@
     "aiPolishService": "AI 润色服务",
     "apiKey": "API 密钥",
     "enterApiKey": "输入 API 密钥...",
-    "test": "测试",
+    "test": "测试连接",
     "connectionSuccess": "连接成功",
     "connectionFailed": "连接失败，请检查你的 API 密钥",
     "connectionFailedConfig": "连接失败，请检查你的配置",
@@ -113,8 +117,8 @@
     "errorOccurred": "发生错误",
     "accessibilityRequired": "启用辅助功能权限",
     "microphoneDenied": "启用麦克风权限",
-    "clipboardTip": "已复制 — 按 {{shortcut}} 粘贴",
-    "editedTip": "已编辑 — 按 {{shortcut}} 撤销",
+    "clipboardTip": "已复制 - 按 {{shortcut}} 粘贴",
+    "editedTip": "已编辑 - 按 {{shortcut}} 撤销",
     "openMainWindow": "打开主窗口",
     "settings": "设置",
     "history": "历史记录",
@@ -129,7 +133,7 @@
     "microphone": {
       "title": "麦克风",
       "required": "听写所必需",
-      "denied": "麦克风已被拒绝 — 请打开设置 → 麦克风",
+      "denied": "麦克风已被拒绝 - 请打开设置 → 麦克风",
       "grantedHint": "已授予"
     },
     "accessibility": {
@@ -146,18 +150,18 @@
     "title": "设置",
     "general": "通用",
     "speechRecognition": "语音识别",
-    "aiPolish": "AI 润色",
+    "aiPolish": "AI 处理",
     "dictionary": "词典",
     "about": "关于",
-    "hotkey": "快捷键",
+    "hotkey": "键盘快捷键",
     "pressKeyCombination": "按下组合键...",
     "clickToConfirm": "再次点击确认，或按下其他组合键",
     "holdToTalk": "按住说话",
-    "toggleOnOff": "切换开/关",
+    "toggleOnOff": "按一下开始或停止",
     "other": "其他",
     "launchAtStartup": "开机启动",
     "closeToTray": "关闭到系统托盘",
-    "language": "语言",
+    "language": "界面语言",
     "accessibilityPermission": "macOS 辅助功能",
     "accessibilityGranted": "权限已授予",
     "accessibilityRequired": "粘贴听写文本所必需",
@@ -165,32 +169,32 @@
     "provider": "服务商",
     "apiKey": "API 密钥",
     "enterApiKey": "输入 API 密钥...",
-    "apiKeySaved": "•••••••••••••  已保存到系统密钥链",
+    "apiKeySaved": "•••••••••••••  已保存在此设备",
     "apiKeyRemove": "移除",
-    "apiKeyUnreadable": "无法读取系统密钥链 — 已保存的密钥可能仍然存在",
-    "apiKeyUnreadableHint": "请解锁登录密钥链后重新打开设置。在此输入密钥会覆盖已存储的内容。",
-    "apiKeyUnencrypted": "以未加密方式存储 — 此设备上没有可用的系统凭据存储",
-    "test": "测试",
+    "apiKeyUnreadable": "无法读取已保存的凭据。",
+    "apiKeyUnreadableHint": "请检查凭据存储的访问权限后重试。输入新密钥将替换已存储的值。",
+    "apiKeyUnencrypted": "以未加密方式保存在本地应用数据中。在 macOS 和 Linux 上，文件仅允许你的账户读取。",
+    "test": "测试连接",
     "connectionSuccess": "连接成功",
     "connectionFailed": "连接失败",
     "storedLocally": "仅保存在你的账户本地，绝不写入设置文件。",
     "sttLanguage": "语言",
     "sttLanguages": "识别语言",
-    "sttLanguagesAutoHint": "自动检测 — 可使用任何支持的语言讲话。",
+    "sttLanguagesAutoHint": "自动检测 - 可使用任何支持的语言讲话。",
     "sttLanguagesSingleHint": "已为所选语言优化；其他语言识别可能较弱。",
     "sttLanguagesMultiHint": "在你的选择中自动检测；润色将偏向这些语言。",
     "model": "模型",
     "fetchModels": "获取可用模型",
     "modelsAvailable": "{{count}} 个模型可用",
-    "baseUrl": "Base URL",
-    "enableAiPolish": "启用 AI 润色",
-    "translationMode": "翻译模式",
+    "baseUrl": "端点 URL",
+    "enableAiPolish": "启用 AI 处理",
+    "translationMode": "翻译输出",
     "selectedTextEditing": "用语音编辑选中文本",
     "selectedTextEditingDesc": "选中文本，按住快捷键说出指令 —「修正语法」、「精简一些」— 选中内容将被替换为处理结果。录音时若检测到选区，胶囊会显示琥珀色光环；没有光环即表示本次口述将照常插入文本。浏览器和 Electron 应用（Cursor、VS Code、Slack）不会向 macOS 暴露选区，因此无法在其中编辑。",
-    "selectedTextEditingRequiresPolish": "需要启用 AI 润色 — 指令由 LLM 执行。",
-    "selectedTextEditingMacOnly": "仅支持 macOS — 读取选区依赖辅助功能，本平台没有对应机制。",
-    "targetLanguage": "目标语言",
-    "aboutDescription": "开源 AI 语音输入工具。说话即写作 — 实时将语音转化为润色文本。",
+    "selectedTextEditingRequiresPolish": "需要 AI 处理。请先在上方启用，再用语音编辑选中文本。",
+    "selectedTextEditingMacOnly": "仅支持 macOS - 读取选区依赖辅助功能，本平台没有对应机制。",
+    "targetLanguage": "输出语言",
+    "aboutDescription": "桌面语音输入，自由选择语音与 AI 服务商。",
     "openSource": "开源",
     "license": "许可证",
     "mit": "MIT",
@@ -198,7 +202,7 @@
     "framework": "框架",
     "tauriReact": "Tauri v2 + React",
     "view": "查看",
-    "maxRecordingDuration": "最大录音时长",
+    "maxRecordingDuration": "录音时长上限",
     "hideCapsuleWhenIdle": "空闲时隐藏胶囊",
     "history": "历史记录",
     "saveHistory": "保存听写历史记录",
@@ -208,7 +212,16 @@
     "retentionHintForever": "记录会一直保留，直到你手动删除。",
     "retentionHintDays": "超过 {{days}} 天的记录会被自动删除，已保存的记录也包括在内；即使关闭保存，该期限依然生效。",
     "retentionConfirm": "将历史记录保留 {{days}} 天？\n\n保存后，超过该期限的记录将被删除，且无法撤销。",
-    "translationRequiresAi": "启用 AI 处理后才能翻译听写内容。"
+    "translationRequiresAi": "启用 AI 处理后才能翻译听写内容。",
+    "dictation": "听写",
+    "privacy": "隐私",
+    "appearance": "外观",
+    "system": "跟随系统",
+    "light": "浅色",
+    "dark": "深色",
+    "advanced": "高级设置",
+    "originalProject": "原始项目",
+    "privacyHint": "音频直接发送给语音服务商。启用 AI 处理时，文字会发送给 AI 服务商。历史记录和词典保存在此设备。"
   },
   "dictionary": {
     "word": "词语",
@@ -218,12 +231,14 @@
     "noEntries": "暂无条目。添加专有名词以提高识别准确度。",
     "learnFromCorrections": {
       "label": "Learn from corrections (experimental)",
-      "description": "After dictation, Pipeup watches your edits for ~15 s and offers to add fixed names and terms here. Reads the focused text field via macOS Accessibility — you'll be prompted to grant the permission on first use."
+      "description": "After dictation, Pipeup watches your edits for ~15 s and offers to add fixed names and terms here. Reads the focused text field via macOS Accessibility - you'll be prompted to grant the permission on first use."
     },
     "failedToAdd": "添加词典条目失败",
     "failedToRemove": "删除词典条目失败",
     "autoLearnedLabel": "Auto-learned from your edit",
-    "autoLearnedTooltip": "Auto-learned. STT produced \"{{observed}}\"."
+    "autoLearnedTooltip": "Auto-learned. STT produced \"{{observed}}\".",
+    "savedImmediately": "词条在添加或删除后立即保存。偏好设置需点击保存按钮。",
+    "removeWord": "删除 {{word}}"
   },
   "correction": {
     "added": "Added \"{{new}}\" to your dictionary",
@@ -240,11 +255,13 @@
     "today": "今天",
     "yesterday": "昨天",
     "copied": "已复制",
-    "clearAll": "清除所有历史记录",
+    "clearAll": "清空历史",
     "clearConfirm": "确定要清除所有历史记录吗？此操作无法撤销。",
     "failedToCopy": "复制到剪贴板失败",
     "failedToClear": "清除历史记录失败",
-    "savingDisabled": "保存已关闭 — 新的听写不会记录在此。以下记录会保留，但你设置的保留期限依然对它们生效。"
+    "savingDisabled": "保存已关闭 - 新的听写不会记录在此。以下记录会保留，但你设置的保留期限依然对它们生效。",
+    "recentLimit": "搜索最近 200 条听写。清空历史将删除所有已保存的记录。",
+    "copyText": "复制文本：{{text}}"
   },
   "error": {
     "somethingWentWrong": "出了点问题",
@@ -252,6 +269,6 @@
     "reload": "重新加载"
   },
   "notifications": {
-    "detectedLanguage": "检测到 {{language}} — 是否在设置中添加？"
+    "detectedLanguage": "检测到 {{language}} - 是否在设置中添加？"
   }
 }

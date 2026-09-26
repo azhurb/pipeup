@@ -19,13 +19,14 @@
     "retry": "Retry"
   },
   "nav": {
-    "home": "Home",
+    "home": "Overview",
     "settings": "Settings",
-    "history": "History"
+    "history": "History",
+    "main": "Main navigation"
   },
   "home": {
-    "welcome": "Welcome to Pipeup",
-    "description": "Hold {{hotkey}} to start voice recording. Your speech will be transcribed and optionally polished by AI.",
+    "welcome": "Your voice, wherever you work.",
+    "description": "Hold your keyboard shortcut, speak, then release to insert your words into the focused app.",
     "totalRecordings": "Total Recordings",
     "today": "Today",
     "currentConfig": "Current Configuration",
@@ -33,7 +34,10 @@
     "llmProvider": "LLM Provider",
     "aiPolish": "AI Polish",
     "enabled": "Enabled",
-    "disabled": "Disabled"
+    "disabled": "Disabled",
+    "toggleDescription": "Press your keyboard shortcut to start speaking. Press it again to finish and insert your words.",
+    "dictionaryHint": "Names, technical terms, and words you use often",
+    "setupHint": "These are your saved settings. Check your provider connection in Dictation before your first recording."
   },
   "onboarding": {
     "welcomeTitle": "Welcome to Pipeup",
@@ -50,7 +54,7 @@
     "next": "Next",
     "getStarted": "Get started",
     "close": "Close",
-    "speakToWrite": "Speak to write — turn your voice into polished text in real time",
+    "speakToWrite": "Speak to write - turn your voice into polished text in real time",
     "selectLanguage": "Choose your language",
     "selectLanguageDesc": "Select the language for the app interface. You can change it later in Settings.",
     "allSet": "Ready to dictate",
@@ -65,7 +69,7 @@
     "aiPolishService": "AI Polish Service",
     "apiKey": "API Key",
     "enterApiKey": "Enter API Key...",
-    "test": "Test",
+    "test": "Test connection",
     "connectionSuccess": "Connection successful",
     "connectionFailed": "Connection failed, please check your API Key",
     "connectionFailedConfig": "Connection failed, please check your config",
@@ -113,8 +117,8 @@
     "errorOccurred": "An error occurred",
     "accessibilityRequired": "Enable Accessibility",
     "microphoneDenied": "Enable microphone",
-    "clipboardTip": "Copied — press {{shortcut}} to paste",
-    "editedTip": "Edited — press {{shortcut}} to undo",
+    "clipboardTip": "Copied - press {{shortcut}} to paste",
+    "editedTip": "Edited - press {{shortcut}} to undo",
     "openMainWindow": "Open Main Window",
     "settings": "Settings",
     "history": "History",
@@ -129,7 +133,7 @@
     "microphone": {
       "title": "Microphone",
       "required": "Required for dictation",
-      "denied": "Microphone denied — open Settings → Microphone",
+      "denied": "Microphone denied - open Settings → Microphone",
       "grantedHint": "Granted"
     },
     "accessibility": {
@@ -145,19 +149,19 @@
   "settings": {
     "title": "Settings",
     "general": "General",
-    "speechRecognition": "Speech Recognition",
-    "aiPolish": "AI Polish",
+    "speechRecognition": "Speech recognition",
+    "aiPolish": "AI processing",
     "dictionary": "Dictionary",
     "about": "About",
-    "hotkey": "Hotkey",
+    "hotkey": "Keyboard shortcut",
     "pressKeyCombination": "Press a key combination...",
     "clickToConfirm": "Click again to confirm, or press another combination",
-    "holdToTalk": "Hold to Talk",
-    "toggleOnOff": "Toggle On/Off",
+    "holdToTalk": "Hold to talk",
+    "toggleOnOff": "Press to start and stop",
     "other": "Other",
-    "launchAtStartup": "Launch at Startup",
+    "launchAtStartup": "Launch at startup",
     "closeToTray": "Close to system tray",
-    "language": "Language",
+    "language": "Interface language",
     "accessibilityPermission": "macOS Accessibility",
     "accessibilityGranted": "Permission granted",
     "accessibilityRequired": "Required to paste dictated text",
@@ -165,40 +169,40 @@
     "provider": "Provider",
     "apiKey": "API Key",
     "enterApiKey": "Enter API Key...",
-    "apiKeySaved": "•••••••••••••  saved in your system keychain",
+    "apiKeySaved": "•••••••••••••  saved on this device",
     "apiKeyRemove": "Remove",
-    "apiKeyUnreadable": "Couldn’t read your keychain — your saved key may still be there",
-    "apiKeyUnreadableHint": "Unlock your login keychain and reopen Settings. Entering a key here replaces whatever is stored.",
-    "apiKeyUnencrypted": "Stored unencrypted — no system credential store is available on this machine",
-    "test": "Test",
+    "apiKeyUnreadable": "Could not read your saved credential.",
+    "apiKeyUnreadableHint": "Check access to credential storage and try again. Entering a key replaces the stored value.",
+    "apiKeyUnencrypted": "Stored unencrypted in local app data. On macOS and Linux, the file is readable only by your account.",
+    "test": "Test connection",
     "connectionSuccess": "Connection successful",
     "connectionFailed": "Connection failed",
     "storedLocally": "Stored locally in your account, never in a settings file.",
     "sttLanguage": "Language",
-    "sttLanguages": "Recognized Languages",
-    "sttLanguagesAutoHint": "Auto Detect — speak any supported language.",
+    "sttLanguages": "Recognition languages",
+    "sttLanguagesAutoHint": "Auto Detect - speak any supported language.",
     "sttLanguagesSingleHint": "Optimized for the selected language; others may transcribe less reliably.",
     "sttLanguagesMultiHint": "Auto-detect among your selections; polish will favor these.",
     "model": "Model",
     "fetchModels": "Fetch available models",
     "modelsAvailable": "{{count}} models available",
-    "baseUrl": "Base URL",
-    "enableAiPolish": "Enable AI Polish",
-    "translationMode": "Translation Mode",
+    "baseUrl": "Endpoint URL",
+    "enableAiPolish": "Enable AI processing",
+    "translationMode": "Translate output",
     "selectedTextEditing": "Edit selected text by voice",
-    "selectedTextEditingDesc": "Select text, hold the hotkey and speak an instruction — \"fix the grammar\", \"make this shorter\" — and the selection is replaced with the result. The capsule shows an amber ring while recording whenever a selection was found; no ring means the dictation will be inserted as usual. Browsers and Electron apps (Cursor, VS Code, Slack) do not expose their selection to macOS, so editing does not reach them.",
-    "selectedTextEditingRequiresPolish": "Requires AI Polish — the instruction is applied by the LLM.",
-    "selectedTextEditingMacOnly": "macOS only — reading the selection needs Accessibility, which has no equivalent on this platform.",
-    "targetLanguage": "Target Language",
-    "aboutDescription": "Open-source AI voice input tool. Speak to write — turn your voice into polished text in real time.",
-    "openSource": "Open Source",
+    "selectedTextEditingDesc": "Select text, hold the hotkey and speak an instruction - \"fix the grammar\", \"make this shorter\" - and the selection is replaced with the result. The capsule shows an amber ring while recording whenever a selection was found; no ring means the dictation will be inserted as usual. Browsers and Electron apps (Cursor, VS Code, Slack) do not expose their selection to macOS, so editing does not reach them.",
+    "selectedTextEditingRequiresPolish": "Requires AI processing. Enable it above to edit selected text by voice.",
+    "selectedTextEditingMacOnly": "macOS only - reading the selection needs Accessibility, which has no equivalent on this platform.",
+    "targetLanguage": "Output language",
+    "aboutDescription": "Voice input for your desktop, with your choice of speech and AI providers.",
+    "openSource": "Open source",
     "license": "License",
     "mit": "MIT",
     "github": "GitHub",
     "framework": "Framework",
     "tauriReact": "Tauri v2 + React",
     "view": "View",
-    "maxRecordingDuration": "Max Recording Duration",
+    "maxRecordingDuration": "Recording limit",
     "hideCapsuleWhenIdle": "Hide capsule when idle",
     "history": "History",
     "saveHistory": "Save dictation history",
@@ -208,7 +212,16 @@
     "retentionHintForever": "Entries are kept until you delete them.",
     "retentionHintDays": "Entries older than {{days}} days are deleted automatically, including ones already saved and even while saving is off.",
     "retentionConfirm": "Keep history for {{days}} days?\n\nEntries older than that will be deleted when you save. This cannot be undone.",
-    "translationRequiresAi": "Enable AI processing to translate dictation."
+    "translationRequiresAi": "Enable AI processing to translate dictation.",
+    "dictation": "Dictation",
+    "privacy": "Privacy",
+    "appearance": "Appearance",
+    "system": "System",
+    "light": "Light",
+    "dark": "Dark",
+    "advanced": "Advanced",
+    "originalProject": "Original project",
+    "privacyHint": "Audio is sent directly to your speech provider. If AI processing is enabled, text is sent to your AI provider. History and dictionary entries stay on this device."
   },
   "dictionary": {
     "word": "Word",
@@ -218,12 +231,14 @@
     "noEntries": "No entries yet. Add proper nouns to improve recognition accuracy.",
     "learnFromCorrections": {
       "label": "Learn from corrections (experimental)",
-      "description": "After dictation, Pipeup watches your edits for ~15 s and offers to add fixed names and terms here. Reads the focused text field via macOS Accessibility — you'll be prompted to grant the permission on first use."
+      "description": "After dictation, Pipeup watches your edits for ~15 s and offers to add fixed names and terms here. Reads the focused text field via macOS Accessibility - you'll be prompted to grant the permission on first use."
     },
     "failedToAdd": "Failed to add dictionary entry",
     "failedToRemove": "Failed to remove dictionary entry",
     "autoLearnedLabel": "Auto-learned from your edit",
-    "autoLearnedTooltip": "Auto-learned. STT produced \"{{observed}}\"."
+    "autoLearnedTooltip": "Auto-learned. STT produced \"{{observed}}\".",
+    "savedImmediately": "Words are saved as you add or remove them. Preference changes use the Save button.",
+    "removeWord": "Remove {{word}}"
   },
   "correction": {
     "added": "Added \"{{new}}\" to your dictionary",
@@ -240,11 +255,13 @@
     "today": "Today",
     "yesterday": "Yesterday",
     "copied": "Copied",
-    "clearAll": "Clear All History",
+    "clearAll": "Clear history",
     "clearConfirm": "Are you sure you want to clear all history? This cannot be undone.",
     "failedToCopy": "Failed to copy to clipboard",
     "failedToClear": "Failed to clear history",
-    "savingDisabled": "Saving is off — new dictations won't be recorded here. Entries below stay, but your retention setting still applies to them."
+    "savingDisabled": "Saving is off - new dictations won't be recorded here. Entries below stay, but your retention setting still applies to them.",
+    "recentLimit": "Search your most recent 200 dictations. Clearing history removes all saved entries.",
+    "copyText": "Copy text: {{text}}"
   },
   "error": {
     "somethingWentWrong": "Something went wrong",
@@ -252,6 +269,6 @@
     "reload": "Reload"
   },
   "notifications": {
-    "detectedLanguage": "Detected {{language}} — add it in Settings?"
+    "detectedLanguage": "Detected {{language}} - add it in Settings?"
   }
 }

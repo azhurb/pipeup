@@ -184,3 +184,36 @@ describe('History clear-all confirmation', () => {
     expect(tauri.clearHistory).not.toHaveBeenCalled()
   })
 })
+
+describe('History search and local dates', () => {
+  afterEach(() => {
+    cleanup()
+    vi.useRealTimers()
+  })
+
+  it('searches transcript and application names without case sensitivity', () => {
+    mockAppStore.history = [entry()]
+    render(<History />)
+    fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'HALLO' } })
+    expect(screen.getByText('Hallo Welt.')).toBeInTheDocument()
+    fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'slack' } })
+    expect(screen.getByText('Hallo Welt.')).toBeInTheDocument()
+    fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'missing' } })
+    expect(screen.getByText('history.noResults')).toBeInTheDocument()
+    expect(screen.getByText('history.recentLimit')).toBeInTheDocument()
+  })
+
+  it('groups stored local timestamps using the local calendar day near midnight', () => {
+    vi.useFakeTimers()
+    // Local midnight is not the UTC calendar day in many timezones. Use local
+    // constructors to keep the fixture faithful to storage on each host.
+    vi.setSystemTime(new Date(2026, 4, 17, 0, 15))
+    mockAppStore.history = [
+      entry({ created_at: '2026-05-17T00:05:00' }),
+      entry({ id: 2, created_at: '2026-05-16 23:50:00' }),
+    ]
+    render(<History />)
+    expect(screen.getByRole('heading', { name: 'history.today' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'history.yesterday' })).toBeInTheDocument()
+  })
+})

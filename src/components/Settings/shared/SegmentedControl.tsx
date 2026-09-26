@@ -1,5 +1,5 @@
 import { useId } from 'react'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 
 interface Props {
   options: { value: string; label: string }[]
@@ -9,12 +9,15 @@ interface Props {
 
 export function SegmentedControl({ options, value, onChange }: Props) {
   const id = useId()
+  const reduceMotion = useReducedMotion()
 
   return (
     <div className="flex bg-bg-tertiary/50 rounded-[10px] p-0.5 gap-0.5">
       {options.map((opt) => (
         <button
           key={opt.value}
+          type="button"
+          aria-pressed={value === opt.value}
           onClick={() => onChange(opt.value)}
           className={`relative flex-1 px-3 py-1.5 text-[13px] rounded-[8px] border-none cursor-pointer transition-colors ${
             value === opt.value
@@ -26,7 +29,7 @@ export function SegmentedControl({ options, value, onChange }: Props) {
             <motion.div
               layoutId={`segment-bg-${id}`}
               className="absolute inset-0 rounded-[8px] jelly-nav-active"
-              transition={{ type: 'spring', stiffness: 400, damping: 18 }}
+              transition={{ duration: reduceMotion ? 0 : 0.15 }}
             />
           )}
           <span className="relative z-10">{opt.label}</span>
