@@ -74,7 +74,15 @@ export function LlmPane() {
         debounceRef.current = null
       }
     }
-  }, [probeKey, canTest, config.llm_provider, config.llm_base_url, doFetchModels, models.length, modelsFetchedAt])
+  }, [
+    probeKey,
+    canTest,
+    config.llm_provider,
+    config.llm_base_url,
+    doFetchModels,
+    models.length,
+    modelsFetchedAt,
+  ])
 
   const handleTest = async () => {
     setLlmTestStatus('testing')
