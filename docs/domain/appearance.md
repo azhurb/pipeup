@@ -19,7 +19,7 @@ Regenerate assets using the commands in [Commands](../references/commands.md#bra
 
 The display name, native window titles, permission copy, and tray tooltip use Pipeup. The repository is `azhurb/pipeup`; historical upstream attribution and copyright are retained.
 
-The bundle identifier is `com.azhurb.pipeup`; the native executable and frontend npm package are named `pipeup`. The old `com.opentypeless.app` data remains available for an optional first-run copy. See [Identity migration](../architecture/identity-migration.md). The existing signing certificate name is retained internally for release builds.
+The bundle identifier is `com.azhurb.pipeup`; the native executable and frontend npm package are named `pipeup`. The old `com.opentypeless.app` data remains available for an optional first-run copy. Release builds use the `Pipeup Release` signing certificate. See [Identity migration](../architecture/identity-migration.md).
 
 The macOS bundle is `Pipeup.app`, separate from `OpenTypeless.app`. The two can remain installed together; running both requires distinct global shortcuts. Repository fork detachment is a separate decision. See [release preparation](../references/release-preparation.md).
 

@@ -42,7 +42,7 @@ Current macOS builds store provider keys in an owner-only file, not the login Ke
 
 A Keychain prompt may come from an older app copy or a custom build using the system vault. Quit any old OpenTypeless copy and confirm which app is requesting access. Keep credential files and application data intact; removing them is not part of the Pipeup upgrade.
 
-Release signing still uses the existing `OpenTypeless Release` certificate. The certificate name is an internal build identifier; Pipeup's bundle identifier is separate. Inspect a bundle's designated requirement with:
+Release builds use the `Pipeup Release` certificate. Inspect a bundle's designated requirement with:
 
 ```bash
 codesign -d -r- /Applications/Pipeup.app

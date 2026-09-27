@@ -199,8 +199,8 @@ misses are not, so a key added out of band is still picked up. `write` and
 ### Legacy macOS Keychain prompts
 
 Current macOS builds do not read provider keys from the Keychain. Older builds or
-custom builds using `SystemCredentialVault` can prompt. The release signing certificate
-is still named `OpenTypeless Release`, but Pipeup now has its own bundle identifier.
+custom builds using `SystemCredentialVault` can prompt. Release builds use the
+`Pipeup Release` signing certificate and Pipeup has its own bundle identifier.
 A stable designated requirement alone does not prevent partition-list prompts.
 See [the macOS storage decision](#macos-deliberately-does-not-use-the-keychain) and
 [Identity migration](identity-migration.md).

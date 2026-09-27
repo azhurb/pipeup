@@ -11,7 +11,7 @@
 
 set -euo pipefail
 
-CERT_NAME="OpenTypeless Local"
+CERT_NAME="Pipeup Local"
 KEYCHAIN="${HOME}/Library/Keychains/login.keychain-db"
 
 cd "$(dirname "$0")/.."
@@ -33,17 +33,17 @@ CERT_HASH="$(get_cert_hash)"
 if [[ -z "${CERT_HASH}" ]]; then
     echo "==> Creating self-signed code-signing certificate '${CERT_NAME}'"
 
-    TMPDIR=$(mktemp -d)
-    trap 'rm -rf "${TMPDIR}"' EXIT
+    CERT_DIR=$(mktemp -d)
+    trap 'rm -rf "${CERT_DIR}"' EXIT
 
-    cat > "${TMPDIR}/cert.conf" <<'CONF'
+    cat > "${CERT_DIR}/cert.conf" <<'CONF'
 [req]
 distinguished_name = dn
 prompt = no
 x509_extensions = v3_ext
 
 [dn]
-CN = OpenTypeless Local
+CN = Pipeup Local
 
 [v3_ext]
 basicConstraints = CA:false
@@ -52,18 +52,18 @@ extendedKeyUsage = critical, codeSigning
 CONF
 
     openssl req -x509 -nodes -newkey rsa:2048 \
-        -keyout "${TMPDIR}/key.pem" \
-        -out "${TMPDIR}/cert.pem" \
+        -keyout "${CERT_DIR}/key.pem" \
+        -out "${CERT_DIR}/cert.pem" \
         -days 3650 \
-        -config "${TMPDIR}/cert.conf"
+        -config "${CERT_DIR}/cert.conf"
 
     # macOS Security framework only reads PKCS#12 with legacy ciphers + SHA1 MAC.
-    P12_PASS="opentypeless-local"
+    P12_PASS="$(openssl rand -hex 24)"
     P12_ARGS=(-export
-              -inkey "${TMPDIR}/key.pem"
-              -in "${TMPDIR}/cert.pem"
+              -inkey "${CERT_DIR}/key.pem"
+              -in "${CERT_DIR}/cert.pem"
               -name "${CERT_NAME}"
-              -out "${TMPDIR}/cert.p12"
+              -out "${CERT_DIR}/cert.p12"
               -keypbe PBE-SHA1-3DES
               -certpbe PBE-SHA1-3DES
               -macalg sha1
@@ -73,7 +73,7 @@ CONF
     fi
     openssl pkcs12 "${P12_ARGS[@]}"
 
-    security import "${TMPDIR}/cert.p12" \
+    security import "${CERT_DIR}/cert.p12" \
         -k "${KEYCHAIN}" \
         -P "${P12_PASS}" \
         -T /usr/bin/codesign \

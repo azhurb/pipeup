@@ -18,6 +18,23 @@ Pipeup uses its own app, executable, database, and credential identifiers. The f
 
 Test fresh setup, **Import a copy**, and **Start fresh** with a packaged release. Seed the old directory with settings, a saved credential, history, and dictionary entries. Confirm import preserves them in Pipeup, turns off Pipeup's auto-start setting, and leaves the source untouched. Also test an incompatible or unreadable legacy database and an unavailable credential store. Confirm a second Pipeup launch does not offer import again. Install original OpenTypeless beside Pipeup, give each a different shortcut, and verify both launch independently with separate data and macOS permission entries. Test the release artifacts on Windows, both macOS architectures, and Linux; a debug bundle is not a packaged upgrade test.
 
+## macOS release signing
+
+The macOS release jobs require a PKCS#12 certificate named `Pipeup Release` in the `MACOS_CERT_P12_BASE64` and `MACOS_CERT_P12_PASSWORD` repository secrets. Missing secrets or a certificate with a different name fail the jobs. Both secrets were rotated on 2026-09-27. Check their update times before tagging:
+
+```bash
+gh secret list -R azhurb/pipeup
+```
+
+To replace the certificate again, run:
+
+```bash
+set -o pipefail
+scripts/create-release-cert.sh | gh secret set -f - -R azhurb/pipeup
+```
+
+After building, inspect each macOS DMG's app signature with `codesign -dv --verbose=4 /path/to/Pipeup.app` and confirm `Authority=Pipeup Release` and `Identifier=com.azhurb.pipeup`. Keep the certificate private and do not put its output in logs or a commit. Rotating the certificate changes macOS's designated requirement, so installed copies may need Microphone and Accessibility permission again. See [Troubleshooting](troubleshooting.md) for recovery.
+
 ## Repository changes
 
 The repository was renamed to `azhurb/pipeup` on 2026-09-26. Origin, package metadata, app source links, templates, active documentation, and stacked PR links use the new name. The fork relationship and upstream attribution are preserved.

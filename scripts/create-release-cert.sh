@@ -2,23 +2,23 @@
 # Generate a self-signed code-signing certificate for CI release builds and
 # print the values that need to be uploaded as GitHub Actions secrets.
 #
-# Run this once per fork. The private key never leaves this script's stdout
-# (which you pipe into `gh secret set`). Nothing is committed.
+# Run this once per fork. The PKCS#12 secret contains the private key, so pipe
+# the output directly into `gh secret set`. Nothing is committed.
 
 set -euo pipefail
 
-CERT_NAME="OpenTypeless Release"
-TMPDIR=$(mktemp -d)
-trap 'rm -rf "${TMPDIR}"' EXIT
+CERT_NAME="Pipeup Release"
+CERT_DIR=$(mktemp -d)
+trap 'rm -rf "${CERT_DIR}"' EXIT
 
-cat > "${TMPDIR}/cert.conf" <<'CONF'
+cat > "${CERT_DIR}/cert.conf" <<'CONF'
 [req]
 distinguished_name = dn
 prompt = no
 x509_extensions = v3_ext
 
 [dn]
-CN = OpenTypeless Release
+CN = Pipeup Release
 
 [v3_ext]
 basicConstraints = CA:false
@@ -27,18 +27,18 @@ extendedKeyUsage = critical, codeSigning
 CONF
 
 openssl req -x509 -nodes -newkey rsa:2048 \
-    -keyout "${TMPDIR}/key.pem" \
-    -out "${TMPDIR}/cert.pem" \
+    -keyout "${CERT_DIR}/key.pem" \
+    -out "${CERT_DIR}/cert.pem" \
     -days 3650 \
-    -config "${TMPDIR}/cert.conf" 2>/dev/null
+    -config "${CERT_DIR}/cert.conf" 2>/dev/null
 
 P12_PASSWORD="$(openssl rand -hex 24)"
 
 P12_ARGS=(-export
-          -inkey "${TMPDIR}/key.pem"
-          -in "${TMPDIR}/cert.pem"
+          -inkey "${CERT_DIR}/key.pem"
+          -in "${CERT_DIR}/cert.pem"
           -name "${CERT_NAME}"
-          -out "${TMPDIR}/cert.p12"
+          -out "${CERT_DIR}/cert.p12"
           -keypbe PBE-SHA1-3DES
           -certpbe PBE-SHA1-3DES
           -macalg sha1
@@ -48,7 +48,7 @@ if openssl version | grep -qE "OpenSSL 3\."; then
 fi
 openssl pkcs12 "${P12_ARGS[@]}" 2>/dev/null
 
-P12_BASE64="$(base64 < "${TMPDIR}/cert.p12")"
+P12_BASE64="$(base64 < "${CERT_DIR}/cert.p12")"
 
 # Output in a parseable form: KEY=value, one per line. Caller pipes into gh.
 cat <<EOF

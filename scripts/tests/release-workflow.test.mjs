@@ -78,3 +78,26 @@ test('untrusted input is passed through environment and releases remain drafts',
   assert.match(workflow, /releaseDraft: true/)
   assert.doesNotMatch(workflow, /default: 'v/)
 })
+
+test('macOS release jobs require the Pipeup signing identity', () => {
+  const signingStep = workflow.match(
+    /      - name: Import macOS code-signing certificate\n[\s\S]*?        run: \|\n((?:          .*\n|\n)+)/,
+  )
+  assert.ok(signingStep, 'macOS signing step must exist')
+  assert.match(signingStep[0], /if: startsWith\(matrix\.platform, 'macos'\)/)
+  assert.match(signingStep[0], /IDENTITY=.*"Pipeup Release"/)
+
+  const guard = signingStep[1].split('          KEYCHAIN_PATH=')[0].replace(/^          /gm, '')
+  for (const [certificate, password] of [['', ''], ['present', ''], ['', 'present']]) {
+    const result = spawnSync('bash', ['-e', '-c', guard], {
+      env: {
+        ...process.env,
+        MACOS_CERT_P12_BASE64: certificate,
+        MACOS_CERT_P12_PASSWORD: password,
+      },
+      encoding: 'utf8',
+    })
+    assert.equal(result.status, 1)
+    assert.match(result.stdout, /Pipeup release signing secrets are required/)
+  }
+})

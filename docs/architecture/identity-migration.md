@@ -1,6 +1,6 @@
 # Independent app identity and first-run import
 
-Pipeup uses the Tauri identifier `com.azhurb.pipeup`, the native executable `pipeup`, the database `pipeup.db`, and the OS credential service `com.azhurb.pipeup`. These names separate installation, local data, single-instance handling, and credentials from OpenTypeless. The signing certificate is still named `OpenTypeless Release`; it is an internal release credential, not the app identity. A new macOS identity requires its own Microphone and Accessibility grants.
+Pipeup uses the Tauri identifier `com.azhurb.pipeup`, the native executable `pipeup`, the database `pipeup.db`, and the OS credential service `com.azhurb.pipeup`. These names separate installation, local data, single-instance handling, and credentials from OpenTypeless. macOS release builds use the `Pipeup Release` signing certificate. A new macOS identity requires its own Microphone and Accessibility grants.
 
 Older Pipeup builds and upstream OpenTypeless used `com.opentypeless.app`. Their data may therefore occupy the same legacy directory. Pipeup cannot tell which app last wrote it. On first launch, if the new Pipeup directory has no settings, database, credentials, or prior import decision and the legacy directory contains supported data, the main window offers **Import a copy** or **Start fresh**. The choice happens before Pipeup opens its stores or registers its global shortcut. Neither choice changes the legacy directory or removes the old app.
 
