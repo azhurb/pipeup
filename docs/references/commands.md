@@ -126,7 +126,7 @@ Use the explicit manual command above after this workflow change is merged into 
 
 ## README screenshots
 
-Run `python3 scripts/capture-readme-screenshots.py` from the repository root after changing the interface or screenshot preview settings. It renders the real Overview and AI Settings components with synthetic data from `src/readme-preview.tsx` and writes both README PNGs at 1800 by 1400 pixels for a 900 by 700 interface. It requires Chrome or Chromium; set `CHROME_BIN` if it is not on the path or in the standard macOS location. Do not put real keys or transcripts in the preview.
+Run `python3 scripts/capture-readme-screenshots.py` from the repository root after changing the interface or screenshot preview settings. It renders the real Overview and AI Settings components with synthetic data from `src/readme-preview.tsx` and writes both README screenshots at 1800 by 1400 pixels for a 900 by 700 interface. It requires Chrome or Chromium; set `CHROME_BIN` if it is not on the path or in the standard macOS location. Do not put real keys or transcripts in the preview.
 
 ## Brand icons
 
