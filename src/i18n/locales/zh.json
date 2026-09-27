@@ -18,6 +18,17 @@
     "failedToLoad": "加载应用数据失败。",
     "retry": "重试"
   },
+  "identityImport": {
+    "title": "将旧数据带入 Pipeup？",
+    "description": "Pipeup 现在与 OpenTypeless 分开保存数据。我们发现了旧身份下的数据。你可以将其复制到 Pipeup，也可以从头开始。无论选择哪一种，旧数据都会保留。",
+    "quitOldApp": "导入前请退出 OpenTypeless 或旧版 Pipeup。如果同时运行两个应用，请设置不同的键盘快捷键。",
+    "import": "复制并导入",
+    "startFresh": "从头开始",
+    "imported": "数据已复制。重启 Pipeup 后即可加载。",
+    "keysToReenter": "部分服务商密钥无法复制。请在设置中重新输入：{{providers}}。",
+    "checkKeys": "无法读取旧的密钥存储。重启后请检查 Pipeup 中的服务商密钥。",
+    "restart": "重启 Pipeup"
+  },
   "nav": {
     "home": "概览",
     "settings": "设置",
@@ -140,7 +151,7 @@
       "title": "辅助功能",
       "required": "粘贴听写文本所必需",
       "grantedHint": "已授予",
-      "settingsHint": "请在系统设置 > 隐私与安全性 > 辅助功能中启用 Pipeup。升级后，macOS 可能仍将其显示为旧名称 OpenTypeless。"
+      "settingsHint": "请在系统设置 > 隐私与安全性 > 辅助功能中启用 Pipeup。旧的 OpenTypeless 条目属于原来的应用身份，不能授予 Pipeup 权限。"
     },
     "openSettings": "打开系统设置",
     "grant": "授权",

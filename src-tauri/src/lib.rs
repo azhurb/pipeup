@@ -2,6 +2,7 @@ pub mod app_detector;
 pub mod audio;
 pub mod correction;
 pub mod credentials;
+mod identity_migration;
 pub mod llm;
 pub mod output;
 pub mod pipeline;
@@ -1046,11 +1047,11 @@ fn default_shortcut() -> Shortcut {
     let fallback = {
         #[cfg(target_os = "macos")]
         {
-            Shortcut::new(Some(Modifiers::ALT), Code::Slash)
+            Shortcut::new(Some(Modifiers::ALT | Modifiers::SHIFT), Code::Slash)
         }
         #[cfg(not(target_os = "macos"))]
         {
-            Shortcut::new(Some(Modifiers::CONTROL), Code::Slash)
+            Shortcut::new(Some(Modifiers::CONTROL | Modifiers::SHIFT), Code::Slash)
         }
     };
     parse_hotkey(&default_hotkey).unwrap_or(fallback)
@@ -1275,6 +1276,13 @@ mod tests {
     }
 
     #[test]
+    fn fresh_pipeup_shortcut_is_parsed_with_shift() {
+        let shortcut = parse_hotkey(&storage::AppConfig::default().hotkey).unwrap();
+        assert!(shortcut.mods.contains(Modifiers::SHIFT));
+        assert_eq!(shortcut.key, Code::Slash);
+    }
+
+    #[test]
     fn test_parse_hotkey_ctrl_shift_a() {
         let s = parse_hotkey("Ctrl+Shift+A");
         assert!(s.is_some());
@@ -1357,11 +1365,43 @@ mod tests {
         }
     }
 }
+#[tauri::command]
+fn identity_import_pending(app: tauri::AppHandle) -> Result<bool, String> {
+    Ok(app
+        .try_state::<IdentityMigrationMode>()
+        .is_some_and(|mode| mode.0))
+}
+
+struct IdentityMigrationMode(bool);
+
+#[tauri::command]
+fn import_legacy_identity(
+    app: tauri::AppHandle,
+) -> Result<identity_migration::ImportReport, String> {
+    let data_dir = app.path().app_data_dir().map_err(|e| e.to_string())?;
+    identity_migration::import(&data_dir).map_err(|e| format!("{e:#}"))
+}
+
+#[tauri::command]
+fn start_fresh_identity(app: tauri::AppHandle) -> Result<(), String> {
+    let data_dir = app.path().app_data_dir().map_err(|e| e.to_string())?;
+    identity_migration::skip(&data_dir).map_err(|e| format!("{e:#}"))
+}
+
+#[tauri::command]
+fn restart_after_identity_choice(app: tauri::AppHandle) -> Result<(), String> {
+    let data_dir = app.path().app_data_dir().map_err(|e| e.to_string())?;
+    if identity_migration::pending(&data_dir) {
+        return Err("Choose whether to import legacy data first".to_string());
+    }
+    app.restart()
+}
+
 pub fn run() {
     tracing_subscriber::fmt()
         .with_env_filter(
             EnvFilter::from_default_env().add_directive(
-                "opentypeless=debug"
+                "pipeup_lib=debug"
                     .parse()
                     .expect("static directive is valid"),
             ),
@@ -1398,10 +1438,22 @@ pub fn run() {
 
             let app_handle = app.handle().clone();
 
-            // Initialize data directory and database
+            // Offer a copy of the previous shared identity before opening any
+            // Pipeup store or shortcut. Import/skip restarts into normal setup.
             let data_dir = app.path().app_data_dir()?;
+            if identity_migration::pending(&data_dir) {
+                app.manage(IdentityMigrationMode(true));
+                if let Some(window) = app.get_webview_window("main") {
+                    window.show()?;
+                    window.set_focus()?;
+                }
+                return Ok(());
+            }
+            app.manage(IdentityMigrationMode(false));
+
+            // Initialize data directory and database
             std::fs::create_dir_all(&data_dir)?;
-            let db_path = data_dir.join("opentypeless.db");
+            let db_path = data_dir.join("pipeup.db");
 
             // Initialize stores
             // Built before the config manager: loading the config runs the
@@ -1724,6 +1776,10 @@ pub fn run() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
+            identity_import_pending,
+            import_legacy_identity,
+            start_fresh_identity,
+            restart_after_identity_choice,
             start_recording,
             stop_recording,
             abort_recording,

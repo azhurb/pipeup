@@ -2,9 +2,9 @@
 //!
 //! Keys used to live in `settings.json` as plain strings, which for a BYOK app
 //! is the widest gap between what the README claims and what the app does. They
-//! now live in the macOS Keychain / Windows Credential Manager / Linux Secret
-//! Service, and [`migrate_legacy_config_secrets`] moves any plaintext left over
-//! from an older install on first launch.
+//! now live in an owner-only file on macOS and in Windows Credential Manager or
+//! Linux Secret Service where available. [`migrate_legacy_config_secrets`] moves
+//! any plaintext left over from an older install on first launch.
 //!
 //! Secrets are keyed by `(namespace, provider)`, not by namespace alone, so
 //! switching STT provider and switching back remembers the earlier key instead
@@ -13,15 +13,17 @@
 //! Everything here goes through the [`CredentialVault`] trait. That indirection
 //! exists for one reason: `cargo test` runs on three OSes in CI, and a test that
 //! touches the real vault either prompts for authorization or fails on a
-//! headless runner. Tests use [`MemoryVault`]; only the app constructs a
-//! [`SystemCredentialVault`].
+//! headless runner. Tests use [`MemoryVault`]; normal startup selects the
+//! platform store through [`default_store`].
 
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 
 /// Vault service name. Matches the bundle identifier in `tauri.conf.json` so
 /// the entries are attributable in Keychain Access / Credential Manager.
-const SERVICE_NAME: &str = "com.opentypeless.app";
+const SERVICE_NAME: &str = "com.azhurb.pipeup";
+#[cfg(not(target_os = "macos"))]
+const LEGACY_SERVICE_NAME: &str = "com.opentypeless.app";
 
 /// Stamped onto every stored payload. Nothing reads a version other than 1 yet;
 /// it is here so a future format change can be detected rather than guessed at,
@@ -399,17 +401,39 @@ pub fn default_store(file_path: std::path::PathBuf) -> SharedVault {
     }
 }
 
+/// Read the previous shared identity only during an explicit first-run import.
+pub fn legacy_store(file_path: std::path::PathBuf) -> SharedVault {
+    let file = std::sync::Arc::new(FileVault::new(file_path));
+    #[cfg(target_os = "macos")]
+    {
+        file
+    }
+    #[cfg(not(target_os = "macos"))]
+    {
+        std::sync::Arc::new(FallbackVault::new(
+            std::sync::Arc::new(SystemCredentialVault::with_service(LEGACY_SERVICE_NAME)),
+            file,
+        ))
+    }
+}
+
 /// The real vault: Keychain on macOS, Credential Manager on Windows, Secret
 /// Service on Linux (see the per-platform `keyring` features in `Cargo.toml`).
-pub struct SystemCredentialVault;
+pub struct SystemCredentialVault {
+    service_name: &'static str,
+}
 
 impl SystemCredentialVault {
     pub fn new() -> Self {
-        Self
+        Self::with_service(SERVICE_NAME)
     }
 
-    fn entry(id: &CredentialId) -> Result<keyring::Entry> {
-        keyring::Entry::new(SERVICE_NAME, &id.account())
+    pub fn with_service(service_name: &'static str) -> Self {
+        Self { service_name }
+    }
+
+    fn entry(&self, id: &CredentialId) -> Result<keyring::Entry> {
+        keyring::Entry::new(self.service_name, &id.account())
             .with_context(|| format!("failed to open vault entry for {}", id.account()))
     }
 }
@@ -422,7 +446,7 @@ impl Default for SystemCredentialVault {
 
 impl CredentialVault for SystemCredentialVault {
     fn read(&self, id: &CredentialId) -> Result<Option<String>> {
-        let entry = Self::entry(id)?;
+        let entry = self.entry(id)?;
         match entry.get_password() {
             Ok(raw) => Ok(Some(decode_secret(&raw))),
             Err(keyring::Error::NoEntry) => Ok(None),
@@ -436,13 +460,13 @@ impl CredentialVault for SystemCredentialVault {
             version: STORED_CREDENTIAL_VERSION,
             secret: secret.to_string(),
         })?;
-        Self::entry(id)?
+        self.entry(id)?
             .set_password(&payload)
             .with_context(|| format!("failed to write vault entry {}", id.account()))
     }
 
     fn delete(&self, id: &CredentialId) -> Result<()> {
-        match Self::entry(id)?.delete_credential() {
+        match self.entry(id)?.delete_credential() {
             Ok(()) | Err(keyring::Error::NoEntry) => Ok(()),
             Err(e) => Err(anyhow::Error::new(e)
                 .context(format!("failed to delete vault entry {}", id.account()))),

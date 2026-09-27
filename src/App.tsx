@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import i18n from './i18n'
 import { useTauriEvents } from './hooks/useTauriEvents'
 import { useTheme } from './hooks/useTheme'
@@ -14,6 +14,7 @@ import {
   checkAccessibilityPermission,
   checkMicrophonePermission,
   requestMicrophonePermission,
+  identityImportPending,
 } from './lib/tauri'
 import { Capsule } from './components/Capsule'
 import { Settings } from './components/Settings'
@@ -25,6 +26,37 @@ import { Onboarding } from './components/Onboarding'
 import { MainLayout } from './components/MainLayout'
 import { HomePage } from './components/HomePage'
 import { ToastContainer } from './components/Toast'
+import { IdentityImport } from './components/IdentityImport'
+
+function IdentityGate({ children, capsule = false }: { children: ReactNode; capsule?: boolean }) {
+  const [pending, setPending] = useState<boolean | null>(null)
+  const [error, setError] = useState(false)
+
+  useEffect(() => {
+    identityImportPending()
+      .then(setPending)
+      .catch(() => setError(true))
+  }, [])
+
+  if (capsule && (pending === null || pending)) return null
+  if (pending === null && !error)
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <span className="text-text-tertiary text-[13px]">{i18n.t('app.loading')}</span>
+      </div>
+    )
+  if (error)
+    return (
+      <div className="flex flex-col items-center justify-center h-screen gap-3">
+        <span className="text-error text-[13px]">{i18n.t('app.failedToLoad')}</span>
+        <button onClick={() => window.location.reload()} className="px-4 py-2 bg-accent text-white">
+          {i18n.t('app.retry')}
+        </button>
+      </div>
+    )
+  if (pending) return <IdentityImport />
+  return children
+}
 
 function CapsuleApp() {
   useTauriEvents('capsule')
@@ -179,8 +211,17 @@ function MainApp() {
 
 function App() {
   // Capsule window loads with #capsule hash — detect synchronously, no race condition
-  if (window.location.hash === '#capsule') return <CapsuleApp />
-  return <MainApp />
+  if (window.location.hash === '#capsule')
+    return (
+      <IdentityGate capsule>
+        <CapsuleApp />
+      </IdentityGate>
+    )
+  return (
+    <IdentityGate>
+      <MainApp />
+    </IdentityGate>
+  )
 }
 
 export default App

@@ -12,11 +12,11 @@ Use this checklist before publishing the Pipeup rebrand. Commands for validation
 - Check tray destinations, launch at startup, saved credentials, history retention, and local history search. Verify one provider flow with your own test account without including its key or transcript in screenshots.
 - Refresh the README screenshots from the current UI using non-sensitive preview data.
 
-## Upgrade compatibility
+## Upgrade and coexistence
 
-Keep `com.opentypeless.app`, the native executable name, database filename, credential identifiers, and existing signing certificate identity. Renaming them requires a separate migration design.
+Pipeup uses its own app, executable, database, and credential identifiers. The first-run import copies old shared-identity data only after the user chooses it. See [Identity migration](../architecture/identity-migration.md) for the exact behavior.
 
-Test an upgrade with existing settings, a saved credential, history, and dictionary entries. Follow the README's old-app removal instructions. Confirm only one app starts and permissions recover without deleting application data. Verify both a fresh installation and an upgrade using the packaged release, not just development mode. Record the name shown in macOS Accessibility for each, and verify the [legacy-name guidance and permission recovery](troubleshooting.md#macos-accessibility-lists-opentypeless-instead-of-pipeup). A debug bundle alongside an installed OpenTypeless copy does not verify the packaged upgrade.
+Test fresh setup, **Import a copy**, and **Start fresh** with a packaged release. Seed the old directory with settings, a saved credential, history, and dictionary entries. Confirm import preserves them in Pipeup, turns off Pipeup's auto-start setting, and leaves the source untouched. Also test an incompatible or unreadable legacy database and an unavailable credential store. Confirm a second Pipeup launch does not offer import again. Install original OpenTypeless beside Pipeup, give each a different shortcut, and verify both launch independently with separate data and macOS permission entries. Test the release artifacts on Windows, both macOS architectures, and Linux; a debug bundle is not a packaged upgrade test.
 
 ## Repository changes
 
@@ -37,7 +37,9 @@ Merge the permission guidance PR and release-preparation PR before tagging. Foll
 
 Before publishing, add release highlights, tested platforms, and known limitations. Confirm Windows, both macOS architectures, and Linux artifacts match the intended version and show Pipeup branding. Record any untested platform explicitly. Remove the workflow's draft-only checklist from the public release body.
 
-After publication, verify the download links and the README's release destination. No database migration or data cleanup is required by this rebrand. Do not delete legacy data directories or credential files.
+If publishing a draft created before the independent identity change, replace its old upgrade instructions with the current [first-run import guidance](../../README.md#upgrading-from-opentypeless-or-an-earlier-pipeup-build). A rebuilt artifact alone does not update existing draft text.
+
+After publication, verify the download links and the README's release destination. Keep the legacy data and credential files in place; the import is a copy.
 
 ## Release status, 2026-09-26
 
@@ -47,6 +49,6 @@ The final stack passed all five CI jobs. Local frontend verification passed 259 
 
 Browser verification used the real React components with synthetic local data at 900 by 700 and 720 by 480. Light/dark appearance, discard, navigation, and refreshed screenshots were checked. Native UI automation could not attach to the packaged app.
 
-The permission follow-up explains the legacy OpenTypeless label in onboarding, the main-window warning, and upgrade guidance. It does not rename macOS's stored permission entry. Packaged fresh-install and upgrade verification, native shortcut conflicts and cancellation, and release artifact checks on Windows, both macOS architectures, and Linux remain outstanding. Follow the full product and upgrade checks above before publication.
+The 2026-09-26 permission follow-up explained the legacy OpenTypeless label before Pipeup had a separate identifier. Packaged fresh-install and upgrade verification, native shortcut conflicts and cancellation, and release artifact checks on Windows, both macOS architectures, and Linux remain outstanding. Follow the full product and upgrade checks above before publication.
 
-Release publication and optional fork detachment still require separate authorization. No database migration, backfill, or cache cleanup is required by the rebrand. After publication, verify download links, a single app instance at login, and successful dictation.
+Release publication and optional fork detachment still require separate authorization. After publication, verify download links, separate app and permission identities, and successful dictation. Do not delete legacy data after an import.

@@ -36,7 +36,7 @@ Verified against `src-tauri/src/storage/mod.rs::Default::default`:
 | `polish_enabled` | `true` |
 | `translate_enabled` | `false` |
 | `target_lang` | `en` |
-| `hotkey` | `Alt+/` (macOS) / `Ctrl+/` (other) |
+| `hotkey` | `Alt+Shift+/` (macOS) / `Ctrl+Shift+/` (other) |
 | `hotkey_mode` | `hold` |
 | `close_to_tray` | `true` |
 | `max_recording_seconds` | `30` |
@@ -70,10 +70,11 @@ Provider API key storage is implemented in `src-tauri/src/credentials.rs`. macOS
 an owner-only file; Windows and Linux use the `keyring` crate with a file fallback.
 Legacy plaintext keys in `settings.json` are migrated as described below.
 
-- **Service name**: `com.opentypeless.app` (matches the `tauri.conf.json` bundle identifier,
+- **Service name**: `com.azhurb.pipeup` (matches the `tauri.conf.json` bundle identifier,
   so entries are attributable in Keychain Access / Credential Manager).
 - **Account**: `<namespace>:<provider>` - `stt:deepgram`, `llm:openrouter`. Changing this
-  format orphans every entry a previous version wrote.
+  format requires another credential migration. The one-time [identity import](identity-migration.md)
+  copies readable keys from the old service name into this one.
 - **Payload**: JSON `{ "version": 1, "secret": "…" }`. The version stamp is forward
   compatibility only; a bare (hand-written) secret is also accepted on read.
 
@@ -199,9 +200,10 @@ misses are not, so a key added out of band is still picked up. `write` and
 
 Current macOS builds do not read provider keys from the Keychain. Older builds or
 custom builds using `SystemCredentialVault` can prompt. The release signing certificate
-is still named `OpenTypeless Release` and the bundle identifier remains
-`com.opentypeless.app` for compatibility, but a stable designated requirement alone does
-not prevent partition-list prompts. See [the macOS storage decision](#macos-deliberately-does-not-use-the-keychain).
+is still named `OpenTypeless Release`, but Pipeup now has its own bundle identifier.
+A stable designated requirement alone does not prevent partition-list prompts.
+See [the macOS storage decision](#macos-deliberately-does-not-use-the-keychain) and
+[Identity migration](identity-migration.md).
 
 Windows and Linux have no equivalent per-app prompt: Credential Manager is
 scoped to the user account, and Secret Service unlocks with the login session.
@@ -235,7 +237,7 @@ The Linux build needs `libdbus-1-dev` (installed by both workflows in `.github/w
 the `linux-native-sync-persistent` feature uses kernel keyutils for the session and Secret
 Service for persistence across reboots.
 
-## SQLite (`<app_data_dir>/opentypeless.db`)
+## SQLite (`<app_data_dir>/pipeup.db`)
 
 Both stores use the same database file via `rusqlite` (bundled). Tables are created at startup with `CREATE TABLE IF NOT EXISTS` directly inside `HistoryStore::new` and `DictionaryStore::new`. The dictionary table also runs a forward `ALTER TABLE` ladder gated by `PRAGMA user_version` (see below).
 

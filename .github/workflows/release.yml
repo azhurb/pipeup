@@ -137,11 +137,11 @@ jobs:
 
             macOS builds are self-signed, not notarized. After installing a trusted download in Applications, run `xattr -cr /Applications/Pipeup.app` if macOS blocks opening it. Grant Microphone and Accessibility permissions when prompted.
 
-            ## Upgrading from OpenTypeless
+            ## Upgrading from OpenTypeless or older Pipeup
 
-            Disable Launch at Startup in the old app, quit it, and remove the old app copy after installing Pipeup. Keep the existing application data. Settings, credentials, history, and dictionary retain their existing storage identities. Re-enable Launch at Startup in Pipeup if needed.
+            Pipeup now has a separate app identity and can be installed beside OpenTypeless. Quit the old app before first launch. Pipeup offers to import a copy of settings, history, dictionary, and available provider keys, or to start fresh. The old app and its data stay untouched. The import turns off Pipeup's Launch at Startup setting; enable it again if wanted. If both apps run, assign different keyboard shortcuts.
 
-            macOS Accessibility may still list Pipeup as OpenTypeless after upgrading. If Pipeup is absent, enable the old-name entry. If paste still fails, follow the [permission recovery steps](https://github.com/${{ github.repository }}/blob/${{ steps.release.outputs.tag }}/docs/references/troubleshooting.md#macos-accessibility-lists-opentypeless-instead-of-pipeup).
+            On macOS, grant Microphone and Accessibility to the new Pipeup entry. The old OpenTypeless entry does not grant Pipeup permission. See [permission recovery](https://github.com/${{ github.repository }}/blob/${{ steps.release.outputs.tag }}/docs/references/troubleshooting.md#macos-accessibility-still-lists-opentypeless) if paste fails.
 
             ## Before publishing this draft
 

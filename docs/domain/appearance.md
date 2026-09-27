@@ -15,14 +15,12 @@ Pipeup is the displayed product name. The developer-focused interface uses warm 
 
 Regenerate assets using the commands in [Commands](../references/commands.md#brand-icons).
 
-## Identity compatibility
+## App identity
 
 The display name, native window titles, permission copy, and tray tooltip use Pipeup. The repository is `azhurb/pipeup`; historical upstream attribution and copyright are retained.
 
-The bundle identifier (`com.opentypeless.app`), credential namespace, database filenames, Cargo executable name, and existing signing certificate identities are deliberately unchanged. This visual rebrand does not move or reset local data and does not detach the repository from its fork network.
+The bundle identifier is `com.azhurb.pipeup`; the native executable and frontend npm package are named `pipeup`. The old `com.opentypeless.app` data remains available for an optional first-run copy. See [Identity migration](../architecture/identity-migration.md). The existing signing certificate name is retained internally for release builds.
 
-The macOS bundle is named `Pipeup.app`; its executable remains `opentypeless`. The previous `OpenTypeless.app` will not be overwritten by that differently named bundle. The [upgrade instructions](../../README.md#upgrading-from-opentypeless) cover retiring the old app copy without deleting its data.
-
-The frontend npm package is named `pipeup`; this does not change the native executable or data paths. Repository rename and fork detachment are separate, approval-dependent operations. See [release preparation](../references/release-preparation.md).
+The macOS bundle is `Pipeup.app`, separate from `OpenTypeless.app`. The two can remain installed together; running both requires distinct global shortcuts. Repository fork detachment is a separate decision. See [release preparation](../references/release-preparation.md).
 
 Name availability and trademark clearance are outside this implementation and remain unverified.

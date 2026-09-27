@@ -12,6 +12,7 @@ Rust commands are registered in the `tauri::generate_handler![...]` block at the
 
 Current command groups (grep-verified against `generate_handler!`):
 
+- Identity import: `identity_import_pending`, `import_legacy_identity`, `start_fresh_identity`, `restart_after_identity_choice`. These run before the normal stores and shortcuts are initialized. See [Identity migration](identity-migration.md).
 - Pipeline: `start_recording`, `stop_recording`, `abort_recording`.
 - Permissions: `check_accessibility_permission`, `request_accessibility_permission`, `check_microphone_permission`, `request_microphone_permission`. The two microphone commands are macOS-only in effect — on other platforms they short-circuit to `authorized` / `true`. Implementation goes through `src-tauri/src/audio/permission.rs`, which links a small ObjC shim (`src-tauri/src/audio/mic_permission.m`, compiled by `build.rs`) wrapping `AVCaptureDevice.authorizationStatus` and `requestAccess`.
 - Config: `get_config`, `update_config`. Neither carries an API key — see Credentials below.

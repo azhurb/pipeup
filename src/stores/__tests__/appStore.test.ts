@@ -27,7 +27,7 @@ describe('appStore', () => {
     it('has sensible defaults', () => {
       const { config } = getState()
       expect(config.theme).toBe('system')
-      expect(config.hotkey).toBe('Ctrl+/')
+      expect(config.hotkey).toBe('Ctrl+Shift+/')
       expect(config.polish_enabled).toBe(true)
     })
 
@@ -49,7 +49,7 @@ describe('appStore', () => {
       const updated = getState().config
 
       expect(updated.theme).toBe('dark')
-      expect(updated.hotkey).toBe('Ctrl+/') // unchanged
+      expect(updated.hotkey).toBe('Ctrl+Shift+/') // unchanged
       expect(updated).not.toBe(original) // new object
     })
   })

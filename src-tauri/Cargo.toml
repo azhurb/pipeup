@@ -1,13 +1,13 @@
 [package]
-name = "opentypeless"
+name = "pipeup"
 version = "0.1.0"
 description = "AI-powered speech-to-text and text polishing desktop app"
-authors = ["OpenTypeless Contributors"]
+authors = ["Pipeup Contributors"]
 license = "MIT"
 edition = "2021"
 
 [lib]
-name = "opentypeless_lib"
+name = "pipeup_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [features]

@@ -10,7 +10,7 @@
 //
 // Two pasteboard types are declared on the item:
 //   * public.utf8-plain-text  — the real text; a genuine paste target reads this.
-//   * com.opentypeless.dictation (private sentinel) — no real paste target asks
+//   * com.azhurb.pipeup.dictation (private sentinel) — no real paste target asks
 //     for an unknown private type, but a clipboard manager that mirrors the whole
 //     pasteboard into history reads *every* type, including this one. A request
 //     for the sentinel therefore flags a greedy background reader, letting the
@@ -22,7 +22,7 @@
 
 #import <AppKit/AppKit.h>
 
-static NSString *const kOtlSentinelType = @"com.opentypeless.dictation";
+static NSString *const kOtlSentinelType = @"com.azhurb.pipeup.dictation";
 
 // Strong references to providers still attached to the pasteboard. AppKit does
 // not reliably keep the data provider alive, so we hold it here until the item

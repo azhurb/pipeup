@@ -53,9 +53,9 @@ impl Default for AppConfig {
             translate_enabled: false,
             target_lang: "en".to_string(),
             #[cfg(target_os = "macos")]
-            hotkey: "Alt+/".to_string(),
+            hotkey: "Alt+Shift+/".to_string(),
             #[cfg(not(target_os = "macos"))]
-            hotkey: "Ctrl+/".to_string(),
+            hotkey: "Ctrl+Shift+/".to_string(),
             hotkey_mode: "hold".to_string(),
             selected_text_enabled: false,
             theme: "system".to_string(),

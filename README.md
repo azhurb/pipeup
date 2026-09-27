@@ -58,13 +58,11 @@ xattr -cr /Applications/Pipeup.app
 
 Grant **Microphone** and **Accessibility** permissions when prompted. Repeat the quarantine step after an update if necessary. See [troubleshooting](docs/references/troubleshooting.md) for permission problems.
 
-### Upgrading from OpenTypeless
+### Upgrading from OpenTypeless or an earlier Pipeup build
 
-Turn off Launch at Startup in the old app if enabled, then quit it. Install Pipeup and move the old `OpenTypeless.app` to Trash so both copies cannot start. Re-enable Launch at Startup in Pipeup if you use it.
+Pipeup now installs with its own app identity, so it can coexist with OpenTypeless. On first launch, if data exists under the old shared identity, Pipeup offers to import a copy of settings, history, dictionary, and available provider keys. Quit the old app before importing. You can also start fresh. Either choice leaves the old app and its data untouched.
 
-macOS Accessibility may still list Pipeup as **OpenTypeless** after upgrading. If Pipeup is absent, enable the old-name entry. If dictation still cannot paste, follow the [permission recovery steps](docs/references/troubleshooting.md#macos-accessibility-lists-opentypeless-instead-of-pipeup).
-
-Keep the existing application data. Pipeup retains the bundle identifier, credential storage identifiers, settings, history, and dictionary. This release changes the product name without resetting your setup. The repository URL is `azhurb/pipeup`.
+The import turns off Pipeup's Launch at Startup setting. Re-enable it after setup if you want both apps to start at login. If both apps are running, give them different keyboard shortcuts. On macOS, grant Microphone and Accessibility to **Pipeup** as a separate app. An existing OpenTypeless permission entry does not grant Pipeup access. See [troubleshooting](docs/references/troubleshooting.md) if dictation cannot paste.
 
 ## Data and privacy
 

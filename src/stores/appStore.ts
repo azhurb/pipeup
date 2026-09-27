@@ -225,7 +225,7 @@ const defaultConfig: AppConfig = {
   polish_enabled: true,
   translate_enabled: false,
   target_lang: 'en',
-  hotkey: isMac ? 'Alt+/' : 'Ctrl+/',
+  hotkey: isMac ? 'Alt+Shift+/' : 'Ctrl+Shift+/',
   hotkey_mode: 'hold',
   selected_text_enabled: false,
   theme: 'system',

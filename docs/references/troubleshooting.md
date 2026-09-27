@@ -2,15 +2,11 @@
 
 Short list of failure modes that surface in user reports.
 
-## macOS: Accessibility lists OpenTypeless instead of Pipeup
+## macOS: Accessibility still lists OpenTypeless
 
-Pipeup was previously named OpenTypeless. After an upgrade, macOS may still show **OpenTypeless** in System Settings > Privacy & Security > Accessibility. Enable that entry if Pipeup is absent, then return to Pipeup and try dictation. The onboarding card and main-window permission banner explain both names before opening Settings.
+Pipeup now uses `com.azhurb.pipeup`. An existing OpenTypeless entry belongs to the old `com.opentypeless.app` identity and does not grant Pipeup Accessibility access. Enable the separate **Pipeup** entry in System Settings > Privacy & Security > Accessibility. If it is absent or ineffective, use the recovery steps below and select the exact `Pipeup.app` bundle you run. Do not delete either app's data to fix a permission entry.
 
-The packaged app declares `CFBundleName` and `CFBundleDisplayName` as `Pipeup`. It retains `com.opentypeless.app` for upgrade compatibility. On 2026-09-26, the local Pipeup debug bundle and `/Applications/OpenTypeless.app` both existed with this identifier; the maintainer confirmed that enabling the OpenTypeless entry allowed Pipeup to dictate.
-
-Inference: the legacy label is associated with existing macOS registration or the old installed copy, rather than a missing Pipeup display name. The exact label selection is not verified. Changing the identifier solely to rename this entry is not a supported fix.
-
-Follow the [upgrade instructions](../../README.md#upgrading-from-opentypeless) to avoid keeping both app copies installed. If the permission remains ineffective, use the recovery steps below and explicitly select the Pipeup bundle you intend to run. A development bundle can live outside Applications; select that exact bundle when testing it. Do not reset all macOS permissions or delete application data to refresh a label.
+The old shared-identity builds could appear under the OpenTypeless name. For upgrades, see [the first-run import](../../README.md#upgrading-from-opentypeless-or-an-earlier-pipeup-build). A debug bundle and a packaged bundle may have different signatures and need separate permission recovery.
 
 ## macOS: "I press the hotkey but nothing happens"
 
@@ -35,7 +31,7 @@ Pipeup detects this on the next paste attempt (`AXIsProcessTrusted()` returns fa
 Fix:
 
 1. System Settings → Privacy & Security → **Accessibility**
-2. Select the ineffective Pipeup entry (it may still be labeled OpenTypeless), then click `-` to remove that entry
+2. Select the ineffective Pipeup entry, then click `-` to remove that entry
 3. Click `+` and select the exact `Pipeup.app` bundle you intend to run
 4. Toggle that entry on; quit and reopen Pipeup if macOS asks
 5. Dictate again
@@ -46,7 +42,7 @@ Current macOS builds store provider keys in an owner-only file, not the login Ke
 
 A Keychain prompt may come from an older app copy or a custom build using the system vault. Quit any old OpenTypeless copy and confirm which app is requesting access. Keep credential files and application data intact; removing them is not part of the Pipeup upgrade.
 
-Release signing still uses the existing `OpenTypeless Release` certificate. The certificate name is an internal compatibility identifier. Inspect a bundle's designated requirement with:
+Release signing still uses the existing `OpenTypeless Release` certificate. The certificate name is an internal build identifier; Pipeup's bundle identifier is separate. Inspect a bundle's designated requirement with:
 
 ```bash
 codesign -d -r- /Applications/Pipeup.app
@@ -87,7 +83,7 @@ Provider failures are reported as `<stage>: <reason>` - the stage says which ste
 
 `No speech detected` means what it says: the microphone is the thing to check *only* for that message. Before 0.7.1 it was also shown when the STT provider itself failed, which sent people looking at their microphone over what was actually an exhausted quota.
 
-Transient capsule errors clear after 2.5 s. Microphone and Accessibility errors remain visible and open the relevant System Settings pane when clicked. The provider's full response - status, body, model - is logged at error level. `Needs confirmation:` a packaged build currently logs to stdout only, so on a Finder launch there is nothing to read afterwards; launching the binary from a terminal (`/Applications/Pipeup.app/Contents/MacOS/opentypeless`) is the only way to capture it today.
+Transient capsule errors clear after 2.5 s. Microphone and Accessibility errors remain visible and open the relevant System Settings pane when clicked. The provider's full response - status, body, model - is logged at error level. `Needs confirmation:` a packaged build currently logs to stdout only, so on a Finder launch there is nothing to read afterwards; launching the binary from a terminal (`/Applications/Pipeup.app/Contents/MacOS/pipeup`) is the only way to capture it today.
 
 An `Edit` failure never costs you anything: the selection is left exactly as it was. A `Polish` failure still pastes the raw transcript.
 

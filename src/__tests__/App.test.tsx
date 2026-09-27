@@ -29,6 +29,7 @@ const checkAccessibilityPermission = vi.fn()
 const checkMicrophonePermission = vi.fn()
 const requestMicrophonePermission = vi.fn()
 const getCredentialStatus = vi.fn()
+const identityImportPending = vi.fn()
 
 vi.mock('../lib/tauri', () => ({
   loadOnboardingCompleted: (...a: unknown[]) => loadOnboardingCompleted(...a),
@@ -39,6 +40,10 @@ vi.mock('../lib/tauri', () => ({
   checkMicrophonePermission: (...a: unknown[]) => checkMicrophonePermission(...a),
   requestMicrophonePermission: (...a: unknown[]) => requestMicrophonePermission(...a),
   getCredentialStatus: (...a: unknown[]) => getCredentialStatus(...a),
+  identityImportPending: (...a: unknown[]) => identityImportPending(...a),
+  importLegacyIdentity: vi.fn(),
+  startFreshIdentity: vi.fn(),
+  restartAfterIdentityChoice: vi.fn(),
   // Unused in this test but imported by the sub-tree.
   saveOnboardingCompleted: vi.fn(),
   updateConfig: vi.fn(),
@@ -115,6 +120,7 @@ function resetAll() {
   checkMicrophonePermission.mockReset().mockResolvedValue('authorized')
   requestMicrophonePermission.mockReset().mockResolvedValue(true)
   getCredentialStatus.mockReset().mockResolvedValue({ stt: 'saved', llm: 'saved' })
+  identityImportPending.mockReset().mockResolvedValue(false)
   // Mount the main-window route.
   window.location.hash = ''
   // Pretend we're on Linux so the mac permission branch is skipped — the
@@ -128,6 +134,15 @@ function resetAll() {
 describe('MainApp initial load — config preservation', () => {
   beforeEach(() => {
     resetAll()
+  })
+
+  it('asks about legacy data before opening Pipeup stores', async () => {
+    identityImportPending.mockResolvedValue(true)
+    render(<App />)
+
+    expect(await screen.findByText('identityImport.title')).toBeTruthy()
+    expect(loadOnboardingCompleted).not.toHaveBeenCalled()
+    expect(getConfig).not.toHaveBeenCalled()
   })
 
   it('loads config even when onboarding is NOT completed', async () => {

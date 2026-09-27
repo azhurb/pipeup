@@ -153,7 +153,7 @@ User-facing promise: a global shortcut starts voice input from other desktop app
 Repo evidence:
 
 - Hotkey config lives in `AppConfig.hotkey` and `AppConfig.hotkey_mode`.
-- Defaults are `Alt+/` on macOS and `Ctrl+/` elsewhere.
+- Fresh Pipeup defaults are `Alt+Shift+/` on macOS and `Ctrl+Shift+/` elsewhere, separate from OpenTypeless's defaults. Imported settings keep their saved shortcut.
 - `parse_hotkey()` and `build_shortcut_handler()` live in `src-tauri/src/lib.rs`.
 - Settings can pause/resume hotkey handling while capturing a new shortcut.
 

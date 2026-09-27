@@ -570,7 +570,7 @@ describe('appStore getInitialState includes llmModels', () => {
 
   it('getInitialState does not change fields other than llmModels', () => {
     const initial = useAppStore.getInitialState()
-    expect(initial.config.hotkey).toBe('Ctrl+/')
+    expect(initial.config.hotkey).toBe('Ctrl+Shift+/')
     expect(initial.pipelineState).toBe('idle')
     expect(initial.dictionary).toEqual([])
   })
