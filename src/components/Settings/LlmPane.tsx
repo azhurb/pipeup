@@ -19,6 +19,8 @@ import { CheckCircle2, XCircle, Loader2, RefreshCw } from 'lucide-react'
 const isMacPlatform = () =>
   typeof navigator !== 'undefined' && navigator.platform.toUpperCase().includes('MAC')
 
+const MODEL_CACHE_TTL_MS = 24 * 60 * 60 * 1000
+
 export function LlmPane() {
   const isMac = isMacPlatform()
   const config = useAppStore((s) => s.config)
@@ -31,6 +33,7 @@ export function LlmPane() {
   const { t } = useTranslation()
 
   const models = useAppStore((s) => s.llmModels)
+  const modelsFetchedAt = useAppStore((s) => s.llmModelsFetchedAt)
   const setModels = useAppStore((s) => s.setLlmModels)
   const [fetchingModels, setFetchingModels] = useState(false)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -52,14 +55,15 @@ export function LlmPane() {
     [setModels],
   )
 
-  // Auto-fetch when the key or base URL changes (debounced); skips if models
-  // already cached. `probeKey` is the unsaved draft, so the list refreshes as
+  // Auto-fetch when the key or base URL changes (debounced); reuse a model list
+  // for at most one day. `probeKey` is the unsaved draft, so the list refreshes as
   // the user pastes a key — with a saved key it is null and Rust reads the
   // vault, which is why this can no longer watch the key's value directly.
   const { probeKey, canTest } = apiKey
   useEffect(() => {
     if (!canTest || !config.llm_base_url) return
-    if (models.length > 0) return
+    if (models.length > 0 && modelsFetchedAt && Date.now() - modelsFetchedAt < MODEL_CACHE_TTL_MS)
+      return
     if (debounceRef.current) clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(() => {
       doFetchModels(probeKey, config.llm_provider, config.llm_base_url)
@@ -70,7 +74,7 @@ export function LlmPane() {
         debounceRef.current = null
       }
     }
-  }, [probeKey, canTest, config.llm_provider, config.llm_base_url, doFetchModels, models.length])
+  }, [probeKey, canTest, config.llm_provider, config.llm_base_url, doFetchModels, models.length, modelsFetchedAt])
 
   const handleTest = async () => {
     setLlmTestStatus('testing')
@@ -130,6 +134,7 @@ export function LlmPane() {
             value={apiKey.value}
             onChange={(e) => {
               apiKey.onChange(e.target.value)
+              setModels([])
               setLlmTestStatus('idle')
               setLlmLatencyMs(null)
             }}
@@ -237,6 +242,7 @@ export function LlmPane() {
             value={config.llm_base_url}
             onChange={(e) => {
               updateConfig({ llm_base_url: e.target.value })
+              setModels([])
               setLlmTestStatus('idle')
               setLlmLatencyMs(null)
             }}

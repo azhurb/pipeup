@@ -178,6 +178,7 @@
     "accessibilityRequired": "Required to paste dictated text",
     "grantPermission": "Grant Permission",
     "provider": "Provider",
+    "geminiTranscribeBatchHint": "Gemini transcribes after you stop recording. This batch request can add a few seconds before text appears. The connection test checks access, not dictation speed.",
     "apiKey": "API Key",
     "enterApiKey": "Enter API Key...",
     "apiKeySaved": "•••••••••••••  saved on this device",

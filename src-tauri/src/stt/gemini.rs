@@ -101,9 +101,11 @@ fn build_request_body(
         transcription_config.insert("custom_vocabulary".into(), serde_json::json!(terms));
     }
 
+    // The plain modes use a string. The object form is documented for
+    // verbatim-only options such as diarization and word timestamps.
     transcription_config.insert(
         "mode".into(),
-        serde_json::json!({ "type": if smart { "smart" } else { "verbatim" } }),
+        serde_json::json!(if smart { "smart" } else { "verbatim" }),
     );
 
     serde_json::json!({
@@ -284,24 +286,23 @@ mod tests {
     #[test]
     fn smart_format_selects_smart_mode() {
         let v = body(&[], true, &[]);
-        assert_eq!(transcription_config(&v)["mode"]["type"], "smart");
+        assert_eq!(transcription_config(&v)["mode"], "smart");
     }
 
     #[test]
     fn smart_format_off_selects_verbatim_mode() {
         let v = body(&[], false, &[]);
-        assert_eq!(transcription_config(&v)["mode"]["type"], "verbatim");
+        assert_eq!(transcription_config(&v)["mode"], "verbatim");
     }
 
     #[test]
     fn body_requests_no_diarization_or_word_timestamps() {
         let v = body(&[], true, &[]);
-        let mode = &transcription_config(&v)["mode"];
-        assert!(
-            mode.get("diarization_mode").is_none() && mode.get("timestamp_granularities").is_none(),
-            "a dictation is one speaker and nothing downstream reads timestamps; asking for either \
-             halves the accepted audio length for no gain"
-        );
+        assert_eq!(transcription_config(&v)["mode"], "smart");
+        assert!(transcription_config(&v).get("diarization_mode").is_none());
+        assert!(transcription_config(&v)
+            .get("timestamp_granularities")
+            .is_none());
     }
 
     #[test]

@@ -11,6 +11,8 @@ Use this checklist before publishing the Pipeup rebrand. Commands for validation
 - Verify recording, cancel, processing, successful insertion, and permission recovery in the native app. Browser previews alone do not verify the native pipeline.
 - Check tray destinations, launch at startup, saved credentials, history retention, and local history search. Verify one provider flow with your own test account without including its key or transcript in screenshots.
 - Refresh the README screenshots from the current UI using non-sensitive preview data.
+- Confirm the provider model suggestions refresh when stale or after changing credentials or the endpoint. Test the selected model because the list comes from the provider and can contain models unsuitable for chat completion.
+- Test Groq Whisper Turbo and the new Gemini 3.5 Flash-Lite defaults with current accounts. For Gemini 3.5 Transcribe, check both smart and verbatim output with speech, and record the delay after recording stops. Its connection test only checks model access.
 
 ## Upgrade and coexistence
 

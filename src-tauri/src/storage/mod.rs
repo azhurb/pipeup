@@ -47,7 +47,7 @@ impl Default for AppConfig {
             stt_provider: "glm-asr".to_string(),
             stt_languages: Vec::new(),
             llm_provider: "openrouter".to_string(),
-            llm_model: "google/gemini-2.5-flash".to_string(),
+            llm_model: "google/gemini-3.5-flash-lite".to_string(),
             llm_base_url: "https://openrouter.ai/api/v1".to_string(),
             polish_enabled: true,
             translate_enabled: false,

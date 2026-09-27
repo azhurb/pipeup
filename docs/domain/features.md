@@ -172,7 +172,7 @@ Repo evidence:
 - Dictionary UI lives under `src/components/Settings/DictionaryPane.tsx`.
 - Dictionary words are loaded before recording in `src-tauri/src/pipeline.rs`.
 - Prompt construction injects sanitized dictionary terms in `src-tauri/src/llm/prompt.rs`.
-- The same words reach the STT step as `SttConfig.custom_vocabulary`, and only `gemini-transcribe` sends them on (capped at the API's 1,000 terms). The API accepts the field, but paired live trials on 2026-08-27, on synthetic and real microphone audio alike, showed no difference in the transcript with and without it - see [`../plans/active/gemini-transcribe.md`](../plans/active/gemini-transcribe.md). For every other provider the dictionary influences the polish prompt only.
+- The same words reach the STT step as `SttConfig.custom_vocabulary`, and only `gemini-transcribe` sends them on (capped at the API's 1,000 terms). Prior paired trials showed no vocabulary effect, but used the old transcription mode shape; a new paired trial is needed after the 2026-09-27 mode correction. See [`../plans/active/gemini-transcribe.md`](../plans/active/gemini-transcribe.md). For every other provider the dictionary influences the polish prompt only.
 
 Needs confirmation:
 
