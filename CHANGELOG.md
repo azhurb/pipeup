@@ -18,6 +18,7 @@ Pipeup originated as a fork of [Tover0314/opentypeless](https://github.com/tover
 ### Changed
 
 - The batch Gemini provider is now labeled "Gemini 3.5 Transcribe (batch)". Its id and saved settings are unchanged.
+- The recording capsule shows seven waveform bars again, as it did before the Pipeup redesign.
 
 ### Fixed
 
