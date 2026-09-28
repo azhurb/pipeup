@@ -125,6 +125,11 @@ pub fn classify(err: &anyhow::Error) -> FailureKind {
         if let Some(e) = cause.downcast_ref::<tokio_tungstenite::tungstenite::Error>() {
             return classify_websocket(e);
         }
+        // A deadline the provider code set itself, such as the Live API's wait
+        // for `setupComplete`.
+        if cause.is::<tokio::time::error::Elapsed>() {
+            return FailureKind::Timeout;
+        }
     }
     FailureKind::Unknown
 }
@@ -259,6 +264,16 @@ where
 mod tests {
     use super::*;
     use std::cell::Cell;
+
+    #[tokio::test]
+    async fn an_expired_deadline_is_a_timeout() {
+        let elapsed = tokio::time::timeout(Duration::ZERO, std::future::pending::<()>())
+            .await
+            .unwrap_err();
+        let err = anyhow::Error::new(elapsed).context("session setup");
+        assert_eq!(classify(&err), FailureKind::Timeout);
+        assert!(is_retryable(&err));
+    }
 
     fn status_error(code: u16) -> anyhow::Error {
         HttpStatusError::new(StatusCode::from_u16(code).unwrap(), format!("HTTP {code}")).into()

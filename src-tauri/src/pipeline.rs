@@ -726,6 +726,7 @@ impl PipelineHandle {
         let detected_lang = self.detected_language.clone();
         let stt_failure = self.stt_error.clone();
         let stt_done = self.stt_done.clone();
+        let aborted = self.abort_flag.clone();
 
         tokio::spawn(async move {
             // Forward audio to STT and receive transcripts
@@ -735,6 +736,13 @@ impl PipelineHandle {
                         match chunk {
                             Some(data) => {
                                 let _ = provider.send_audio(&data).await;
+                            }
+                            None if aborted.load(Ordering::SeqCst) => {
+                                // Cancelled: `abort()` sets the flag before it stops
+                                // capture, so this is seen here. Finishing the turn
+                                // would upload or finalize audio the user threw away.
+                                provider.abort().await;
+                                break;
                             }
                             None => {
                                 // Audio channel closed — disconnect and capture final transcript
@@ -1313,7 +1321,12 @@ impl PipelineHandle {
             "siliconflow" => "https://api.siliconflow.cn/v1/audio/transcriptions".to_string(),
             "deepgram" => "https://api.deepgram.com/v1/listen".to_string(),
             "assemblyai" => "https://api.assemblyai.com/v2/transcript".to_string(),
-            "gemini-transcribe" => crate::stt::gemini::ENDPOINT.to_string(),
+            // The Live provider opens a WebSocket, which the HTTP pool cannot
+            // keep warm, but the same host still saves the DNS lookup and TLS
+            // session setup on the first dictation.
+            "gemini-transcribe" | "gemini-transcribe-live" => {
+                crate::stt::gemini::ENDPOINT.to_string()
+            }
             _ => {
                 tracing::debug!(
                     "Unknown STT provider '{}', skipping pre-warm",

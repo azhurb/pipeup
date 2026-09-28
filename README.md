@@ -46,7 +46,7 @@ Get an installer from [Releases](https://github.com/azhurb/pipeup/releases). Che
 3. Optionally configure AI processing with an LLM provider and model. You can skip this step.
 4. Use your keyboard shortcut in the app where you want to type.
 
-Speech providers include Deepgram, AssemblyAI, Gemini Transcribe, OpenAI Whisper, Groq, GLM-ASR, and SiliconFlow. Supported models and languages depend on the provider. See the [provider reference](docs/architecture/providers.md).
+Speech providers include Deepgram, AssemblyAI, Gemini Transcribe (Live streaming or batch), OpenAI Whisper, Groq, GLM-ASR, and SiliconFlow. Supported models and languages depend on the provider. See the [provider reference](docs/architecture/providers.md).
 
 ### macOS
 

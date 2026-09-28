@@ -117,6 +117,30 @@ describe('Capsule — selected-text mode ring', () => {
   })
 })
 
+describe('Capsule - interim text', () => {
+  beforeEach(() => {
+    useAppStore.setState(useAppStore.getInitialState())
+  })
+
+  it('shows the newest interim words while recording, hidden from screen readers', () => {
+    useAppStore.setState({
+      ...useAppStore.getInitialState(),
+      pipelineState: 'recording',
+      partialTranscript: 'Hi team, I pushed the release notes to the shared folder.',
+    })
+    render(<Capsule />)
+    const line = screen.getByTestId('capsule-interim')
+    expect(line.textContent).toBe('…notes to the shared folder.')
+    expect(line).toHaveAttribute('aria-hidden', 'true')
+  })
+
+  it('shows no text line before any interim arrives', () => {
+    setUp('recording', false)
+    render(<Capsule />)
+    expect(screen.queryByTestId('capsule-interim')).not.toBeInTheDocument()
+  })
+})
+
 describe('Capsule — edited tip', () => {
   beforeEach(() => {
     useAppStore.setState(useAppStore.getInitialState())

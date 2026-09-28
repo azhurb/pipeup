@@ -22,7 +22,7 @@ const MAX_AUDIO_BYTES: usize = 24 * 1024 * 1024;
 /// truncating someone's dictionary at 100 silently drops words they added on
 /// purpose, and the failure mode past that point is degraded biasing, not an
 /// error.
-const MAX_VOCABULARY_TERMS: usize = 1000;
+pub(super) const MAX_VOCABULARY_TERMS: usize = 1000;
 
 /// Map an ISO-639-1 code from `SttConfig.languages` to the BCP-47 tag the
 /// transcription API expects (`language_codes` is documented as region-tagged:
@@ -41,7 +41,7 @@ const MAX_VOCABULARY_TERMS: usize = 1000;
 /// through would be ignored rather than rejected. Dropping it keeps the request
 /// to the documented shape and makes the mapping table the single place that
 /// decides what we claim to support.
-fn bcp47(code: &str) -> Option<&'static str> {
+pub(super) fn bcp47(code: &str) -> Option<&'static str> {
     Some(match code.trim().to_lowercase().as_str() {
         "zh" => "zh-CN",
         "en" => "en-US",
@@ -502,8 +502,7 @@ mod tests {
 /// of inline payload, far more than a dictation produces.
 ///
 /// For real-time partials, `gemini-3.5-transcribe-live` over the Live API is the
-/// streaming counterpart and would be a separate provider in the shape of
-/// [`super::deepgram`].
+/// streaming counterpart: see [`super::gemini_live`].
 pub struct GeminiTranscribeProvider {
     stt_config: Option<SttConfig>,
     audio_buffer: Vec<u8>,

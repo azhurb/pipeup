@@ -175,6 +175,23 @@ textarea {
   width: 88px;
   height: 32px;
 }
+.capsule-activity-interim {
+  width: 300px;
+  justify-content: flex-start;
+  gap: 8px;
+  /* Leaves room on the right for the cancel button. */
+  padding: 0 32px 0 14px;
+}
+.capsule-interim {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 12px;
+  line-height: 32px;
+  opacity: 0.9;
+}
 .capsule-cancel {
   position: absolute;
   right: 3px;

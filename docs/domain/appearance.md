@@ -6,8 +6,8 @@ Pipeup is the displayed product name. The developer-focused interface uses warm 
 
 - `src/styles/globals.css` owns the palette and shared surface styles. Existing `jelly-*` class names are compatibility hooks; their appearance is now flat.
 - `MainLayout` owns the primary sidebar. Overview, History, and Dictionary are primary destinations; Settings stays at the bottom of the sidebar. Settings has General, Dictation, AI processing, Privacy, and About pages with addressable routes and explicit Save/Discard changes behavior.
-- Active recording, transcription, polishing, and completion all use an 88 by 32 logical-pixel capsule. `useCapsuleResize` adds the native window padding. Recovery messages retain their larger sizes.
-- Normal recording and processing have no visible text. State labels remain available to assistive technology. See [Voice input](voice-input.md#recording-feedback) for cancellation, recording limits, and recovery behavior.
+- Active recording, transcription, polishing, and completion all use an 88 by 32 logical-pixel capsule. Recording widens to 300 by 32 while interim text is shown. `useCapsuleResize` adds the native window padding. Recovery messages retain their larger sizes.
+- Normal recording and processing have no visible text, except the interim transcript line a streaming provider can add while recording. State labels remain available to assistive technology. See [Voice input](voice-input.md#recording-feedback) for cancellation, recording limits, and recovery behavior.
 
 ## Brand assets
 

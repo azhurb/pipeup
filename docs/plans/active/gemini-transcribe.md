@@ -82,8 +82,9 @@ whole `stop()` ran 2.8 to 4.5 s, of which the STT step is nearly all.
 
 The practical consequence is that this batch provider adds about three to four seconds after
 hotkey release in these samples. A per-provider latency comparison against Groq Whisper on the
-same machine has not been done yet. The separate Gemini Live transcription model streams
-partials during speech and is the path to evaluate if shorter post-recording waits are required.
+same machine has not been done yet. The streaming counterpart, `gemini-transcribe-live`, landed on
+2026-09-28 and finalizes in about half a second on the same audio; see
+[Providers → Gemini Transcribe Live](../../architecture/providers.md#gemini-transcribe-live-streaming).
 
 **Needs confirmation**: whether the flat cost is model warm-up, the inline-base64 upload, or
 queueing. The upload is the cheapest to rule out, since request size does scale with audio length
@@ -91,10 +92,6 @@ and the timings do not.
 
 ## Deferred
 
-- **`gemini-3.5-transcribe-live`.** The streaming counterpart over the Live API, in the shape of
-  `stt::deepgram`: partials during the utterance instead of one request at the end. Roughly twice
-  the price (~$0.009/min blended against ~$0.005/min). Worth doing only if the batch round-trip
-  measures badly against the streaming providers.
 - **Vocabulary biasing for the other providers.** `SttConfig.custom_vocabulary` now reaches every
   provider and only this one reads it. Deepgram keyterms and AssemblyAI word boost are the
   equivalents, and unlike this provider's version they may actually do something — worth wiring
