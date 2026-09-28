@@ -53,11 +53,6 @@ export function SttPane() {
             {t('settings.geminiTranscribeLiveHint')}
           </p>
         )}
-        {config.stt_provider === 'gemini-transcribe' && (
-          <p className="text-[11px] text-text-tertiary mt-2">
-            {t('settings.geminiTranscribeBatchHint')}
-          </p>
-        )}
       </FormField>
 
       <FormField label={t('settings.apiKey')}>

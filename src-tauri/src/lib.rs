@@ -437,8 +437,8 @@ async fn check_openai_whisper_model(client: &reqwest::Client, api_key: &str) -> 
 /// It also catches the case the upload probe could not — a key that is valid but
 /// has no access to `gemini-3.5-transcribe`.
 ///
-/// `model` is `stt::gemini::MODEL` or `stt::gemini_live::MODEL`: the two
-/// providers share a key, but access is granted per model.
+/// `model` is `stt::gemini_live::MODEL`: access is granted per model, so the
+/// probe asks about that model rather than about the key in general.
 async fn check_gemini_transcribe_model(
     client: &reqwest::Client,
     api_key: &str,
@@ -527,13 +527,6 @@ async fn test_stt_connection(
             Ok(resp.status().is_success())
         }
         "openai-whisper" => Ok(check_openai_whisper_model(client, &api_key).await.is_ok()),
-        "gemini-transcribe" => {
-            Ok(
-                check_gemini_transcribe_model(client, &api_key, stt::gemini::MODEL)
-                    .await
-                    .is_ok(),
-            )
-        }
         "gemini-transcribe-live" => {
             Ok(
                 check_gemini_transcribe_model(client, &api_key, stt::gemini_live::MODEL)
@@ -732,11 +725,6 @@ async fn bench_stt_connection(
         "openai-whisper" => {
             let t0 = std::time::Instant::now();
             check_openai_whisper_model(client, &api_key).await?;
-            Ok(t0.elapsed().as_millis() as u32)
-        }
-        "gemini-transcribe" => {
-            let t0 = std::time::Instant::now();
-            check_gemini_transcribe_model(client, &api_key, stt::gemini::MODEL).await?;
             Ok(t0.elapsed().as_millis() as u32)
         }
         "gemini-transcribe-live" => {

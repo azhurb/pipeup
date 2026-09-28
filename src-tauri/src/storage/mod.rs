@@ -71,20 +71,33 @@ impl Default for AppConfig {
     }
 }
 
-/// One-shot migration applied at config load time.
+/// One-shot migrations applied at config load time.
 ///
 /// Converts the legacy single-string `stt_language` field into the new
 /// multi-value `stt_languages` array. The legacy sentinel `"multi"` and any
 /// empty string become an empty array (auto-detect); any other code becomes
 /// a singleton list.
 ///
+/// Also moves a saved `gemini-transcribe` (the batch provider, since removed)
+/// to `gemini-transcribe-live`. Left alone it would fall through the factory to
+/// the GLM-ASR default. The Gemini key needs no move: Live already reads the
+/// key saved under the batch id (`credentials::STT_KEY_ALIASES`).
+///
 /// Returns `true` if `value` was mutated.
 fn migrate_legacy_config(value: &mut serde_json::Value) -> bool {
     let Some(obj) = value.as_object_mut() else {
         return false;
     };
+    let mut changed = false;
+    if obj.get("stt_provider").and_then(|v| v.as_str()) == Some("gemini-transcribe") {
+        obj.insert(
+            "stt_provider".to_string(),
+            serde_json::json!("gemini-transcribe-live"),
+        );
+        changed = true;
+    }
     if !obj.contains_key("stt_language") {
-        return false;
+        return changed;
     }
     let legacy = obj.remove("stt_language");
     if !obj.contains_key("stt_languages") {
@@ -608,6 +621,25 @@ mod config_migration_tests {
         let snapshot = v.clone();
         let mutated = migrate_legacy_config(&mut v);
         assert!(!mutated);
+        assert_eq!(v, snapshot);
+    }
+
+    #[test]
+    fn removed_gemini_batch_provider_moves_to_live() {
+        let mut v = json!({ "stt_provider": "gemini-transcribe", "stt_languages": ["en"] });
+        let mutated = migrate_legacy_config(&mut v);
+        assert!(mutated);
+        assert_eq!(
+            v,
+            json!({ "stt_provider": "gemini-transcribe-live", "stt_languages": ["en"] })
+        );
+    }
+
+    #[test]
+    fn gemini_live_is_left_as_it_is() {
+        let mut v = json!({ "stt_provider": "gemini-transcribe-live" });
+        let snapshot = v.clone();
+        assert!(!migrate_legacy_config(&mut v));
         assert_eq!(v, snapshot);
     }
 

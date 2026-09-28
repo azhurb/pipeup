@@ -13,7 +13,7 @@ Use this checklist before the next Pipeup release. Version 0.9.0 was published w
 - Refresh the README screenshots from the current UI using non-sensitive preview data.
 - Confirm the provider model suggestions refresh when stale or after changing credentials or the endpoint. Test the selected model because the list comes from the provider and can contain models unsuitable for chat completion.
 - Test Groq Whisper Turbo and the new Gemini 3.5 Flash-Lite defaults with current accounts. For Gemini 3.5 Transcribe, check both smart and verbatim output with speech, and record the delay after recording stops. Its connection test only checks model access.
-- For Gemini 3.5 Transcribe Live, confirm it uses the key saved for batch without asking again, that the capsule stays compact with no text while speaking, and that the inserted text matches the final transcript with the last words present once. Record the delay from hotkey release to insertion next to batch (848 to 1,026 ms against 4,022 ms in the 2026-09-28 dev-build smoke test). Cancel mid-dictation and confirm nothing is inserted. Confirm a user whose saved provider is batch Gemini still gets batch after upgrading.
+- For Gemini 3.5 Transcribe Live, confirm it uses the key saved for batch without asking again, that the capsule stays compact with no text while speaking, and that the inserted text matches the final transcript with the last words present once. Record the delay from hotkey release to insertion (848 to 1,026 ms in the 2026-09-28 dev-build smoke test). Cancel mid-dictation and confirm nothing is inserted. Confirm a user whose saved provider was the removed batch Gemini lands on Live after upgrading, with their key still working.
 
 ## Upgrade and coexistence
 
