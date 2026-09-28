@@ -436,14 +436,17 @@ async fn check_openai_whisper_model(client: &reqwest::Client, api_key: &str) -> 
 /// the key is accepted without billing the user to check their own credentials.
 /// It also catches the case the upload probe could not — a key that is valid but
 /// has no access to `gemini-3.5-transcribe`.
+///
+/// `model` is `stt::gemini::MODEL` or `stt::gemini_live::MODEL`: the two
+/// providers share a key, but access is granted per model.
 async fn check_gemini_transcribe_model(
     client: &reqwest::Client,
     api_key: &str,
+    model: &str,
 ) -> Result<(), String> {
     let resp = client
         .get(format!(
-            "https://generativelanguage.googleapis.com/v1beta/models/{}",
-            stt::gemini::MODEL
+            "https://generativelanguage.googleapis.com/v1beta/models/{model}"
         ))
         .header("x-goog-api-key", api_key)
         .timeout(std::time::Duration::from_secs(10))
@@ -524,9 +527,20 @@ async fn test_stt_connection(
             Ok(resp.status().is_success())
         }
         "openai-whisper" => Ok(check_openai_whisper_model(client, &api_key).await.is_ok()),
-        "gemini-transcribe" => Ok(check_gemini_transcribe_model(client, &api_key)
-            .await
-            .is_ok()),
+        "gemini-transcribe" => {
+            Ok(
+                check_gemini_transcribe_model(client, &api_key, stt::gemini::MODEL)
+                    .await
+                    .is_ok(),
+            )
+        }
+        "gemini-transcribe-live" => {
+            Ok(
+                check_gemini_transcribe_model(client, &api_key, stt::gemini_live::MODEL)
+                    .await
+                    .is_ok(),
+            )
+        }
         "glm-asr" | "groq-whisper" | "siliconflow" => {
             // All three use the Whisper-compatible file upload API
             let (endpoint, model, extra_fields) = whisper_compat_test_target(&provider);
@@ -722,7 +736,12 @@ async fn bench_stt_connection(
         }
         "gemini-transcribe" => {
             let t0 = std::time::Instant::now();
-            check_gemini_transcribe_model(client, &api_key).await?;
+            check_gemini_transcribe_model(client, &api_key, stt::gemini::MODEL).await?;
+            Ok(t0.elapsed().as_millis() as u32)
+        }
+        "gemini-transcribe-live" => {
+            let t0 = std::time::Instant::now();
+            check_gemini_transcribe_model(client, &api_key, stt::gemini_live::MODEL).await?;
             Ok(t0.elapsed().as_millis() as u32)
         }
         "glm-asr" | "groq-whisper" | "siliconflow" => {

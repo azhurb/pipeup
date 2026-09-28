@@ -44,10 +44,15 @@ export function SttPane() {
         >
           {STT_PROVIDERS.map((p) => (
             <option key={p.value} value={p.value}>
-              {p.label}
+              {p.recommended ? t('settings.recommendedOption', { label: p.label }) : p.label}
             </option>
           ))}
         </select>
+        {config.stt_provider === 'gemini-transcribe-live' && (
+          <p className="text-[11px] text-text-tertiary mt-2">
+            {t('settings.geminiTranscribeLiveHint')}
+          </p>
+        )}
         {config.stt_provider === 'gemini-transcribe' && (
           <p className="text-[11px] text-text-tertiary mt-2">
             {t('settings.geminiTranscribeBatchHint')}

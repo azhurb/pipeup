@@ -1,6 +1,7 @@
 pub mod assemblyai;
 pub mod deepgram;
 pub mod gemini;
+pub mod gemini_live;
 pub mod whisper_compat;
 
 use std::time::Duration;
@@ -148,6 +149,11 @@ pub trait SttProvider: Send + Sync {
     /// Disconnect and optionally return a final `(text, detected_language)` pair
     /// for file-based providers. Streaming providers return `Ok(None)`.
     async fn disconnect(&mut self) -> Result<DisconnectResult>;
+    /// Drop the session without waiting for a transcript, because the user
+    /// cancelled. The default does nothing: dropping the provider is enough for
+    /// the file-based ones, which have only buffered audio. A streaming provider
+    /// overrides it to close its socket instead of finishing the turn.
+    async fn abort(&mut self) {}
     fn name(&self) -> &str;
 }
 
@@ -168,6 +174,7 @@ mod factory_tests {
     const DROPDOWN_IDS: &[(&str, &str)] = &[
         ("deepgram", "Deepgram Nova-3"),
         ("assemblyai", "AssemblyAI"),
+        ("gemini-transcribe-live", "Gemini Transcribe Live"),
         ("gemini-transcribe", "Gemini Transcribe"),
         ("glm-asr", "GLM-ASR"),
         ("openai-whisper", "OpenAI Whisper"),
@@ -207,6 +214,7 @@ pub fn create_provider(provider_name: &str, client: reqwest::Client) -> Box<dyn 
     match provider_name {
         "deepgram" => Box::new(deepgram::DeepgramProvider::new()),
         "assemblyai" => Box::new(assemblyai::AssemblyAiProvider::new()),
+        "gemini-transcribe-live" => Box::new(gemini_live::GeminiLiveProvider::new()),
         "gemini-transcribe" => Box::new(gemini::GeminiTranscribeProvider::new(client.clone())),
         "glm-asr" => make(WhisperCompatConfig {
             provider_name: "GLM-ASR",

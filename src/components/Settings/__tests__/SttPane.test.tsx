@@ -96,6 +96,33 @@ describe('SttPane', () => {
       expect(mockAppStore.setSttTestStatus).toHaveBeenCalledWith('idle')
       expect(mockAppStore.setSttLatencyMs).toHaveBeenCalledWith(null)
     })
+
+    it('lists Gemini Live as the recommended option ahead of batch', () => {
+      render(<SttPane />)
+      const values = Array.from(screen.getByRole('combobox').querySelectorAll('option')).map((o) =>
+        o.getAttribute('value'),
+      )
+      expect(values.indexOf('gemini-transcribe-live')).toBeGreaterThanOrEqual(0)
+      expect(values.indexOf('gemini-transcribe-live')).toBeLessThan(
+        values.indexOf('gemini-transcribe'),
+      )
+      const live = screen.getByRole('option', { name: 'settings.recommendedOption' })
+      expect(live).toHaveValue('gemini-transcribe-live')
+    })
+
+    it('explains the Live provider when it is selected', () => {
+      mockAppStore.config.stt_provider = 'gemini-transcribe-live'
+      render(<SttPane />)
+      expect(screen.getByText('settings.geminiTranscribeLiveHint')).toBeInTheDocument()
+      expect(screen.queryByText('settings.geminiTranscribeBatchHint')).not.toBeInTheDocument()
+    })
+
+    it('keeps the batch explanation for users who chose batch', () => {
+      mockAppStore.config.stt_provider = 'gemini-transcribe'
+      render(<SttPane />)
+      expect(screen.getByRole('combobox')).toHaveValue('gemini-transcribe')
+      expect(screen.getByText('settings.geminiTranscribeBatchHint')).toBeInTheDocument()
+    })
   })
 
   describe('API Key input', () => {

@@ -16,6 +16,7 @@ interface CapsuleSizeInput {
   hasCorrectionToast: boolean
   hasClipboardTip: boolean
   hasEditedTip: boolean
+  hasInterim: boolean
 }
 
 function getSizeForState({
@@ -26,6 +27,7 @@ function getSizeForState({
   hasCorrectionToast,
   hasClipboardTip,
   hasEditedTip,
+  hasInterim,
 }: CapsuleSizeInput): CapsuleSize {
   if (contextMenuOpen) return { width: 220, height: 220 }
   if (hasError) return { width: 200, height: 36 }
@@ -39,6 +41,10 @@ function getSizeForState({
   // "Added \"<word>\" to your dictionary" plus the Undo button.
   if (hasCorrectionToast && state === 'idle') return { width: 320, height: 36 }
   if (expanded) return { width: 220, height: 90 }
+  // Interim text from a streaming provider widens the recording pill so the
+  // words fit next to the waveform. Only while recording: after release the
+  // capsule returns to the shared active size.
+  if (hasInterim && state === 'recording') return { width: 300, height: 32 }
   switch (state) {
     case 'idle':
       return { width: 36, height: 36 }
@@ -65,6 +71,7 @@ export function useCapsuleResize() {
   const correctionSuggestion = useAppStore((s) => s.correctionSuggestion)
   const clipboardTip = useAppStore((s) => s.clipboardTip)
   const editedTip = useAppStore((s) => s.editedTip)
+  const hasInterim = useAppStore((s) => s.partialTranscript.trim() !== '')
   const initialized = useRef(false)
   const prevWindowSize = useRef<{ width: number; height: number } | null>(null)
   const prevCorrectionPresent = useRef(false)
@@ -98,6 +105,7 @@ export function useCapsuleResize() {
       hasCorrectionToast,
       hasClipboardTip: clipboardTip,
       hasEditedTip: editedTip,
+      hasInterim,
     })
     const windowWidth = size.width + 24
     const windowHeight = size.height + 24
@@ -234,6 +242,7 @@ export function useCapsuleResize() {
     hasCorrectionToast,
     clipboardTip,
     editedTip,
+    hasInterim,
     shouldBeVisible,
   ])
 
@@ -245,5 +254,6 @@ export function useCapsuleResize() {
     hasCorrectionToast,
     hasClipboardTip: clipboardTip,
     hasEditedTip: editedTip,
+    hasInterim,
   })
 }

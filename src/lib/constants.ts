@@ -1,3 +1,5 @@
+import type { SttProvider } from '../stores/appStore'
+
 // App metadata
 export const APP_NAME = 'Pipeup'
 // No APP_VERSION here on purpose: the release workflow rewrites the version in
@@ -7,15 +9,23 @@ export const APP_NAME = 'Pipeup'
 export const APP_REPO_URL = 'https://github.com/azhurb/pipeup'
 export const APP_LICENSE_URL = 'https://github.com/azhurb/pipeup/blob/main/LICENSE'
 
-export const STT_PROVIDERS = [
+// `recommended` marks the preferred option within a provider family. The
+// dropdowns append a translated "(recommended)"; the Overview shows the bare
+// label. Choosing it is never automatic: saved choices stay as they are.
+export const STT_PROVIDERS: readonly {
+  value: SttProvider
+  label: string
+  recommended?: boolean
+}[] = [
   { value: 'deepgram', label: 'Deepgram Nova-3' },
   { value: 'assemblyai', label: 'AssemblyAI' },
-  { value: 'gemini-transcribe', label: 'Gemini 3.5 Transcribe' },
+  { value: 'gemini-transcribe-live', label: 'Gemini 3.5 Transcribe Live', recommended: true },
+  { value: 'gemini-transcribe', label: 'Gemini 3.5 Transcribe (batch)' },
   { value: 'glm-asr', label: 'GLM-ASR (智谱)' },
   { value: 'openai-whisper', label: 'OpenAI Whisper' },
   { value: 'groq-whisper', label: 'Groq Whisper' },
   { value: 'siliconflow', label: 'SiliconFlow (硅基流动)' },
-] as const
+]
 
 export const LLM_PROVIDERS = [
   { value: 'zhipu', label: '智谱 (Zhipu)' },

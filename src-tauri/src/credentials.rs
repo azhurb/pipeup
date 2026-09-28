@@ -51,11 +51,27 @@ pub struct CredentialId {
     pub provider: String,
 }
 
+/// STT provider ids that share another id's saved key.
+///
+/// Both Gemini transcription providers take the same Google AI Studio key, so
+/// the Live provider files its key under the batch provider's entry. Choosing
+/// Live therefore reuses a key the user already saved, and saving a key on
+/// either one updates both. Aliasing here, where every read, write, presence
+/// check and deletion builds its id, keeps the two from drifting apart.
+const STT_KEY_ALIASES: &[(&str, &str)] = &[("gemini-transcribe-live", "gemini-transcribe")];
+
 impl CredentialId {
     pub fn new(namespace: impl Into<String>, provider: impl Into<String>) -> Self {
+        let namespace = namespace.into();
+        let mut provider = provider.into();
+        if namespace == STT_NAMESPACE {
+            if let Some((_, canonical)) = STT_KEY_ALIASES.iter().find(|(id, _)| *id == provider) {
+                provider = (*canonical).to_string();
+            }
+        }
         Self {
-            namespace: namespace.into(),
-            provider: provider.into(),
+            namespace,
+            provider,
         }
     }
 
@@ -693,6 +709,33 @@ mod tests {
     use super::*;
     use serde_json::json;
     use std::sync::Arc;
+
+    #[test]
+    fn gemini_live_shares_the_batch_gemini_key() {
+        let vault = MemoryVault::new();
+        vault
+            .write(&CredentialId::stt("gemini-transcribe"), "gemini-key")
+            .unwrap();
+        assert_eq!(
+            vault
+                .read(&CredentialId::stt("gemini-transcribe-live"))
+                .unwrap(),
+            Some("gemini-key".to_string()),
+            "choosing Live must reuse the key saved for the batch provider"
+        );
+        assert_eq!(
+            CredentialId::new(STT_NAMESPACE, "gemini-transcribe-live").account(),
+            "stt:gemini-transcribe"
+        );
+    }
+
+    #[test]
+    fn stt_aliases_do_not_leak_into_the_llm_namespace() {
+        assert_eq!(
+            CredentialId::llm("gemini-transcribe-live").account(),
+            "llm:gemini-transcribe-live"
+        );
+    }
 
     #[test]
     fn account_is_namespace_and_provider() {

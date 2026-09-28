@@ -48,8 +48,11 @@ async fn connect(&mut self, config: &SttConfig) -> Result<()>;
 async fn send_audio(&mut self, chunk: &[u8]) -> Result<()>;
 async fn recv_transcript(&mut self) -> Result<Option<TranscriptEvent>>;
 async fn disconnect(&mut self) -> Result<DisconnectResult>;
+async fn abort(&mut self) {} // default: nothing to do
 fn name(&self) -> &str;
 ```
+
+`abort` runs instead of `disconnect` when the user cancels: the STT task checks the pipeline's `abort_flag` when the audio channel closes. The default does nothing, which is enough for the file-based providers (dropping them drops the buffered audio, and they no longer upload a cancelled dictation). `gemini-transcribe-live` overrides it to close its socket without finishing the turn.
 
 `TranscriptEvent` variants: `Partial`, `Final { text, confidence, language }`, `SpeechStarted`, `SpeechEnded`, `Error`. The `language` field on `Final` carries an ISO-639-1 code when the provider reports detected language (Deepgram in multi mode; AssemblyAI does not currently report it).
 
@@ -64,7 +67,7 @@ fn name(&self) -> &str;
 - **Whisper-compatible** (`openai-whisper`, `groq-whisper`, `glm-asr`, `siliconflow`): the form field `language=<code>` is sent **only when `languages.len() == 1`**. Both 0 and >1 omit the field and let Whisper auto-detect — the Whisper API doesn't accept a set. All Whisper-compat requests also include `response_format=verbose_json` so the response carries the detected `language`.
 - **Deepgram**: URL `?language=<code>` when `languages.len() == 1`; otherwise `?language=multi` (Deepgram's native multi-language mode handles both empty-set and many-set).
 - **AssemblyAI**: the streaming WebSocket URL does not accept a language hint today; the field is silently ignored. Follow-up.
-- **Gemini Transcribe**: the only provider that takes the selection as a *set*. `language_codes` is a JSON array and the model handles code-switching between the entries, so a multi-language selection reaches the wire intact instead of degrading to auto-detect. The API wants region-tagged BCP-47 (`en-US`, `es-ES`) while `SttConfig.languages` holds ISO-639-1, so `gemini::bcp47` maps each code and picks a region per language; an unmappable code is **dropped** rather than passed through, because an unknown tag risks a 400 that loses the utterance while auto-detect still produces text. An empty set omits the field.
+- **Gemini Transcribe** (batch and Live): the only providers that take the selection as a *set*. `language_codes` is a JSON array and the model handles code-switching between the entries, so a multi-language selection reaches the wire intact instead of degrading to auto-detect. The API wants region-tagged BCP-47 (`en-US`, `es-ES`) while `SttConfig.languages` holds ISO-639-1, so `gemini::bcp47` maps each code and picks a region per language; an unmappable code is **dropped** rather than passed through, because an unknown tag risks a 400 that loses the utterance while auto-detect still produces text. An empty set omits the field.
 
 The multi-element selection in the UI is primarily a hint to the **polish prompt** (which receives the full `user_languages` set via `PolishRequest`) rather than the STT. The pipeline-level polish therefore biases toward the user's languages even when the wire-level STT request can't carry them.
 
@@ -78,6 +81,7 @@ Match arms currently registered in `stt::create_provider`:
 
 - `deepgram`
 - `assemblyai`
+- `gemini-transcribe-live`
 - `gemini-transcribe`
 - `glm-asr`
 - `openai-whisper`
@@ -105,13 +109,34 @@ Diarization and word-level timestamps are deliberately not requested: a dictatio
 
 No detected-language field exists anywhere in the response, so this provider returns `None` and shows no language badge, the same as AssemblyAI.
 
-**Smart mode works with the string form.** On 2026-09-27, the live Rust path transcribed a synthetic 7.4-second disfluent sample as `I had three meetings on Tuesday: 1. Review budget 2. Send a recap`, removing fillers and formatting the list. The API call took about four seconds. Prior trials with the object form produced unchanged text; the current guide resolves that mismatch. Vocabulary biasing still needs a fresh paired trial. The batch provider only sends audio after the hotkey is released, so this request latency remains visible to the user. The [Live API model](https://ai.google.dev/gemini-api/docs/live-api/live-transcribe) is a separate streaming integration if lower latency is required. See the trial history in [`../plans/active/gemini-transcribe.md`](../plans/active/gemini-transcribe.md).
+**Smart mode works with the string form.** On 2026-09-27, the live Rust path transcribed a synthetic 7.4-second disfluent sample as `I had three meetings on Tuesday: 1. Review budget 2. Send a recap`, removing fillers and formatting the list. The API call took about four seconds. Prior trials with the object form produced unchanged text; the current guide resolves that mismatch. Vocabulary biasing still needs a fresh paired trial. The batch provider only sends audio after the hotkey is released, so this request latency remains visible to the user. The [Live API model](https://ai.google.dev/gemini-api/docs/live-api/live-transcribe) is the streaming counterpart; see [Gemini Transcribe Live](#gemini-transcribe-live-streaming). See the trial history in [`../plans/active/gemini-transcribe.md`](../plans/active/gemini-transcribe.md).
+
+### Gemini Transcribe Live (streaming)
+
+`gemini-transcribe-live` runs `gemini-3.5-transcribe-live` over the Live API: a WebSocket to `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent`, implemented in `src-tauri/src/stt/gemini_live.rs`. It is the recommended Gemini option in Settings and onboarding, but it is never selected automatically: users who chose `gemini-transcribe` keep batch, because the two differ in price and behavior.
+
+**Key.** It reuses the batch provider's saved key. `credentials::CredentialId::new` maps the STT id `gemini-transcribe-live` onto `gemini-transcribe` (`STT_KEY_ALIASES`), so every read, write, presence check and deletion shares one vault entry. The key goes in an `x-goog-api-key` header rather than the documented `?key=` query parameter, so it never appears in a URL.
+
+**Push-to-talk protocol.** `connect` sends `setup` with `automaticActivityDetection.disabled: true`, waits for `setupComplete` (8 s bound), then sends `activityStart`. Audio streams as base64 `audio/pcm;rate=16000` in 100 ms messages. `disconnect` flushes the remainder, sends `activityEnd`, and waits for the turn's final transcript (10 s bound). Transcription settings follow the batch provider (`languageCodes` via `gemini::bcp47`, `customVocabulary` capped at 1,000, `mode` `SMART` or `VERBATIM`), in the Live API's camelCase and upper-case spelling.
+
+**Verified against the live API on 2026-09-28**, with a raw WebSocket probe and with the Rust path (`stt::gemini_live::tests::live_streams_speech_and_compares_with_batch`, `#[ignore]`d since it needs a key and a network). Findings the code depends on:
+
+- **Server messages arrive in binary frames**, `setupComplete` included. `frame_text` accepts binary and text frames; the shared `drain_final_text` helper ignores binary frames, which is one reason this provider has its own reader.
+- **Interim text is cumulative per turn.** Each `interimInputTranscription` repeats and extends the previous one, so the provider replaces its pending text rather than appending. The first interim can be a vocabulary term the model has not actually heard yet (`Pipeup` appeared before `Hi team`); interim text is display-only, so this never reaches the document.
+- **One final per activity**, even across a three-second pause, because server-side VAD is off. After `activityEnd` the server sent `inputTranscription`, then `generationComplete`, then a `voiceActivity` `ACTIVITY_END`, all within a millisecond, 225 to 550 ms after `activityEnd`. Silence produces `ACTIVITY_END` alone.
+- **A bad key passes the handshake.** The server accepts the socket and closes it with code 1007 and "API key not valid" once it reads `setup`, so `connect` waits for the close frame. `close_error` maps close reasons onto HTTP statuses so `retry::classify` words them correctly ("API key rejected", "rate limited"); only 1011 and 1013 are retried.
+
+**Finalization rules** (the pure `Transcript` state and `await_final`, unit-tested with scripted streams). A final replaces the interim it confirms, a repeated or cumulative final is merged rather than appended, and an interim after the final is ignored. The wait ends on `generationComplete` or `ACTIVITY_END` once a final is in. `ACTIVITY_END` without a final starts a 300 ms grace for a late final; the observed order makes that unnecessary, but it is observed rather than documented, and it only delays a silent recording. The final goes back through `DisconnectResult`, so the pipeline inserts it once.
+
+**Failures.** A timeout, a close, or a send failure before the final keeps the latest interim text rather than losing the dictation, and logs a warning; an error is returned only when there is no text. If the session drops while recording, `recv_transcript` hands the interim over as a `Final` and then returns the error, which the pipeline records without showing (the text may be enough). Speech after a mid-recording drop is lost. The Live API documents a 10-minute session limit, shorter than the 12.5-minute audio cap of the batch providers; past it the same salvage applies. **Needs confirmation**: how the server ends a session at that limit (`goAway` is parsed and logged, but was not observed).
+
+**Latency and price.** On synthetic speech (8 s), the final arrived 300 to 513 ms after release in the Rust live test, against 3.1 to 3.5 s for batch on the same audio, with identical text. The first interim appeared 0.7 to 1.1 s after capture started. In the native app, hotkey release to finished insertion took 848 and 1,026 ms with Live (STT 380 and 556 ms) and 4,022 ms with batch (STT 3,553 ms). Google's pricing page lists Live at $3.50 per million input tokens against $2.00 for batch (about $0.009 against $0.005 per minute including output), both with a free tier, as of 2026-09-28.
 
 ### Connection tests and benchmarks
 
 `test_stt_connection` and `bench_stt_connection` in `lib.rs` probe a key without running a dictation. The key comes either from the command's `api_key: Option<String>` (a candidate the user typed but has not saved) or, when that is `None`, from the credential vault — see [Storage → Credentials](storage.md#credentials-os-credential-vault). Probing never persists the candidate. Deepgram and AssemblyAI use a cheap authenticated `GET`. The Whisper-compatible providers upload a 0.1 s silent WAV, sharing endpoint/model/extra-field resolution through `whisper_compat_test_target`.
 
-`gemini-transcribe` and `openai-whisper` are the exceptions, for the same reason. OpenAI bills every `/audio/transcriptions` call, so the upload probe charged the user to verify their own key — a real annoyance in a BYOK app. It now reads `GET /v1/models/whisper-1` instead, which proves the key is accepted for free. `gemini-transcribe` reads `GET /v1beta/models/gemini-3.5-transcribe` for the same reason, and that probe also catches a case the upload probe cannot: a key that is valid but has no access to the transcription model. The other Whisper-compatible providers keep the upload probe. One consequence worth knowing: the benchmark number shown for `openai-whisper` is now a model-read round-trip rather than a transcription round-trip, so it is not comparable with the other Whisper-compatible providers' figures. **Needs confirmation**: whether GLM-ASR, Groq and SiliconFlow expose an equivalent per-model endpoint, and whether their transcription calls are billed the same way — if both hold, they should move to the same probe.
+`gemini-transcribe` and `openai-whisper` are the exceptions, for the same reason. OpenAI bills every `/audio/transcriptions` call, so the upload probe charged the user to verify their own key — a real annoyance in a BYOK app. It now reads `GET /v1/models/whisper-1` instead, which proves the key is accepted for free. `gemini-transcribe` reads `GET /v1beta/models/gemini-3.5-transcribe` for the same reason (and `gemini-transcribe-live` reads `gemini-3.5-transcribe-live`, since access is granted per model), and that probe also catches a case the upload probe cannot: a key that is valid but has no access to the transcription model. The other Whisper-compatible providers keep the upload probe. One consequence worth knowing: the benchmark number shown for `openai-whisper` is now a model-read round-trip rather than a transcription round-trip, so it is not comparable with the other Whisper-compatible providers' figures. **Needs confirmation**: whether GLM-ASR, Groq and SiliconFlow expose an equivalent per-model endpoint, and whether their transcription calls are billed the same way — if both hold, they should move to the same probe.
 
 ### Draining the close of a streaming session
 

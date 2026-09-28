@@ -36,7 +36,7 @@ export function SttSetupStep() {
         >
           {STT_PROVIDERS.map((p) => (
             <option key={p.value} value={p.value}>
-              {p.label}
+              {p.recommended ? `${p.label} (recommended)` : p.label}
             </option>
           ))}
         </select>
