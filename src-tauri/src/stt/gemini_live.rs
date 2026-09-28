@@ -358,7 +358,7 @@ where
                     }
                 }
             }
-            Err(e) => tracing::warn!("{PROVIDER_NAME}: unparseable message: {e}"),
+            Err(e) => tracing::warn!("{PROVIDER_NAME}: unparsable message: {e}"),
         }
     }
 }
@@ -638,7 +638,7 @@ impl SttProvider for GeminiLiveProvider {
             let events = match parse_server_message(raw) {
                 Ok(events) => events,
                 Err(e) => {
-                    tracing::warn!("{PROVIDER_NAME}: unparseable message: {e}");
+                    tracing::warn!("{PROVIDER_NAME}: unparsable message: {e}");
                     continue;
                 }
             };
