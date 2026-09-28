@@ -386,6 +386,14 @@ mod tests {
         }
     }
 
+    // Upper bound for tests that expect an emit. The happy path needs only a
+    // few 25ms polls (baseline, change, stable), but a loaded CI runner can
+    // stall the tokio worker well past a sub-second bound, which flaked
+    // `emits_suggestion_when_user_corrects_one_word` on ubuntu. `recv_timeout`
+    // returns as soon as the emit arrives, so a generous bound costs nothing.
+    // Tests asserting that nothing is emitted keep their own short waits.
+    const EMIT_TIMEOUT: Duration = Duration::from_secs(5);
+
     fn temp_store() -> Arc<DictionaryStore> {
         use std::sync::atomic::AtomicU64;
         static N: AtomicU64 = AtomicU64::new(0);
@@ -435,7 +443,7 @@ mod tests {
         let _h = spawn(field, dict.clone(), "Hello Timmy ".to_string(), move |s| {
             let _ = tx.send(s);
         });
-        let got = tokio::task::spawn_blocking(move || rx.recv_timeout(Duration::from_millis(500)))
+        let got = tokio::task::spawn_blocking(move || rx.recv_timeout(EMIT_TIMEOUT))
             .await
             .unwrap()
             .expect("watcher must emit a suggestion");
@@ -506,7 +514,7 @@ mod tests {
                 let _ = tx.send(s);
             },
         );
-        let got = tokio::task::spawn_blocking(move || rx.recv_timeout(Duration::from_millis(800)))
+        let got = tokio::task::spawn_blocking(move || rx.recv_timeout(EMIT_TIMEOUT))
             .await
             .unwrap()
             .expect("watcher must emit a suggestion after the value stabilises");
@@ -532,7 +540,7 @@ mod tests {
         let _h = spawn(field, dict.clone(), "Philip".to_string(), move |s| {
             let _ = tx.send(s);
         });
-        let got = tokio::task::spawn_blocking(move || rx.recv_timeout(Duration::from_millis(800)))
+        let got = tokio::task::spawn_blocking(move || rx.recv_timeout(EMIT_TIMEOUT))
             .await
             .unwrap()
             .expect("watcher must emit Philip → Philipp");
@@ -555,7 +563,7 @@ mod tests {
         let _h = spawn(field, dict.clone(), "Philip".to_string(), move |s| {
             let _ = tx.send(s);
         });
-        let got = tokio::task::spawn_blocking(move || rx.recv_timeout(Duration::from_millis(800)))
+        let got = tokio::task::spawn_blocking(move || rx.recv_timeout(EMIT_TIMEOUT))
             .await
             .unwrap()
             .expect("watcher must emit after snapshot retry");
