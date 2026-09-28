@@ -46,26 +46,25 @@ export const LLM_PROVIDERS = [
  *     the best available model does reason, the switch that turns it off belongs
  *     in `llm::openai::reasoning_params`, not in a comment here.
  *
- * Verified against provider docs on 2026-08-15. Base URLs carry no trailing
+ * Verified against provider docs on 2026-09-27. Base URLs carry no trailing
  * slash: the request path is built as `{baseUrl}/chat/completions`.
  */
 export const LLM_DEFAULT_CONFIG: Record<string, { baseUrl: string; model: string }> = {
   // Bare `glm-4-flash` is no longer an enumerated ID; the dated build is, and it
   // is free and predates GLM's thinking mode entirely.
   zhipu: { baseUrl: 'https://open.bigmodel.cn/api/paas/v4', model: 'glm-4-flash-250414' },
-  // `deepseek-chat` was discontinued on 2026-07-24 along with `deepseek-reasoner`.
-  deepseek: { baseUrl: 'https://api.deepseek.com/v1', model: 'deepseek-v4-flash' },
+  // V4 Flash retired in September 2026; its old ID temporarily redirects to V4.1.
+  deepseek: { baseUrl: 'https://api.deepseek.com/v1', model: 'deepseek-flash' },
   siliconflow: { baseUrl: 'https://api.siliconflow.cn/v1', model: 'Qwen/Qwen2.5-7B-Instruct' },
   // gpt-4o-mini is off the promoted list but is served, not deprecated, and
   // genuinely has no reasoning mode — which beats a newer tier that reasons by
   // default and rejects the `temperature` this app sends.
   openai: { baseUrl: 'https://api.openai.com/v1', model: 'gpt-4o-mini' },
-  // Gemini 2.0 Flash was shut down on 2026-06-01. 2.5-flash-lite is the cheapest
-  // model whose thinking is off by default; every 3.x flash tier reasons and
-  // Google documents that it cannot be fully disabled.
+  // New Google projects have limited access to 2.5 models. 3.5 Flash-Lite is
+  // stable, low cost, and uses minimal thinking by default.
   gemini: {
     baseUrl: 'https://generativelanguage.googleapis.com/v1beta/openai',
-    model: 'gemini-2.5-flash-lite',
+    model: 'gemini-3.5-flash-lite',
   },
   // The moonshot-v1 series goes offline platform-wide on 2026-08-31.
   moonshot: { baseUrl: 'https://api.moonshot.cn/v1', model: 'kimi-k2.5' },

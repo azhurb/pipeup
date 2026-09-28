@@ -18,6 +18,17 @@
     "failedToLoad": "Failed to load application data.",
     "retry": "Retry"
   },
+  "identityImport": {
+    "title": "Bring your data to Pipeup?",
+    "description": "Pipeup now keeps its data separate from OpenTypeless. We found data under the older shared identity. You can copy it into Pipeup or start fresh. The old data stays in place either way.",
+    "quitOldApp": "Quit OpenTypeless or an older Pipeup build before importing. If you run both apps, give them different keyboard shortcuts.",
+    "import": "Import a copy",
+    "startFresh": "Start fresh",
+    "imported": "Data copied. Restart Pipeup to load it.",
+    "keysToReenter": "Some provider keys could not be copied. Re-enter these in Settings: {{providers}}.",
+    "checkKeys": "The old credential store could not be read. Check your provider keys in Pipeup after restarting.",
+    "restart": "Restart Pipeup"
+  },
   "nav": {
     "home": "Overview",
     "settings": "Settings",
@@ -140,7 +151,7 @@
       "title": "Accessibility",
       "required": "Required to paste dictated text",
       "grantedHint": "Granted",
-      "settingsHint": "In System Settings > Privacy & Security > Accessibility, enable Pipeup. After an upgrade, macOS may list it as OpenTypeless, its previous name."
+      "settingsHint": "In System Settings > Privacy & Security > Accessibility, enable Pipeup. The old OpenTypeless entry belongs to the previous app identity and does not grant Pipeup access."
     },
     "openSettings": "Open System Settings",
     "grant": "Grant",
@@ -167,6 +178,7 @@
     "accessibilityRequired": "Required to paste dictated text",
     "grantPermission": "Grant Permission",
     "provider": "Provider",
+    "geminiTranscribeBatchHint": "Gemini transcribes after you stop recording. This batch request can add a few seconds before text appears. The connection test checks access, not dictation speed.",
     "apiKey": "API Key",
     "enterApiKey": "Enter API Key...",
     "apiKeySaved": "•••••••••••••  saved on this device",

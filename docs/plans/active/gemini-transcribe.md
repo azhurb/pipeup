@@ -38,10 +38,10 @@ GEMINI_API_KEY=... GEMINI_TEST_WAV=/path/to/16k-mono.wav \
 - **`mime_type` is not validated either** (`audio/banana` returns 200), so the format is sniffed
   and the MIME we send is not load-bearing.
 
-## Settled: the two differentiating features are inert
+## Smart mode corrected on 2026-09-27
 
-Both are accepted, both are provably real parameters (the API 400s a misspelled one), and
-neither changes the output. Tested on two independent samples, synthetic and real:
+The previous request used `mode: {"type": "smart"}`. Google accepted that shape, but
+paired trials on synthetic and real microphone samples produced no visible smart-mode effect:
 
 | Parameter | Sample | Paired trials | Result |
 | --- | --- | --- | --- |
@@ -50,21 +50,16 @@ neither changes the output. Tested on two independent samples, synthetic and rea
 | `mode: smart` vs `verbatim` | `say`-synthesized, disfluent | 2 | byte-identical, fillers retained in both |
 | `mode: smart` vs `verbatim` | real microphone, spoken digits | 3 | byte-identical |
 
-The real-microphone case is the decisive one, because it puts smart mode against its own
-documented job. A dictation of spoken digits transcribes as `Testing 1 2 3 4 5` in **both**
-modes: spaced digits, exactly the "format spoken numbers into clean text" that smart mode
-claims and verbatim does not. If the modes did anything, this sample would separate them.
+The current [transcription guide](https://ai.google.dev/gemini-api/docs/transcribe) sends
+`mode: "smart"` for plain smart transcription. Pipeup now sends that string. A live run of
+`stt::gemini::tests::live_round_trips_against_the_real_api` with a synthetic 7.4-second WAV
+returned `I had three meetings on Tuesday: 1. Review budget 2. Send a recap` after about
+four seconds. The spoken fillers were removed and the list was formatted. This verifies the
+new request shape and the Rust response parser against the current API. It does not prove
+the full effect of `custom_vocabulary`; repeat that paired trial with the new shape before
+claiming dictionary biasing works.
 
-The earlier synthetic result was therefore not an artifact of TTS audio being too canonical.
-
-What is still unknown: whether these are inactive on the free tier (responses report
-`service_tier: "standard"`) or not yet implemented on this API surface. Both would look
-identical from here. Re-test if Google announces a change; there is nothing to fix on our side,
-since the request is correct by the API's own validation.
-
-**Consequence for users:** the polish step stays on for this provider. It is doing the filler
-removal and formatting work that smart mode was supposed to take over, and there is currently no
-latency or quality argument for skipping it.
+Keep LLM polish optional for users who want more rewriting than smart transcription provides.
 
 ## Latency: a flat cost per dictation
 
@@ -85,10 +80,10 @@ The round-trip is essentially independent of how much audio is sent: a seven-fol
 audio length costs about 20% more time. This is fixed overhead, not throughput. The pipeline's
 whole `stop()` ran 2.8 to 4.5 s, of which the STT step is nearly all.
 
-The practical consequence is that this provider is a poor fit for the short-burst dictation the
-app is built around, and unusually good for long passages. A per-provider latency comparison
-against Groq Whisper on the same machine has not been done yet and is the obvious next
-measurement, since that is the provider most users here are switching from.
+The practical consequence is that this batch provider adds about three to four seconds after
+hotkey release in these samples. A per-provider latency comparison against Groq Whisper on the
+same machine has not been done yet. The separate Gemini Live transcription model streams
+partials during speech and is the path to evaluate if shorter post-recording waits are required.
 
 **Needs confirmation**: whether the flat cost is model warm-up, the inline-base64 upload, or
 queueing. The upload is the cheapest to rule out, since request size does scale with audio length

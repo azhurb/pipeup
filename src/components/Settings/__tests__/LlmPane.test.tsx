@@ -60,6 +60,7 @@ const mockAppStore = {
   llmLatencyMs: null as number | null,
   setLlmLatencyMs: vi.fn(),
   llmModels: [] as string[],
+  llmModelsFetchedAt: null as number | null,
   setLlmModels: vi.fn(),
 }
 
@@ -99,6 +100,7 @@ describe('LlmPane', () => {
     mockAppStore.llmTestStatus = 'idle'
     mockAppStore.llmLatencyMs = null
     mockAppStore.llmModels = []
+    mockAppStore.llmModelsFetchedAt = null
   })
 
   afterEach(() => {

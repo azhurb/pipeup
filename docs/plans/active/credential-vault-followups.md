@@ -55,9 +55,9 @@ Deliberately **not** proposed: a user-facing "disable keychain" toggle. It is a 
 setting most users cannot evaluate, and it would re-legitimize plaintext storage on platforms
 where the vault works fine.
 
-## 2. Code signing — **now blocks the macOS Keychain**
+## 2. Code signing - **now blocks the macOS Keychain**
 
-Release builds are signed with a self-signed "OpenTypeless Release" certificate. The
+Release builds use a self-signed certificate. The
 designated requirement (`certificate leaf = H"…"`) *is* stable across versions, so the item
 **ACL** keeps matching — but that is not the check that prompts.
 

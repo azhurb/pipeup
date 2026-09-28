@@ -124,6 +124,10 @@ Releases are tag-driven. `.github/workflows/release.yml` triggers on tags matchi
 
 Use the explicit manual command above after this workflow change is merged into `main`. The workflow definition comes from `main`; source code comes from the requested existing tag. This rebuilds without retagging and can replace draft assets. Inspect the existing release and obtain authorization before rerunning; do not silently overwrite published assets. Dispatching an older workflow ref uses that older workflow and does not acquire these safeguards.
 
+## README screenshots
+
+Run `python3 scripts/capture-readme-screenshots.py` from the repository root after changing the interface or screenshot preview settings. It renders the real Overview and AI Settings components with synthetic data from `src/readme-preview.tsx` and writes both README screenshots at 1800 by 1400 pixels for a 900 by 700 interface. It requires Chrome or Chromium; set `CHROME_BIN` if it is not on the path or in the standard macOS location. Do not put real keys or transcripts in the preview.
+
 ## Brand icons
 
 The SVG files are the editable sources. Generate the desktop app assets, then regenerate the monochrome macOS tray sizes in a temporary output directory:

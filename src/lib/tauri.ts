@@ -1,6 +1,29 @@
 import { invoke } from '@tauri-apps/api/core'
 import type { AppConfig, HistoryEntry, DictionaryEntry } from '../stores/appStore'
 
+export interface IdentityImportReport {
+  settingsImported: boolean
+  historyImported: boolean
+  credentialsToReenter: string[]
+  legacyCredentialStoreUnavailable: boolean
+}
+
+export async function identityImportPending(): Promise<boolean> {
+  return invoke('identity_import_pending')
+}
+
+export async function importLegacyIdentity(): Promise<IdentityImportReport> {
+  return invoke('import_legacy_identity')
+}
+
+export async function startFreshIdentity(): Promise<void> {
+  return invoke('start_fresh_identity')
+}
+
+export async function restartAfterIdentityChoice(): Promise<void> {
+  return invoke('restart_after_identity_choice')
+}
+
 // Pipeline commands
 export async function startRecording(): Promise<void> {
   return invoke('start_recording')

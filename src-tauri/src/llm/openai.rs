@@ -55,9 +55,11 @@ fn glm_supports_thinking(model: &str) -> bool {
 fn reasoning_params(model: &str, base_url: &str) -> Vec<(&'static str, serde_json::Value)> {
     let mut params = Vec::new();
 
-    // Gemini 3.x flash-lite has thinking off by default; the explicit opt-out is
-    // defensive against a future model where it engages.
-    if model.contains("gemini") {
+    // Google accepts "none" for 2.5 Flash, but 3.x cannot disable thinking and
+    // 2.5 Pro rejects it. The 3.5 Flash-Lite default already uses minimal effort.
+    if model.starts_with("gemini-2.5-flash")
+        && base_url.contains("generativelanguage.googleapis.com")
+    {
         params.push(("reasoning_effort", serde_json::json!("none")));
     }
 
@@ -69,10 +71,11 @@ fn reasoning_params(model: &str, base_url: &str) -> Vec<(&'static str, serde_jso
         params.push(("reasoning_effort", serde_json::json!("none")));
     }
 
-    // DeepSeek V4 merged reasoning into every model as a request flag, defaulting
-    // to enabled. Kimi K2.5/K2.6 use the identical shape; K2.7-code rejects
+    // DeepSeek Flash merged reasoning into every model as a request flag,
+    // defaulting to enabled. Kimi K2.5/K2.6 use the identical shape; K2.7-code rejects
     // `disabled` and K3 has no off switch at all, so both stay out of the gate.
-    let deepseek_v4 = model.starts_with("deepseek-v4") && base_url.contains("deepseek.com");
+    let deepseek_v4 = (model == "deepseek-flash" || model.starts_with("deepseek-v4"))
+        && base_url.contains("deepseek.com");
     let kimi_k25 = matches!(model, "kimi-k2.5" | "kimi-k2.6") && base_url.contains("moonshot.");
     if deepseek_v4 || kimi_k25 {
         params.push(("thinking", serde_json::json!({ "type": "disabled" })));
@@ -144,6 +147,14 @@ impl LlmProvider for OpenAiProvider {
         });
 
         if let Some(obj) = body.as_object_mut() {
+            // Google recommends the model default sampling parameters for 3.x.
+            if config.model.starts_with("gemini-3.")
+                && config
+                    .base_url
+                    .contains("generativelanguage.googleapis.com")
+            {
+                obj.remove("temperature");
+            }
             for (k, v) in reasoning_params(&config.model, &config.base_url) {
                 obj.insert(k.to_string(), v);
             }
@@ -339,7 +350,7 @@ mod tests {
     }
 
     #[test]
-    fn gemini_keeps_its_existing_opt_out() {
+    fn gemini_25_flash_keeps_its_existing_opt_out() {
         assert_eq!(
             effort(
                 "gemini-2.5-flash-lite",
@@ -348,6 +359,18 @@ mod tests {
             .as_deref(),
             Some("none")
         );
+    }
+
+    #[test]
+    fn gemini_35_and_25_pro_do_not_receive_an_unsupported_opt_out() {
+        let google = "https://generativelanguage.googleapis.com/v1beta/openai";
+        assert!(effort("gemini-3.5-flash-lite", google).is_none());
+        assert!(effort("gemini-2.5-pro", google).is_none());
+        assert!(effort(
+            "google/gemini-3.5-flash-lite",
+            "https://openrouter.ai/api/v1"
+        )
+        .is_none());
     }
 
     /// A model with no known switch must send nothing at all rather than a
@@ -396,11 +419,13 @@ mod tests {
     }
 
     #[test]
-    fn deepseek_v4_and_kimi_k25_switch_thinking_off() {
-        assert_eq!(
-            thinking("deepseek-v4-flash", "https://api.deepseek.com/v1"),
-            Some(serde_json::json!({ "type": "disabled" }))
-        );
+    fn deepseek_flash_and_kimi_k25_switch_thinking_off() {
+        for model in ["deepseek-flash", "deepseek-v4-flash"] {
+            assert_eq!(
+                thinking(model, "https://api.deepseek.com/v1"),
+                Some(serde_json::json!({ "type": "disabled" }))
+            );
+        }
         assert_eq!(
             thinking("kimi-k2.5", "https://api.moonshot.cn/v1"),
             Some(serde_json::json!({ "type": "disabled" }))

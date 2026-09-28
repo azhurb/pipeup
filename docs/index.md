@@ -11,10 +11,11 @@ Repository-local system of record for architecture, domain knowledge, decisions,
 - [Providers](architecture/providers.md) — STT and LLM provider traits and registry.
 - [Frontend ↔ Backend](architecture/frontend-backend.md) — Tauri commands, events, two-window bundle.
 - [Storage](architecture/storage.md) — `tauri-plugin-store` config and SQLite history/dictionary.
+- [Identity migration](architecture/identity-migration.md) - separate app identity and first-run legacy data import.
 
 ## Domain
 
-- [Appearance](domain/appearance.md) - brand assets, visual system, capsule behavior, and identity compatibility.
+- [Appearance](domain/appearance.md) - brand assets, visual system, capsule behavior, and app identity.
 
 - [Feature map](domain/features.md) — public features reconciled with repo evidence.
 - [Voice input](domain/voice-input.md) — recording flow and prompt behavior.

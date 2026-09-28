@@ -356,6 +356,29 @@ describe('LlmPane models cache: skip fetch when populated', () => {
     expect(mockFetch).toHaveBeenCalledTimes(1)
   })
 
+  it('refreshes a cached model list after one day', async () => {
+    const { fetchLlmModels } = await import('../../../lib/tauri')
+    const mockFetch = vi.mocked(fetchLlmModels)
+    mockFetch.mockClear()
+
+    useAppStore.getState().setLlmModels(['old-model'])
+    useAppStore.setState({ llmModelsFetchedAt: Date.now() - 25 * 60 * 60 * 1000 })
+    useAppStore.getState().updateConfig({
+      llm_base_url: 'https://api.openai.com/v1',
+      llm_provider: 'openai',
+    })
+    useAppStore.getState().setKeyDraft('llm', 'sk-test')
+
+    renderSettings()
+    clickSidebarItem('settings.aiPolish')
+
+    await act(async () => {
+      await vi.runAllTimersAsync()
+    })
+
+    expect(mockFetch).toHaveBeenCalledTimes(1)
+  })
+
   it('updates llmModels in the store after fetchLlmModels resolves', async () => {
     const { fetchLlmModels } = await import('../../../lib/tauri')
     vi.mocked(fetchLlmModels).mockResolvedValue(['gpt-4o', 'gpt-3.5-turbo'])
@@ -570,7 +593,7 @@ describe('appStore getInitialState includes llmModels', () => {
 
   it('getInitialState does not change fields other than llmModels', () => {
     const initial = useAppStore.getInitialState()
-    expect(initial.config.hotkey).toBe('Ctrl+/')
+    expect(initial.config.hotkey).toBe('Ctrl+Shift+/')
     expect(initial.pipelineState).toBe('idle')
     expect(initial.dictionary).toEqual([])
   })

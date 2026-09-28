@@ -2,7 +2,7 @@
 
 ## Pipeup
 
-The product name of this OpenTypeless-derived app. The frontend npm package is `pipeup`. The repository URL is `azhurb/pipeup`; the native executable, bundle identifier, and credential namespace remain unchanged for compatibility. See [Appearance](appearance.md).
+The product name of this OpenTypeless-derived app. The frontend npm package and native executable are `pipeup`. The repository URL is `azhurb/pipeup`; its app and credential identifiers are separate from OpenTypeless. See [Appearance](appearance.md) and [Identity migration](../architecture/identity-migration.md).
 
 ## AppConfig
 

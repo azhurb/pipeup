@@ -162,6 +162,7 @@ interface AppState {
 
   // LLM model list cache (persists across tab switches)
   llmModels: string[]
+  llmModelsFetchedAt: number | null
   setLlmModels: (models: string[]) => void
 
   // Pipeline error
@@ -220,12 +221,12 @@ const defaultConfig: AppConfig = {
   stt_provider: 'glm-asr',
   stt_languages: [],
   llm_provider: 'openrouter',
-  llm_model: 'google/gemini-2.5-flash',
+  llm_model: 'google/gemini-3.5-flash-lite',
   llm_base_url: 'https://openrouter.ai/api/v1',
   polish_enabled: true,
   translate_enabled: false,
   target_lang: 'en',
-  hotkey: isMac ? 'Alt+/' : 'Ctrl+/',
+  hotkey: isMac ? 'Alt+Shift+/' : 'Ctrl+Shift+/',
   hotkey_mode: 'hold',
   selected_text_enabled: false,
   theme: 'system',
@@ -299,7 +300,9 @@ export const useAppStore = create<AppState>((set) => ({
   setLlmLatencyMs: (llmLatencyMs) => set({ llmLatencyMs }),
 
   llmModels: [],
-  setLlmModels: (llmModels) => set({ llmModels }),
+  llmModelsFetchedAt: null,
+  setLlmModels: (llmModels) =>
+    set({ llmModels, llmModelsFetchedAt: llmModels.length > 0 ? Date.now() : null }),
 
   pipelineError: null,
   setPipelineError: (pipelineError) => set({ pipelineError }),
