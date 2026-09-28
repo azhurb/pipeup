@@ -62,7 +62,7 @@ Shared by both:
 
 ## Recording feedback
 
-The capsule uses a waveform while recording and three processing dots while transcribing or polishing. It does not show elapsed time or shortcuts. When a streaming provider (Deepgram, AssemblyAI, Gemini Transcribe Live) sends interim text, the recording pill widens to 300 by 32 and shows the newest words on one line (`src/lib/interimTail.ts`). The line is hidden from assistive technology, since a live region rewriting itself several times a second would drown out everything else, and it disappears when recording ends. The inserted text is always the provider's final transcript, not the interim line. Cancellation appears on hover or keyboard focus (always visible on devices without hover); it discards the current dictation. The configured recording limit still applies through `src/hooks/useRecordingLimit.ts`.
+The capsule uses a waveform while recording and three processing dots while transcribing or polishing. It does not show elapsed time or shortcuts. Interim text from a streaming provider (Deepgram, AssemblyAI, Gemini Transcribe Live) is not shown: a clipped, still-changing fragment next to the waveform read as broken, and it asked the user to proofread words they had not finished saying. The inserted text is always the provider's final transcript. Cancellation appears on hover or keyboard focus (always visible on devices without hover); it discards the current dictation. The configured recording limit still applies through `src/hooks/useRecordingLimit.ts`.
 
 Errors, clipboard recovery, selected-text confirmation, and dictionary-correction undo still show actionable text. The selected-text amber ring remains visible. See [Appearance](appearance.md) for the visual system.
 

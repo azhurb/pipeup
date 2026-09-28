@@ -53,7 +53,7 @@ export function useTauriEvents(windowRole: 'main' | 'capsule' = 'main') {
         // Clear any previous error when starting a new pipeline run
         setPipelineError(null)
         // A hotkey start does not go through useRecording's reset, so the last
-        // run's interim text would otherwise flash up in the new capsule.
+        // run's interim text would otherwise carry over into the new run.
         setPartialTranscript('')
         // Dismiss lingering tips — the user is dictating again.
         setClipboardTip(false)
