@@ -187,22 +187,13 @@ describe('useCapsuleResize — the edited tip keeps the capsule on screen', () =
     expect(hide).toHaveBeenCalledTimes(1)
   })
 
-  it('widens the recording pill for interim text, and only while recording', async () => {
+  it('keeps the recording pill compact while a streaming provider sends interim text', async () => {
     const { result } = renderHook(() => useCapsuleResize())
     await flushAsync()
 
     act(() => {
       useAppStore.getState().setPipelineState('recording')
-    })
-    expect(result.current).toEqual({ width: 88, height: 32 })
-
-    act(() => {
       useAppStore.getState().setPartialTranscript('Hi team')
-    })
-    expect(result.current).toEqual({ width: 300, height: 32 })
-
-    act(() => {
-      useAppStore.getState().setPipelineState('transcribing')
     })
     expect(result.current).toEqual({ width: 88, height: 32 })
   })
