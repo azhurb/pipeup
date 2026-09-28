@@ -13,7 +13,88 @@ permissions:
   contents: write
 
 jobs:
+  # One job owns the draft. The four builds used to each ask tauri-action to
+  # find-or-create the release, and two of them could race and make two drafts
+  # for one tag. Now they all upload to the release id created here.
+  create-release:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.release.outputs.tag }}
+      version: ${{ steps.release.outputs.version }}
+      release_id: ${{ steps.draft.outputs.release_id }}
+    steps:
+      - name: Validate release tag
+        id: release
+        shell: bash
+        env:
+          REQUESTED_TAG: ${{ github.event.inputs.tag || github.ref_name }}
+        run: |
+          if [[ ! "$REQUESTED_TAG" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
+            echo "::error::Expected a release tag like v1.2.3."
+            exit 1
+          fi
+          echo "tag=$REQUESTED_TAG" >> "$GITHUB_OUTPUT"
+          echo "version=${REQUESTED_TAG#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Create the draft release, or reuse this tag's draft
+        id: draft
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ steps.release.outputs.tag }}
+        run: |
+          existing=$(gh api "repos/$GH_REPO/releases" --paginate \
+            --jq ".[] | select(.tag_name == \"$TAG\") | \"\(.id) \(.draft)\"")
+          # A step runs under `bash -e`, and grep -c exits 1 on zero matches.
+          count=$(printf '%s\n' "$existing" | grep -c . || true)
+          if [[ "$count" -gt 1 ]]; then
+            echo "::error::More than one release exists for $TAG. Delete the extra drafts, then rerun."
+            exit 1
+          fi
+          if [[ -n "$existing" ]]; then
+            read -r id draft <<< "$existing"
+            if [[ "$draft" != "true" ]]; then
+              echo "::error::$TAG is already published. Refusing to overwrite its assets."
+              exit 1
+            fi
+            echo "Reusing draft $id for $TAG"
+            echo "release_id=$id" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          cat > "$RUNNER_TEMP/notes.md" <<'NOTES'
+          ## Pipeup
+
+          Voice input for desktop with your own speech and AI providers. A speech provider API key is required; AI processing is optional.
+
+          See the [changelog](https://github.com/${{ github.repository }}/blob/${{ steps.release.outputs.tag }}/CHANGELOG.md) for changes in this release.
+
+          ## Downloads
+
+          Choose the macOS DMG for your processor (Apple Silicon or Intel), the Windows MSI, or the Linux AppImage/DEB below.
+
+          macOS builds are self-signed, not notarized. After installing a trusted download in Applications, run `xattr -cr /Applications/Pipeup.app` if macOS blocks opening it. Grant Microphone and Accessibility permissions when prompted.
+
+          ## Upgrading from OpenTypeless or older Pipeup
+
+          Pipeup now has a separate app identity and can be installed beside OpenTypeless. Quit the old app before first launch. Pipeup offers to import a copy of settings, history, dictionary, and available provider keys, or to start fresh. The old app and its data stay untouched. The import turns off Pipeup's Launch at Startup setting; enable it again if wanted. If both apps run, assign different keyboard shortcuts.
+
+          On macOS, grant Microphone and Accessibility to the new Pipeup entry. The old OpenTypeless entry does not grant Pipeup permission. See [permission recovery](https://github.com/${{ github.repository }}/blob/${{ steps.release.outputs.tag }}/docs/references/troubleshooting.md#macos-accessibility-still-lists-opentypeless) if paste fails.
+
+          ## Before publishing this draft
+
+          The maintainer must add the release highlights, verified platforms, and known issues after completing the [release checks](https://github.com/${{ github.repository }}/blob/${{ steps.release.outputs.tag }}/docs/references/release-preparation.md). Remove this draft-only section before publication.
+          NOTES
+          # Fail here, not in the four builds, if the tag was never pushed.
+          gh api "repos/$GH_REPO/git/ref/tags/$TAG" --silent
+          id=$(gh api -X POST "repos/$GH_REPO/releases" \
+            -f tag_name="$TAG" -f name="Pipeup $TAG" -F draft=true \
+            -F body=@"$RUNNER_TEMP/notes.md" --jq .id)
+          echo "Created draft $id for $TAG"
+          echo "release_id=$id" >> "$GITHUB_OUTPUT"
+
   build:
+    needs: create-release
     strategy:
       fail-fast: false
       matrix:
@@ -33,27 +114,14 @@ jobs:
 
     runs-on: ${{ matrix.platform }}
     steps:
-      - name: Validate release tag
-        id: release
-        shell: bash
-        env:
-          REQUESTED_TAG: ${{ github.event.inputs.tag || github.ref_name }}
-        run: |
-          if [[ ! "$REQUESTED_TAG" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
-            echo "::error::Expected a release tag like v1.2.3."
-            exit 1
-          fi
-          echo "tag=$REQUESTED_TAG" >> "$GITHUB_OUTPUT"
-          echo "version=${REQUESTED_TAG#v}" >> "$GITHUB_OUTPUT"
-
       - uses: actions/checkout@v4
         with:
-          ref: refs/tags/${{ steps.release.outputs.tag }}
+          ref: refs/tags/${{ needs.create-release.outputs.tag }}
 
       - name: Sync version from tag
         shell: bash
         env:
-          VERSION: ${{ steps.release.outputs.version }}
+          VERSION: ${{ needs.create-release.outputs.version }}
         run: |
           echo "Syncing version: $VERSION"
 
@@ -127,30 +195,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           APPLE_SIGNING_IDENTITY: ${{ env.APPLE_SIGNING_IDENTITY }}
         with:
-          tagName: ${{ steps.release.outputs.tag }}
-          releaseName: 'Pipeup ${{ steps.release.outputs.tag }}'
-          releaseBody: |
-            ## Pipeup
-
-            Voice input for desktop with your own speech and AI providers. A speech provider API key is required; AI processing is optional.
-
-            See the [changelog](https://github.com/${{ github.repository }}/blob/${{ steps.release.outputs.tag }}/CHANGELOG.md) for changes in this release.
-
-            ## Downloads
-
-            Choose the macOS DMG for your processor (Apple Silicon or Intel), the Windows MSI, or the Linux AppImage/DEB below.
-
-            macOS builds are self-signed, not notarized. After installing a trusted download in Applications, run `xattr -cr /Applications/Pipeup.app` if macOS blocks opening it. Grant Microphone and Accessibility permissions when prompted.
-
-            ## Upgrading from OpenTypeless or older Pipeup
-
-            Pipeup now has a separate app identity and can be installed beside OpenTypeless. Quit the old app before first launch. Pipeup offers to import a copy of settings, history, dictionary, and available provider keys, or to start fresh. The old app and its data stay untouched. The import turns off Pipeup's Launch at Startup setting; enable it again if wanted. If both apps run, assign different keyboard shortcuts.
-
-            On macOS, grant Microphone and Accessibility to the new Pipeup entry. The old OpenTypeless entry does not grant Pipeup permission. See [permission recovery](https://github.com/${{ github.repository }}/blob/${{ steps.release.outputs.tag }}/docs/references/troubleshooting.md#macos-accessibility-still-lists-opentypeless) if paste fails.
-
-            ## Before publishing this draft
-
-            The maintainer must add the release highlights, verified platforms, and known issues after completing the [release checks](https://github.com/${{ github.repository }}/blob/${{ steps.release.outputs.tag }}/docs/references/release-preparation.md). Remove this draft-only section before publication.
-          releaseDraft: true
-          prerelease: false
+          releaseId: ${{ needs.create-release.outputs.release_id }}
           args: ${{ matrix.args }}
