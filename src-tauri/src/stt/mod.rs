@@ -1,6 +1,5 @@
 pub mod assemblyai;
 pub mod deepgram;
-pub mod gemini;
 pub mod gemini_live;
 pub mod whisper_compat;
 
@@ -101,7 +100,7 @@ pub struct SttConfig {
     pub smart_format: bool,
     pub sample_rate: u32,
     /// Terms from the user's dictionary, for providers that accept vocabulary
-    /// biasing. Only `gemini-transcribe` reads it today; the others ignore it,
+    /// biasing. Only `gemini-transcribe-live` reads it today; the others ignore it,
     /// the same way the Whisper-compatible ones ignore `smart_format`.
     pub custom_vocabulary: Vec<String>,
 }
@@ -175,7 +174,6 @@ mod factory_tests {
         ("deepgram", "Deepgram Nova-3"),
         ("assemblyai", "AssemblyAI"),
         ("gemini-transcribe-live", "Gemini Transcribe Live"),
-        ("gemini-transcribe", "Gemini Transcribe"),
         ("glm-asr", "GLM-ASR"),
         ("openai-whisper", "OpenAI Whisper"),
         ("groq-whisper", "Groq Whisper"),
@@ -215,7 +213,6 @@ pub fn create_provider(provider_name: &str, client: reqwest::Client) -> Box<dyn 
         "deepgram" => Box::new(deepgram::DeepgramProvider::new()),
         "assemblyai" => Box::new(assemblyai::AssemblyAiProvider::new()),
         "gemini-transcribe-live" => Box::new(gemini_live::GeminiLiveProvider::new()),
-        "gemini-transcribe" => Box::new(gemini::GeminiTranscribeProvider::new(client.clone())),
         "glm-asr" => make(WhisperCompatConfig {
             provider_name: "GLM-ASR",
             endpoint: "https://open.bigmodel.cn/api/paas/v4/audio/transcriptions",

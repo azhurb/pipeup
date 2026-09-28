@@ -1324,9 +1324,7 @@ impl PipelineHandle {
             // The Live provider opens a WebSocket, which the HTTP pool cannot
             // keep warm, but the same host still saves the DNS lookup and TLS
             // session setup on the first dictation.
-            "gemini-transcribe" | "gemini-transcribe-live" => {
-                crate::stt::gemini::ENDPOINT.to_string()
-            }
+            "gemini-transcribe-live" => crate::stt::gemini_live::PREWARM_URL.to_string(),
             _ => {
                 tracing::debug!(
                     "Unknown STT provider '{}', skipping pre-warm",

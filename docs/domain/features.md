@@ -22,8 +22,7 @@ Current repo STT provider labels (from `src/lib/constants.ts`):
 
 - Deepgram Nova-3
 - AssemblyAI
-- Gemini 3.5 Transcribe Live (recommended Gemini option)
-- Gemini 3.5 Transcribe (batch)
+- Gemini 3.5 Transcribe Live (recommended)
 - GLM-ASR
 - OpenAI Whisper
 - Groq Whisper

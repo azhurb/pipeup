@@ -9,7 +9,6 @@ use tokio_tungstenite::{
     tungstenite::{self, protocol::CloseFrame, Message},
 };
 
-use super::gemini::{bcp47, MAX_VOCABULARY_TERMS};
 use super::{DisconnectResult, SttConfig, SttProvider, TranscriptEvent, WsStream};
 
 pub const PROVIDER_NAME: &str = "Gemini Transcribe Live";
@@ -17,6 +16,58 @@ pub const MODEL: &str = "gemini-3.5-transcribe-live";
 pub const WS_URL: &str = "wss://generativelanguage.googleapis.com/ws/\
      google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent";
 const HOST: &str = "generativelanguage.googleapis.com";
+/// HTTPS origin of the same host, for the pipeline's connection pre-warm.
+pub const PREWARM_URL: &str = "https://generativelanguage.googleapis.com/";
+
+/// Gemini accepts up to 1,000 custom-vocabulary terms and documents that best
+/// results come from ~100. We send the API's ceiling rather than the advice:
+/// truncating someone's dictionary at 100 silently drops words they added on
+/// purpose, and the failure mode past that point is degraded biasing, not an
+/// error.
+const MAX_VOCABULARY_TERMS: usize = 1000;
+
+/// Map an ISO-639-1 code from `SttConfig.languages` to the BCP-47 tag the
+/// transcription API expects (`language_codes` is documented as region-tagged:
+/// `en-US`, `es-ES`).
+///
+/// Our Settings UI only offers bare ISO-639-1 codes, so the region has to be
+/// chosen here. Where a language has more than one plausible region we take the
+/// larger speaker population (`pt-BR`, not `pt-PT`) or the standard written
+/// form (`ar-SA` for Modern Standard Arabic, `zh-CN` for simplified). A user who
+/// needs `en-GB` spelling cannot express it today.
+///
+/// An unrecognized code returns `None` and is dropped from the request. This is
+/// tidiness, not safety: the batch transcription API (since removed) was measured on
+/// 2026-08-27 to accept a bare
+/// `en` and even a gibberish `xx-YY` with a 200, so an unmapped code passed
+/// through would be ignored rather than rejected. Dropping it keeps the request
+/// to the documented shape and makes the mapping table the single place that
+/// decides what we claim to support.
+fn bcp47(code: &str) -> Option<&'static str> {
+    Some(match code.trim().to_lowercase().as_str() {
+        "zh" => "zh-CN",
+        "en" => "en-US",
+        "ja" => "ja-JP",
+        "ko" => "ko-KR",
+        "fr" => "fr-FR",
+        "de" => "de-DE",
+        "es" => "es-ES",
+        "pt" => "pt-BR",
+        "ru" => "ru-RU",
+        "ar" => "ar-SA",
+        "hi" => "hi-IN",
+        "th" => "th-TH",
+        "vi" => "vi-VN",
+        "it" => "it-IT",
+        "nl" => "nl-NL",
+        "tr" => "tr-TR",
+        "pl" => "pl-PL",
+        "uk" => "uk-UA",
+        "id" => "id-ID",
+        "ms" => "ms-MY",
+        _ => return None,
+    })
+}
 
 /// How long `connect` waits for `setupComplete`. Measured at ~200 ms after the
 /// handshake on 2026-09-28. A bad key does not fail the handshake: the server
@@ -1126,9 +1177,8 @@ mod tests {
         assert_eq!(provider.transcript.text(), "");
     }
 
-    /// End-to-end against the live API, and a latency comparison with the batch
-    /// provider on the same audio. Ignored by default: it needs a key and a
-    /// network.
+    /// End-to-end against the live API, with timings. Ignored by default: it
+    /// needs a key and a network.
     ///
     /// Audio is fed through a channel in 20 ms chunks at real-time pace, started
     /// *before* `connect`, which is what the pipeline does: capture opens first
@@ -1141,7 +1191,7 @@ mod tests {
     /// ```
     #[tokio::test]
     #[ignore = "requires GEMINI_API_KEY and network"]
-    async fn live_streams_speech_and_compares_with_batch() {
+    async fn live_streams_speech_against_the_real_api() {
         let api_key = match std::env::var("GEMINI_API_KEY") {
             Ok(k) if !k.is_empty() => k,
             _ => panic!("set GEMINI_API_KEY to run this test"),
@@ -1206,19 +1256,11 @@ mod tests {
         let live_result = live.disconnect().await.expect("disconnect");
         let live_final_ms = released.elapsed().as_millis();
 
-        let mut batch = super::super::gemini::GeminiTranscribeProvider::new(reqwest::Client::new());
-        batch.connect(&config).await.expect("batch connect");
-        batch.send_audio(&pcm).await.expect("batch send_audio");
-        let released = Instant::now();
-        let batch_result = batch.disconnect().await.expect("batch disconnect");
-        let batch_final_ms = released.elapsed().as_millis();
-
         println!("audio: {audio_secs:.1}s");
         println!("live connect: {connect_ms}ms after capture start");
         println!(
             "live first partial: {first_partial_ms:?}ms after capture start ({partials} partials)"
         );
         println!("live release to final: {live_final_ms}ms -> {live_result:?}");
-        println!("batch release to final: {batch_final_ms}ms -> {batch_result:?}");
     }
 }

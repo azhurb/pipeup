@@ -12,11 +12,11 @@ Pipeup originated as a fork of [Tover0314/opentypeless](https://github.com/tover
 
 ### Added
 
-- **Gemini 3.5 Transcribe Live, a streaming speech provider, now the recommended Gemini option.** Text streams while you speak and appears in the capsule, and the final transcript arrives about half a second after you release the hotkey instead of three to four seconds with batch. It uses the Gemini key you already saved for batch. Live costs more than batch (Google lists roughly $0.009 against $0.005 per minute), so if you picked batch before, you stay on batch until you choose Live under Settings > Dictation.
+- **Gemini 3.5 Transcribe Live, a streaming speech provider.** Gemini transcribes while you speak, so the final transcript arrives about half a second after you release the hotkey instead of three to four seconds with batch. It uses your saved Gemini key.
 
 ### Changed
 
-- The batch Gemini provider is now labeled "Gemini 3.5 Transcribe (batch)". Its id and saved settings are unchanged.
+- **Removed the batch "Gemini 3.5 Transcribe" option; Gemini 3.5 Transcribe Live is now the only Gemini speech provider.** If you had batch selected, you are moved to Live automatically and your saved Gemini key keeps working.
 - The recording capsule shows seven waveform bars again, as it did before the Pipeup redesign.
 
 ### Fixed

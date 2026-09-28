@@ -7,7 +7,6 @@ export type SttProvider =
   | 'deepgram'
   | 'assemblyai'
   | 'gemini-transcribe-live'
-  | 'gemini-transcribe'
   | 'glm-asr'
   | 'openai-whisper'
   | 'groq-whisper'

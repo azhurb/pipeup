@@ -1,11 +1,13 @@
 # Gemini Transcribe
 
+**The batch provider described below was removed on 2026-09-28; `gemini-transcribe-live` replaced it** (see [Providers](../../architecture/providers.md#gemini-transcribe-batch-removed)). The trial history stays for reference. The open vocabulary and region items apply to Live, which sends the same `customVocabulary`, `languageCodes` and mode.
+
 `gemini-3.5-transcribe` is registered as a batch STT provider (`gemini-transcribe`). This file
 tracks what is left open after live verification.
 
 Landed: provider in `src-tauri/src/stt/gemini.rs`, factory arm, `SttConfig.custom_vocabulary`
 fed from the user's dictionary, connection test / benchmark via a free model read, pre-warm,
-frontend ID and label. See [Providers → Gemini Transcribe](../../architecture/providers.md#gemini-transcribe-batch).
+frontend ID and label. See [Providers → Gemini Transcribe](../../architecture/providers.md#gemini-transcribe-batch-removed).
 
 ## Verified against the live API on 2026-08-27
 
