@@ -23,6 +23,7 @@ Pipeup originated as a fork of [Tover0314/opentypeless](https://github.com/tover
 ### Fixed
 
 - Cancelling a dictation no longer uploads the recording to a batch speech provider.
+- Long dictations into Claude Code no longer collapse into a `[Pasted text]` placeholder when the same terminal also runs Codex or Gemini, for example in other iTerm2 tabs or other Herdr panes. The paste is now split for Claude's stricter limit.
 
 ## [0.9.0] - 2026-09-26
 

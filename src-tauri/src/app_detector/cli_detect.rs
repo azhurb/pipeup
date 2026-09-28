@@ -62,19 +62,37 @@ pub fn cli_kind_from_name(name: &str) -> Option<CliKind> {
 /// the focused application's pid. A matching CLI process that descends from
 /// `frontmost_pid` is reported `High`; a match elsewhere is `Low`. `High`
 /// wins over `Low`.
+///
+/// One app can host several CLIs at once: iTerm2 tabs, or a Herdr session,
+/// whose server stays a child of the client that started it, so every agent
+/// pane descends from the terminal. The focused pane is not knowable from the
+/// process table, so when a `claude` is among the descendants it is reported
+/// in preference to the others: its paste collapse is the strictest, and the
+/// looser Codex/Gemini limit would let a Claude paste turn into a placeholder.
 pub fn detect_from_processes(procs: &[Proc], frontmost_pid: i32) -> Option<DetectedCli> {
+    let mut high: Option<CliKind> = None;
     let mut low: Option<CliKind> = None;
     for p in procs {
         let Some(kind) = cli_kind_from_name(&p.name) else {
             continue;
         };
         if is_descendant_of(procs, p.pid, frontmost_pid) {
-            return Some(DetectedCli {
-                kind,
-                confidence: Confidence::High,
-            });
+            if kind == CliKind::Claude {
+                return Some(DetectedCli {
+                    kind,
+                    confidence: Confidence::High,
+                });
+            }
+            high.get_or_insert(kind);
+        } else {
+            low.get_or_insert(kind);
         }
-        low.get_or_insert(kind);
+    }
+    if let Some(kind) = high {
+        return Some(DetectedCli {
+            kind,
+            confidence: Confidence::High,
+        });
     }
     low.map(|kind| DetectedCli {
         kind,
@@ -356,6 +374,51 @@ mod tests {
             detect_from_processes(&procs, 53586),
             Some(DetectedCli {
                 kind: CliKind::Claude,
+                confidence: Confidence::High,
+            })
+        );
+    }
+
+    #[test]
+    fn claude_wins_when_several_clis_descend_from_the_focused_app() {
+        // Herdr in iTerm2 with a Codex pane and a Claude pane. The server
+        // stays a child of the client, so both agents descend from iTerm2,
+        // and the scan reaches codex first.
+        let procs = vec![
+            proc(700, 1, "iTerm2"),
+            proc(710, 700, "iTermServer"),
+            proc(720, 710, "zsh"),
+            proc(730, 720, "herdr"),
+            proc(740, 730, "herdr"),
+            proc(750, 740, "zsh"),
+            proc(760, 750, "codex"),
+            proc(770, 740, "zsh"),
+            proc(780, 770, "claude"),
+        ];
+        assert_eq!(
+            detect_from_processes(&procs, 700),
+            Some(DetectedCli {
+                kind: CliKind::Claude,
+                confidence: Confidence::High,
+            })
+        );
+    }
+
+    #[test]
+    fn a_claude_outside_the_focused_app_does_not_override_its_own_cli() {
+        // Codex in the focused terminal; Claude Code runs elsewhere (a
+        // desktop app's bundled CLI). The focused app's own CLI stands.
+        let procs = vec![
+            proc(900, 1, "Claude"),
+            proc(910, 900, "claude"),
+            proc(700, 1, "iTerm2"),
+            proc(720, 700, "zsh"),
+            proc(760, 720, "codex"),
+        ];
+        assert_eq!(
+            detect_from_processes(&procs, 700),
+            Some(DetectedCli {
+                kind: CliKind::Codex,
                 confidence: Confidence::High,
             })
         );

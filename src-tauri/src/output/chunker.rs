@@ -133,9 +133,10 @@ fn strictest_cli_limit() -> ChunkLimit {
 /// so staying at or under both is what keeps a dictation visible as text. Codex
 /// and Gemini tolerate up to ~1000 chars; those two remain empirical.
 ///
-/// One known gap, inferred and unverified: Claude's newline threshold appears
-/// to tighten in a very short terminal (the limit reads as `min(rows - 10, 2)`),
-/// so a pane under ~12 rows can collapse a chunk this function considers safe.
+/// One known gap: Claude's newline threshold is `min(rows - 10, 2)`, confirmed
+/// against Claude Code 2.1.281, so a pane under 12 rows collapses a chunk this
+/// function considers safe, and at 10 rows or fewer any pasted newline does.
+/// The pane height is not visible from here.
 fn cli_chunk_limit(kind: CliKind) -> ChunkLimit {
     match kind {
         CliKind::Claude => ChunkLimit::CharsAndNewlines {
