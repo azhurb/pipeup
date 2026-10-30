@@ -52,8 +52,11 @@ mod tests {
     #[test]
     fn waits_for_complete_lines() {
         let mut decoder = SseLines::default();
-        assert!(decoder.push(b"data: hel").unwrap().is_empty());
-        assert_eq!(decoder.push(b"lo\nnext").unwrap(), ["data: hello"]);
+        assert!(decoder.push(b"data: hello").unwrap().is_empty());
+        assert_eq!(
+            decoder.push(b" world\nnext").unwrap(),
+            ["data: hello world"]
+        );
         assert_eq!(decoder.push(b" line\n").unwrap(), ["next line"]);
     }
 
