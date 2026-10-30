@@ -12,6 +12,7 @@ Pipeup originated as a fork of [Tover0314/opentypeless](https://github.com/tover
 
 ### Fixed
 
+- Updated the async-trait dependency to fix generated-code Clippy errors with Rust 1.99.
 - Streaming AI polish preserves Cyrillic, CJK, and emoji characters across network chunk boundaries.
 - Gemini Live now requests verbatim transcription before optional AI polish, avoiding a second cleanup stage during recognition. Optional polish remains enabled by default and user-controlled.
 
