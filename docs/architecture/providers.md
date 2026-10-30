@@ -58,7 +58,7 @@ fn name(&self) -> &str;
 
 `DisconnectResult` is `Option<(String, Option<String>)>` — file-based providers return `(text, detected_language)` on close. Streaming providers return `Ok(None)` and emit `Final` instead.
 
-`SttConfig.custom_vocabulary` carries the user's dictionary words (the same list the polish prompt gets, cloned in `pipeline.rs` before the polish path `take()`s the preloaded copy). Only `gemini-transcribe-live` reads it today; every other provider ignores it, the way the Whisper-compatible ones ignore `smart_format`. Deepgram keyterms and AssemblyAI word boost are the per-provider equivalents and are not wired — see [`../plans/active/gemini-transcribe.md`](../plans/active/gemini-transcribe.md).
+`SttConfig.custom_vocabulary` carries dictionary words only when `AppConfig.stt_dictionary_hints_enabled` is true. This is off by default, including when loading older settings without the field. The polish prompt still receives its separate spelling references. Only `gemini-transcribe-live` reads it today; every other provider ignores it, the way the Whisper-compatible ones ignore `smart_format`. Deepgram keyterms and AssemblyAI word boost are the per-provider equivalents and are not wired — see [`../plans/active/gemini-transcribe.md`](../plans/active/gemini-transcribe.md).
 
 ### Language hint mapping rule
 
@@ -100,8 +100,8 @@ Match arms currently registered in `stt::create_provider`:
 `gemini-transcribe-live` runs `gemini-3.5-transcribe-live` over the Live API: a WebSocket to `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent`, implemented in `src-tauri/src/stt/gemini_live.rs`. It is the only Gemini option in Settings and onboarding, and it replaced the batch provider (above).
 
 Gemini Live always requests verbatim transcription to retain dictated details before optional
-LLM polish. The shared `SttConfig.smart_format` hint cannot enable Gemini smart cleanup.
-Polish remains independently controlled by `polish_enabled`, enabled by default. The fidelity
+LLM polish. Recognition vocabulary hints require the separate opt-in on the Dictionary page. The shared `SttConfig.smart_format` hint cannot enable Gemini smart cleanup.
+Polish remains independently controlled by `polish_enabled`, enabled by default. The polish prompt instructs the model to use dictionary references only for contextually clear spelling corrections and preserve different valid words and names. The fidelity
 comparison in [the historical batch notes](../plans/active/gemini-transcribe.md#dictation-fidelity-check-2026-10-30)
 tested the removed batch model; it does not establish the cause of the reported Live failures.
 

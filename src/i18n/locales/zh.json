@@ -241,7 +241,7 @@
     "pronunciation": "发音",
     "pronunciationOptional": "发音（可选）",
     "add": "添加",
-    "noEntries": "暂无条目。添加专有名词以提高识别准确度。",
+    "noEntries": "暂无条目。添加人名和专业术语，供 AI 处理时修正拼写。",
     "learnFromCorrections": {
       "label": "Learn from corrections (experimental)",
       "description": "After dictation, Pipeup watches your edits for ~15 s and offers to add fixed names and terms here. Reads the focused text field via macOS Accessibility - you'll be prompted to grant the permission on first use."
@@ -251,7 +251,12 @@
     "autoLearnedLabel": "Auto-learned from your edit",
     "autoLearnedTooltip": "Auto-learned. STT produced \"{{observed}}\".",
     "savedImmediately": "词条在添加或删除后立即保存。偏好设置需点击保存按钮。",
-    "removeWord": "删除 {{word}}"
+    "removeWord": "删除 {{word}}",
+    "recognitionHints": {
+      "label": "在语音识别时使用词典提示",
+      "description": "默认关闭。将词典条目发送给 Gemini，帮助识别人名和工具名称，但可能替换发音相近的其他词语。关闭后，AI 处理仍可谨慎修正拼写。",
+      "unavailable": "仅适用于 Gemini Live。其他语音服务暂不使用词典提示。"
+    }
   },
   "correction": {
     "added": "Added \"{{new}}\" to your dictionary",

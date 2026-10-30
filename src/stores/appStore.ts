@@ -55,6 +55,7 @@ export interface DictionaryEntry {
 export interface AppConfig {
   stt_provider: SttProvider
   stt_languages: string[]
+  stt_dictionary_hints_enabled: boolean
   llm_provider: LlmProvider
   llm_model: string
   llm_base_url: string
@@ -220,6 +221,7 @@ const isMac =
 const defaultConfig: AppConfig = {
   stt_provider: 'glm-asr',
   stt_languages: [],
+  stt_dictionary_hints_enabled: false,
   llm_provider: 'openrouter',
   llm_model: 'google/gemini-3.5-flash-lite',
   llm_base_url: 'https://openrouter.ai/api/v1',

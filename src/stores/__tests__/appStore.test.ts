@@ -29,6 +29,7 @@ describe('appStore', () => {
       expect(config.theme).toBe('system')
       expect(config.hotkey).toBe('Ctrl+Shift+/')
       expect(config.polish_enabled).toBe(true)
+      expect(config.stt_dictionary_hints_enabled).toBe(false)
     })
 
     it('defaults history to on and retention to forever, matching pre-toggle behavior', () => {

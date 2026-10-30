@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 Pipeup originated as a fork of [Tover0314/opentypeless](https://github.com/tover0314-w/opentypeless). The entry for `0.1.0` describes the upstream baseline; `0.2.0` is the fork's first release, marking the BYOK-only direction and the changes listed below.
 
+## [Unreleased]
+
+### Changed
+
+- Dictionary hints during Gemini Live speech recognition are now opt-in on the Dictionary page and off by default, including after upgrading. Optional AI processing keeps dictionary spelling references and is instructed to preserve distinct valid words and names.
+
 ## [0.9.6] - 2026-10-30
 
 ### Fixed

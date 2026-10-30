@@ -18,6 +18,8 @@ use tauri_plugin_store::StoreExt;
 pub struct AppConfig {
     pub stt_provider: String,
     pub stt_languages: Vec<String>,
+    /// Opt in to recognition vocabulary biasing. Polish keeps its own spelling references.
+    pub stt_dictionary_hints_enabled: bool,
     pub llm_provider: String,
     pub llm_model: String,
     pub llm_base_url: String,
@@ -46,6 +48,7 @@ impl Default for AppConfig {
         Self {
             stt_provider: "glm-asr".to_string(),
             stt_languages: Vec::new(),
+            stt_dictionary_hints_enabled: false,
             llm_provider: "openrouter".to_string(),
             llm_model: "google/gemini-3.5-flash-lite".to_string(),
             llm_base_url: "https://openrouter.ai/api/v1".to_string(),

@@ -110,12 +110,74 @@ vi.mock('@tauri-apps/api/app', () => ({ getVersion: vi.fn().mockResolvedValue('9
 
 // ─── Import components AFTER mocks ───────────────────────────────────────────
 import { Settings } from '../index'
+import { DictionaryPane } from '../DictionaryPane'
+import { DirtyBar } from '../shared/DirtyBar'
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 function resetStore() {
   window.history.replaceState(null, '', '#/settings')
   useAppStore.setState(useAppStore.getInitialState())
 }
+
+describe('Dictionary recognition hints', () => {
+  beforeEach(() => {
+    resetStore()
+    useAppStore.getState().updateConfig({ stt_provider: 'gemini-transcribe-live' })
+    useAppStore.getState().setSavedConfig(useAppStore.getState().config)
+  })
+
+  it('keeps hints off until opted in and persists the preference through Save', async () => {
+    render(
+      <>
+        <DictionaryPane />
+        <DirtyBar />
+      </>,
+    )
+    const toggle = screen.getByRole('switch', { name: 'dictionary.recognitionHints.label' })
+    expect(toggle).toHaveAttribute('aria-checked', 'false')
+    fireEvent.click(toggle)
+    expect(useAppStore.getState().config.stt_dictionary_hints_enabled).toBe(true)
+    expect(useAppStore.getState().savedConfig?.stt_dictionary_hints_enabled).toBe(false)
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+    await waitFor(() => {
+      expect(useAppStore.getState().savedConfig?.stt_dictionary_hints_enabled).toBe(true)
+    })
+    expect(useAppStore.getState().config.polish_enabled).toBe(true)
+  })
+
+  it('discards an unsaved opt-in without removing dictionary entries', () => {
+    const entry = {
+      id: 1,
+      word: 'Alina',
+      pronunciation: null,
+      source: 'manual',
+      observed_source: null,
+      frequency_used: 0,
+      last_used: null,
+    }
+    useAppStore.getState().setDictionary([entry])
+    render(
+      <>
+        <DictionaryPane />
+        <DirtyBar />
+      </>,
+    )
+    fireEvent.click(screen.getByRole('switch', { name: 'dictionary.recognitionHints.label' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Discard changes' }))
+    expect(useAppStore.getState().config.stt_dictionary_hints_enabled).toBe(false)
+    expect(useAppStore.getState().dictionary).toEqual([entry])
+  })
+
+  it('explains when the selected speech provider does not support hints', () => {
+    useAppStore.getState().updateConfig({ stt_provider: 'groq-whisper' })
+    render(<DictionaryPane />)
+    const toggle = screen.getByRole('switch', { name: 'dictionary.recognitionHints.label' })
+    expect(toggle).toBeDisabled()
+    expect(screen.getByText('dictionary.recognitionHints.unavailable')).toBeInTheDocument()
+    fireEvent.click(toggle)
+    expect(useAppStore.getState().config.stt_dictionary_hints_enabled).toBe(false)
+  })
+})
 
 function seedSavedConfig() {
   const { config } = useAppStore.getState()
