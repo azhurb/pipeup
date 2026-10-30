@@ -1206,7 +1206,7 @@ mod tests {
         };
         let config = SttConfig {
             api_key,
-            languages: vec!["en".to_string()],
+            languages: vec!["en".to_string(), "ru".to_string()],
             smart_format: true,
             sample_rate: 16000,
             custom_vocabulary: vec!["Pipeup".to_string()],

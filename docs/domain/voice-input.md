@@ -9,7 +9,7 @@ Evidence: `README.md`, `src-tauri/src/pipeline.rs`, `src-tauri/src/llm/prompt.rs
 1. User presses the configured global hotkey or uses the tray recording action.
 2. App records microphone audio.
 3. STT provider transcribes speech.
-4. LLM provider optionally polishes or translates the transcript. Gemini recognition uses
+4. LLM provider optionally polishes or translates the transcript. Gemini Live recognition uses
    verbatim mode first; its optional polish step remains enabled by default and can be turned off.
 5. App pastes the result into the focused field via the system clipboard, chunking the paste when the target is a terminal-hosted CLI ([Pipeline → Output Path](../architecture/pipeline.md#output-path)).
 6. App stores a local history entry, unless the user has turned history saving off ([Feature map → Optional History And Retention](features.md#optional-history-and-retention)).

@@ -8,11 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 Pipeup originated as a fork of [Tover0314/opentypeless](https://github.com/tover0314-w/opentypeless). The entry for `0.1.0` describes the upstream baseline; `0.2.0` is the fork's first release, marking the BYOK-only direction and the changes listed below.
 
-## [0.9.5] - 2026-09-29
+## [0.9.6] - 2026-10-30
 
 ### Fixed
-- Streaming polish preserves Cyrillic, CJK, and emoji characters when a network chunk splits a UTF-8 character.
-- Gemini now transcribes verbatim before optional AI polish, preventing its smart cleanup from dropping details or reversing spoken corrections. The polish setting remains enabled by default and user-controlled.
+
+- Streaming AI polish preserves Cyrillic, CJK, and emoji characters across network chunk boundaries.
+- Gemini Live now requests verbatim transcription before optional AI polish, avoiding a second cleanup stage during recognition. Optional polish remains enabled by default and user-controlled.
+
+## [0.9.5] - 2026-09-29
 
 ### Added
 
@@ -51,7 +54,9 @@ Pipeup originated as a fork of [Tover0314/opentypeless](https://github.com/tover
 ### Added
 - **Gemini 3.5 Transcribe is available as a speech provider.** Pick it under Settings > Dictation and paste a Google AI Studio key. It transcribes a whole dictation in one request when you release the hotkey, the same way the Whisper-based providers do, and it has been checked end to end against the live API rather than only against the documentation. Pricing at the time of writing is roughly half a cent per minute of audio, with a free tier. Pressing **Test** costs nothing: it reads the model instead of transcribing, the same as the OpenAI Whisper probe, so it also tells you whether your key actually has access to the transcription model rather than only that the key is valid.
 
-  Gemini receives dictionary vocabulary hints and requests verbatim transcription. Short paired tests on 2026-08-27 found no visible effect from either setting. A longer Russian comparison on 2026-10-30 found that smart mode does change output and can lose details or change a corrected date before the optional polish step. Verbatim transcription followed by polish preserved those details in that comparison; the app now uses that combination by default. See the [scoped comparison](docs/plans/active/gemini-transcribe.md#dictation-fidelity-check-2026-10-30).
+  **Two things it is sent that the other providers are not, and neither currently does anything.** Your dictionary words go along with the audio as recognition hints, and the provider is asked to clean up fillers and false starts before the text reaches the polish step. Google's API accepts both, and they are definitely the right parameters, since it rejects a misspelled one outright. They simply have no effect. Paired runs with and without them produce byte-identical transcripts, on synthetic speech and on a real microphone recording alike. The clearest case: dictating a string of digits comes back as "1 2 3 4 5" whether the cleanup mode is on or off, and turning spoken numbers into clean text is the one thing that mode most specifically promises.
+
+  So the polish step stays on for this provider, and does the tidying itself. Nothing here is configurable and none of it costs you anything extra; if Google switches these on later, they start working with no change on our side.
 
   **It costs about three and a half seconds, whatever you said.** Measured over eleven real dictations: the request takes 3.0 to 4.1 seconds and barely moves with the length of the audio, so 2 seconds of speech costs 3.2 seconds and 15 seconds of speech costs 3.8. That is a fixed price per dictation rather than a rate, which makes it a poor fit for short bursts and unusually good for long ones. If you mostly dictate a sentence at a time, you will feel it.
 
