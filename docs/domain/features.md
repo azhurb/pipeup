@@ -173,7 +173,8 @@ Repo evidence:
 - Dictionary UI lives under `src/components/Settings/DictionaryPane.tsx`.
 - Dictionary words are loaded before recording in `src-tauri/src/pipeline.rs`.
 - Prompt construction injects sanitized dictionary terms in `src-tauri/src/llm/prompt.rs`.
-- The same words reach the STT step as `SttConfig.custom_vocabulary`, and only the two Gemini providers send them on (capped at the API's 1,000 terms). Prior paired trials showed no vocabulary effect, but used the old transcription mode shape; a new paired trial is needed after the 2026-09-27 mode correction. See [`../plans/active/gemini-transcribe.md`](../plans/active/gemini-transcribe.md). For every other provider the dictionary influences the polish prompt only.
+- Dictionary > "Use dictionary hints during speech recognition" opts Gemini Live into `SttConfig.custom_vocabulary` (up to 1,000 terms). It is off by default, including on upgrade, because hints can replace a different similar-sounding name. Other speech providers currently ignore dictionary hints, so the control is disabled for them. Like other preferences, it uses Save/Discard.
+- Optional AI processing still receives the dictionary as conservative spelling references: use a term only when context clearly identifies it, preserve different valid words and names, and keep the transcript when uncertain. Turning recognition hints off does not turn polishing off or remove dictionary entries.
 
 Needs confirmation:
 

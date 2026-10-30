@@ -15,6 +15,25 @@ use crate::stt::{self, SttConfig, TranscriptEvent};
 
 // ─── Timing constants ───
 
+/// Build recognition settings independently from optional AI polishing.
+fn build_stt_config(
+    config: &storage::AppConfig,
+    api_key: String,
+    vocabulary: Vec<String>,
+) -> SttConfig {
+    SttConfig {
+        api_key,
+        languages: config.stt_languages.clone(),
+        smart_format: true,
+        sample_rate: 16000,
+        custom_vocabulary: if config.stt_dictionary_hints_enabled {
+            vocabulary
+        } else {
+            Vec::new()
+        },
+    }
+}
+
 /// Normalize text for typing into the foreground app. Trims trailing whitespace and appends a
 /// single space so that successive dictations don't glue together. The polish prompt asks the
 /// LLM to end with terminal punctuation, so the typical typed output is e.g. `"Hello world. "`.
@@ -634,9 +653,8 @@ impl PipelineHandle {
             .state::<std::sync::Arc<storage::DictionaryStore>>()
             .words()
             .await;
-        // The same list feeds STT vocabulary biasing and the polish prompt, so it
-        // is cloned rather than moved: the polish path `take()`s the preloaded
-        // copy much later, long after the STT config below has been built.
+        // Polish always keeps the spelling references. Recognition receives a
+        // separate copy only when its hint setting is enabled in build_stt_config.
         let stt_vocabulary = dict_words.clone();
         *self
             .preloaded_dictionary
@@ -689,13 +707,7 @@ impl PipelineHandle {
         // AssemblyAI) this is a full WebSocket handshake; audio is buffering
         // into audio_rx the whole time, so the dead window the user used to
         // see has now been folded into a pre-buffer.
-        let stt_config = SttConfig {
-            api_key: stt_api_key,
-            languages: config_data.stt_languages.clone(),
-            smart_format: true,
-            sample_rate: 16000,
-            custom_vocabulary: stt_vocabulary,
-        };
+        let stt_config = build_stt_config(&config_data, stt_api_key, stt_vocabulary);
 
         let mut provider =
             stt::create_provider(&config_data.stt_provider, self.shared_client.clone());
@@ -1360,12 +1372,52 @@ impl PipelineHandle {
 #[cfg(test)]
 mod tests {
     use super::{
-        empty_transcript_message, normalize_for_output, output_error_message,
+        build_stt_config, empty_transcript_message, normalize_for_output, output_error_message,
         provider_error_message, should_capture_selection, should_retain_on_clipboard,
         with_trailing_space, ACCESSIBILITY_REQUIRED_CODE, STAGE_EDIT, STAGE_POLISH, STAGE_SPEECH,
     };
     use crate::retry::HttpStatusError;
     use reqwest::StatusCode;
+
+    #[test]
+    fn legacy_settings_keep_dictionary_for_polish_without_biasing_recognition() {
+        let config: crate::storage::AppConfig = serde_json::from_value(serde_json::json!({
+            "stt_provider": "gemini-transcribe-live",
+            "stt_languages": ["en", "ru"],
+            "polish_enabled": true
+        }))
+        .unwrap();
+        let dictionary = vec!["Alina".to_string()];
+        let stt = build_stt_config(&config, "test-key".into(), dictionary.clone());
+        assert!(stt.custom_vocabulary.is_empty());
+        assert_eq!(stt.languages, ["en", "ru"]);
+        assert!(config.polish_enabled);
+        let prompt = crate::llm::prompt::build_system_prompt(
+            crate::llm::AppType::General,
+            &dictionary,
+            false,
+            "",
+            false,
+            None,
+            &[],
+        );
+        assert!(prompt.contains("\"Alina\""));
+    }
+
+    #[test]
+    fn explicit_recognition_hints_work_even_when_polish_is_off() {
+        let config: crate::storage::AppConfig = serde_json::from_value(serde_json::json!({
+            "stt_provider": "gemini-transcribe-live",
+            "stt_dictionary_hints_enabled": true,
+            "polish_enabled": false
+        }))
+        .unwrap();
+        let stt = build_stt_config(&config, "test-key".into(), vec!["Alina".into()]);
+        assert_eq!(stt.custom_vocabulary, ["Alina"]);
+        assert!(!config.polish_enabled);
+        let saved = serde_json::to_value(&config).unwrap();
+        assert_eq!(saved["stt_dictionary_hints_enabled"], true);
+    }
 
     /// A provider rejection shaped like the real thing: the status carried in the
     /// chain, the body echoed into the message.

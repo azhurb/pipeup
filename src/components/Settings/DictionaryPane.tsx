@@ -4,6 +4,7 @@ import { Trash2, Plus, Sparkles } from 'lucide-react'
 import { useAppStore } from '../../stores/appStore'
 import { addDictionaryEntry, removeDictionaryEntry, getDictionary } from '../../lib/tauri'
 import { toast } from '../Toast'
+import { Toggle } from './shared/Toggle'
 
 const isMac = typeof navigator !== 'undefined' && navigator.platform.toUpperCase().includes('MAC')
 
@@ -43,6 +44,22 @@ export function DictionaryPane() {
 
   return (
     <div className="space-y-4">
+      <div className="space-y-2 p-3 bg-bg-secondary rounded-[10px] border border-border">
+        <Toggle
+          label={t('dictionary.recognitionHints.label')}
+          checked={config.stt_dictionary_hints_enabled}
+          onChange={(checked) => updateConfig({ stt_dictionary_hints_enabled: checked })}
+          disabled={config.stt_provider !== 'gemini-transcribe-live'}
+        />
+        <p className="text-[12px] text-text-secondary">
+          {t('dictionary.recognitionHints.description')}
+        </p>
+        {config.stt_provider !== 'gemini-transcribe-live' && (
+          <p className="text-[12px] text-text-tertiary">
+            {t('dictionary.recognitionHints.unavailable')}
+          </p>
+        )}
+      </div>
       {isMac && (
         <div className="flex items-start gap-3 p-3 bg-bg-secondary rounded-[10px] border border-border">
           <input

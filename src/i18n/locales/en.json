@@ -241,7 +241,7 @@
     "pronunciation": "Pronunciation",
     "pronunciationOptional": "Pronunciation (optional)",
     "add": "Add",
-    "noEntries": "No entries yet. Add proper nouns to improve recognition accuracy.",
+    "noEntries": "No entries yet. Add names and technical terms for spelling corrections during AI processing.",
     "learnFromCorrections": {
       "label": "Learn from corrections (experimental)",
       "description": "After dictation, Pipeup watches your edits for ~15 s and offers to add fixed names and terms here. Reads the focused text field via macOS Accessibility - you'll be prompted to grant the permission on first use."
@@ -251,7 +251,12 @@
     "autoLearnedLabel": "Auto-learned from your edit",
     "autoLearnedTooltip": "Auto-learned. STT produced \"{{observed}}\".",
     "savedImmediately": "Words are saved as you add or remove them. Preference changes use the Save button.",
-    "removeWord": "Remove {{word}}"
+    "removeWord": "Remove {{word}}",
+    "recognitionHints": {
+      "label": "Use dictionary hints during speech recognition",
+      "description": "Off by default. Sends dictionary terms to Gemini to help recognize names and tools, but may replace similar-sounding words. AI processing can still make conservative spelling corrections when this is off.",
+      "unavailable": "Available with Gemini Live. Other speech providers do not use dictionary hints."
+    }
   },
   "correction": {
     "added": "Added \"{{new}}\" to your dictionary",

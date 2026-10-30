@@ -143,7 +143,17 @@ pub fn build_system_prompt(
     };
 
     if !dictionary.is_empty() {
-        prompt.push_str("\n\nIMPORTANT: The following are the user's custom terms. Always use these exact spellings:");
+        prompt.push_str(
+            "\n\nDICTIONARY SPELLING REFERENCES: The following entries are preferred spellings, not replacement instructions. \
+             Use an entry only when the transcript and context clearly identify that same name or term. \
+             Preserve a different valid word or name even if it sounds similar. Never insert a listed term merely because it is in the dictionary, \
+             and never turn an ordinary word into a product name. When uncertain, keep the transcript unchanged. \
+             For selected-text editing, honor the user's explicit editing instruction; dictionary entries must not expand its scope.\n\
+             Examples: with dictionary Alina, preserve Elena in 'Send the report to Elena'. \
+             With dictionary Claude, preserve the Russian word код in 'проверь код'. \
+             With dictionary OpenAI, 'open ai released a model' may become 'OpenAI released a model' when that company is clearly intended.\n\
+             Preferred spellings:",
+        );
         for word in dictionary {
             // Sanitize: remove quotes and newlines to prevent prompt injection
             let sanitized = word.replace('"', "").replace('\n', " ").replace('\r', "");

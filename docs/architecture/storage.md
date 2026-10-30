@@ -31,8 +31,9 @@ Verified against `src-tauri/src/storage/mod.rs::Default::default`:
 | --- | --- |
 | `stt_provider` | `glm-asr` |
 | `stt_languages` | `[]` (empty = auto-detect) |
+| `stt_dictionary_hints_enabled` | `false` |
 | `llm_provider` | `openrouter` |
-| `llm_model` | `google/gemini-2.5-flash` |
+| `llm_model` | `google/gemini-3.5-flash-lite` |
 | `polish_enabled` | `true` |
 | `translate_enabled` | `false` |
 | `target_lang` | `en` |
@@ -47,6 +48,10 @@ Verified against `src-tauri/src/storage/mod.rs::Default::default`:
 If you add or change a default, update this table in the same PR.
 
 ### Config migrations
+
+Older settings without `stt_dictionary_hints_enabled` deserialize as false through the existing
+Serde defaults. Explicit opt-ins persist through normal saves. Dictionary entries and the
+independent polish setting are preserved; no database migration is needed.
 
 `ConfigManager::load` runs two migrations on the raw JSON value before deserializing into `AppConfig`. Both are idempotent, and a mutated value is written back on the same load.
 
