@@ -49,6 +49,7 @@ User-facing promise: after transcription, the app can refine text by adding punc
 Repo evidence:
 
 - `polish_enabled`, `translate_enabled`, and `target_lang` are part of `AppConfig`.
+- Gemini transcribes verbatim before this optional step; disabling polish returns its raw transcript.
 - LLM calls are orchestrated in `src-tauri/src/pipeline.rs`.
 - Prompt construction lives in `src-tauri/src/llm/prompt.rs`.
 - Settings > AI processing exposes provider, model, an advanced endpoint override, AI processing, translation, and selected-text editing controls. The selected-text toggle is **disabled while AI processing is off** - the LLM is what applies the spoken instruction, so the setting would otherwise be enableable into a silent no-op.

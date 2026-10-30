@@ -195,16 +195,12 @@ impl LlmProvider for OpenAiProvider {
             let mut think = super::think::ThinkFilter::new();
             let mut stream = response.bytes_stream();
 
-            let mut buffer = String::new();
+            let mut lines = super::sse::SseLines::default();
             while let Some(chunk) = stream.next().await {
                 let chunk = chunk?;
-                buffer.push_str(&String::from_utf8_lossy(&chunk));
 
                 // Process SSE lines
-                while let Some(line_end) = buffer.find('\n') {
-                    let line = buffer[..line_end].trim().to_string();
-                    buffer = buffer[line_end + 1..].to_string();
-
+                for line in lines.push(&chunk)? {
                     if let Some(data) = line.strip_prefix("data: ") {
                         if data == "[DONE]" {
                             break;
