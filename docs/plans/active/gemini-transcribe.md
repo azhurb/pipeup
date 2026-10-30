@@ -63,6 +63,61 @@ claiming dictionary biasing works.
 
 Keep LLM polish optional for users who want more rewriting than smart transcription provides.
 
+## Dictation fidelity check, 2026-10-30
+
+Controlled API comparison using synthetic speech, not the user's missing recordings. The
+English passage was 151.7 seconds; the Russian passage was 139.5 seconds. Both included
+fillers, corrections, numerical details, qualifications, and a question. Separate short
+English and Russian recordings asked whether the listener could explain how something works.
+
+Gemini used the app's batch model, inline 16 kHz mono PCM WAV input, `en-US`/`ru-RU`
+language hints, and smart-mode object. Its raw results were then sent through the configured
+`qwen/qwen3.8-27b` on Groq using the current dictation prompt, General and Chat contexts,
+English/Russian language hints, temperature 0.3, 4,096-token ceiling, streaming enabled,
+and reasoning disabled. No selection, translation, or dictionary was supplied. The HTTP
+harness assembled complete SSE lines before decoding UTF-8; this comparison did not exercise
+microphone capture, app detection, or paste delivery.
+
+| Sample | Raw Gemini whitespace-separated words | After General polish | After Chat polish |
+| --- | --- | --- | --- |
+| Short English question | 7 | 8 | 8 |
+| Short Russian question | 6 | 6 | 6 |
+| Long English passage | 360 | 361 | 358 |
+| Long Russian passage | 237 | 237 | 236 |
+
+Word counts describe these samples only; they are not a fidelity score. All polish responses
+completed with `finish_reason: stop`.
+
+The substantive failure was already in the raw Russian smart transcript:
+
+- Source: "Семинар состоится семнадцатого ноября, не девятнадцатого". Smart output set the
+  date to **19 November**, reversing the stated correction.
+- Smart omitted "Эти группы пересекаются, это не семь разных людей" and "Аллергию нельзя
+  считать просто предпочтением", losing the overlapping attendee counts and allergy caveat.
+- It also removed the statement that the spoken question was part of the dictation.
+- General and Chat polish retained the wrong date and did not recover the missing details.
+
+On the **same Russian audio**, `mode: {"type": "verbatim"}` returned 261 words, preserved
+"17 ноября, не 19" and all three qualifications above. General polish of that verbatim
+transcript returned 260 words and kept those details. The documented `mode: "smart"` form
+returned a byte-identical transcript to the app's smart object. No Gemini request-shape
+change is justified by this comparison alone.
+
+Neither the single-sentence collapse nor answering a dictated question reproduced in these
+trials. The questions remained questions through both stages. The tests did not exercise
+selected-text edit mode, which uses a different prompt. Synthetic speech is a controlled
+probe, not evidence of the frequency of failures in natural, stuttering speech.
+
+Initial Groq requests with Python's default User-Agent received HTTP 403; an app-specific
+User-Agent succeeded. Two Russian polish requests then hit the per-minute output-token
+limit and succeeded after waiting. Neither transport failure was treated as model output.
+
+**Scope correction before release:** these trials used the older local checkout's batch
+provider. GitHub main had already replaced it with Gemini Live. They demonstrate a batch
+smart-mode fidelity failure, not the cause of the user's Live incidents. The batch provider
+remains removed. The release change applies verbatim mode to Gemini Live and keeps optional
+polish enabled by default. Live protocol verification is recorded in the release PR.
+
 ## Latency: a flat cost per dictation
 
 Measured 2026-08-28 from eleven real dictations through the app (log line pairs

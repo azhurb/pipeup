@@ -8,6 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 Pipeup originated as a fork of [Tover0314/opentypeless](https://github.com/tover0314-w/opentypeless). The entry for `0.1.0` describes the upstream baseline; `0.2.0` is the fork's first release, marking the BYOK-only direction and the changes listed below.
 
+## [0.9.6] - 2026-10-30
+
+### Fixed
+
+- Updated the async-trait dependency to fix generated-code Clippy errors with Rust 1.99.
+- Streaming AI polish preserves Cyrillic, CJK, and emoji characters across network chunk boundaries.
+- Gemini Live now requests verbatim transcription before optional AI polish, avoiding a second cleanup stage during recognition. Optional polish remains enabled by default and user-controlled.
+
 ## [0.9.5] - 2026-09-29
 
 ### Added

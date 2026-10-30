@@ -1,5 +1,6 @@
 pub mod openai;
 pub mod prompt;
+mod sse;
 pub mod think;
 
 use anyhow::Result;

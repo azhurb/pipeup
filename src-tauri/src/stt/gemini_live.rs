@@ -112,9 +112,10 @@ const CLOSE_TIMEOUT: Duration = Duration::from_secs(1);
 /// one final transcript per `activityStart`/`activityEnd` pair, even across a
 /// multi-second pause (verified live on 2026-09-28).
 ///
-/// Language, vocabulary and mode follow the batch provider, but the Live API
-/// spells its fields in camelCase and its modes in upper case.
-fn build_setup_message(languages: &[String], smart: bool, vocabulary: &[String]) -> String {
+/// Language and vocabulary use the Live API camelCase fields. Mode is always
+/// VERBATIM so recognition preserves details before the optional polish step.
+/// The shared `SttConfig.smart_format` hint intentionally does not affect Gemini.
+fn build_setup_message(languages: &[String], vocabulary: &[String]) -> String {
     let mut transcription = serde_json::Map::new();
 
     let codes: Vec<&str> = languages.iter().filter_map(|c| bcp47(c)).collect();
@@ -127,10 +128,7 @@ fn build_setup_message(languages: &[String], smart: bool, vocabulary: &[String])
         transcription.insert("customVocabulary".into(), serde_json::json!(terms));
     }
 
-    transcription.insert(
-        "mode".into(),
-        serde_json::json!(if smart { "SMART" } else { "VERBATIM" }),
-    );
+    transcription.insert("mode".into(), serde_json::json!("VERBATIM"));
 
     serde_json::json!({
         "setup": {
@@ -479,7 +477,6 @@ async fn open_session(config: &SttConfig) -> Result<WsStream> {
     let (mut ws, _) = connect_async(request).await?;
     ws.send(Message::Text(build_setup_message(
         &config.languages,
-        config.smart_format,
         &config.custom_vocabulary,
     )))
     .await?;
@@ -788,10 +785,10 @@ mod tests {
 
     type Item = std::result::Result<Message, tungstenite::Error>;
 
-    fn setup(languages: &[&str], smart: bool, vocabulary: &[&str]) -> serde_json::Value {
+    fn setup(languages: &[&str], vocabulary: &[&str]) -> serde_json::Value {
         let langs: Vec<String> = languages.iter().map(|s| s.to_string()).collect();
         let vocab: Vec<String> = vocabulary.iter().map(|s| s.to_string()).collect();
-        serde_json::from_str(&build_setup_message(&langs, smart, &vocab)).unwrap()
+        serde_json::from_str(&build_setup_message(&langs, &vocab)).unwrap()
     }
 
     /// The server's framing: JSON in a binary frame.
@@ -856,7 +853,7 @@ mod tests {
 
     #[test]
     fn setup_disables_server_vad_for_push_to_talk() {
-        let v = setup(&[], true, &[]);
+        let v = setup(&[], &[]);
         assert_eq!(v["setup"]["model"], "models/gemini-3.5-transcribe-live");
         assert_eq!(
             v["setup"]["generationConfig"]["responseModalities"],
@@ -869,17 +866,17 @@ mod tests {
     }
 
     #[test]
-    fn setup_maps_mode_languages_and_vocabulary() {
-        let v = setup(&["en", "de", "xx"], true, &["Pipeup", "Tauri"]);
+    fn setup_always_uses_verbatim_and_preserves_languages_and_vocabulary() {
+        let v = setup(&["en", "de", "xx"], &["Pipeup", "Tauri"]);
         let t = &v["setup"]["inputAudioTranscription"];
-        assert_eq!(t["mode"], "SMART");
+        assert_eq!(t["mode"], "VERBATIM");
         assert_eq!(t["languageCodes"], serde_json::json!(["en-US", "de-DE"]));
         assert_eq!(
             t["customVocabulary"],
             serde_json::json!(["Pipeup", "Tauri"])
         );
 
-        let v = setup(&[], false, &[]);
+        let v = setup(&[], &[]);
         let t = &v["setup"]["inputAudioTranscription"];
         assert_eq!(t["mode"], "VERBATIM");
         assert!(
@@ -892,8 +889,7 @@ mod tests {
     #[test]
     fn setup_caps_vocabulary_at_the_api_limit() {
         let words: Vec<String> = (0..1500).map(|i| format!("w{i}")).collect();
-        let v: serde_json::Value =
-            serde_json::from_str(&build_setup_message(&[], true, &words)).unwrap();
+        let v: serde_json::Value = serde_json::from_str(&build_setup_message(&[], &words)).unwrap();
         let sent = v["setup"]["inputAudioTranscription"]["customVocabulary"]
             .as_array()
             .unwrap();
@@ -1210,7 +1206,7 @@ mod tests {
         };
         let config = SttConfig {
             api_key,
-            languages: vec!["en".to_string()],
+            languages: vec!["en".to_string(), "ru".to_string()],
             smart_format: true,
             sample_rate: 16000,
             custom_vocabulary: vec!["Pipeup".to_string()],

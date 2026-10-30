@@ -99,9 +99,15 @@ Match arms currently registered in `stt::create_provider`:
 
 `gemini-transcribe-live` runs `gemini-3.5-transcribe-live` over the Live API: a WebSocket to `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent`, implemented in `src-tauri/src/stt/gemini_live.rs`. It is the only Gemini option in Settings and onboarding, and it replaced the batch provider (above).
 
+Gemini Live always requests verbatim transcription to retain dictated details before optional
+LLM polish. The shared `SttConfig.smart_format` hint cannot enable Gemini smart cleanup.
+Polish remains independently controlled by `polish_enabled`, enabled by default. The fidelity
+comparison in [the historical batch notes](../plans/active/gemini-transcribe.md#dictation-fidelity-check-2026-10-30)
+tested the removed batch model; it does not establish the cause of the reported Live failures.
+
 **Key.** It reads the key saved under the batch provider's id. `credentials::CredentialId::new` maps the STT id `gemini-transcribe-live` onto `gemini-transcribe` (`STT_KEY_ALIASES`), so every read, write, presence check and deletion shares one vault entry. The key goes in an `x-goog-api-key` header rather than the documented `?key=` query parameter, so it never appears in a URL.
 
-**Push-to-talk protocol.** `connect` sends `setup` with `automaticActivityDetection.disabled: true`, waits for `setupComplete` (8 s bound), then sends `activityStart`. Audio streams as base64 `audio/pcm;rate=16000` in 100 ms messages. `disconnect` flushes the remainder, sends `activityEnd`, and waits for the turn's final transcript (10 s bound). Transcription settings (`languageCodes` via `gemini_live::bcp47`, `customVocabulary` capped at 1,000, `mode` `SMART` or `VERBATIM`), in the Live API's camelCase and upper-case spelling.
+**Push-to-talk protocol.** `connect` sends `setup` with `automaticActivityDetection.disabled: true`, waits for `setupComplete` (8 s bound), then sends `activityStart`. Audio streams as base64 `audio/pcm;rate=16000` in 100 ms messages. `disconnect` flushes the remainder, sends `activityEnd`, and waits for the turn's final transcript (10 s bound). Transcription settings (`languageCodes` via `gemini_live::bcp47`, `customVocabulary` capped at 1,000, `mode` always `VERBATIM`), in the Live API's camelCase and upper-case spelling.
 
 **Verified against the live API on 2026-09-28**, with a raw WebSocket probe and with the Rust path (`stt::gemini_live::tests::live_streams_speech_against_the_real_api`, `#[ignore]`d since it needs a key and a network). Findings the code depends on:
 
@@ -156,6 +162,11 @@ fn name(&self) -> &str;
 ```
 
 `OpenAiProvider` handles OpenAI-compatible providers via `base_url` + `model`. All registered LLM providers go through it.
+
+Streaming polish buffers response bytes until a complete SSE line is available before
+decoding UTF-8 (`llm::sse::SseLines`). HTTP chunk boundaries can split Cyrillic, CJK, or
+emoji characters; invalid UTF-8 in a complete line returns a normal polish error.
+
 
 Frontend LLM provider IDs (`src/stores/appStore.ts`): `zhipu`, `deepseek`, `siliconflow`, `openai`, `gemini`, `moonshot`, `qwen`, `groq`, `claude`, `ollama`, `openrouter`.
 
